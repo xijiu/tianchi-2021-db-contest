@@ -32,7 +32,7 @@ JVM参数默认如下：
 
 
 # 测试数据说明
-复赛只有两张表 lineitem 和 orders，每表两列（均为 bigint），每表数据量10亿行。
+复赛有两张表 lineitem 和 orders，每表均有两列。为减少选手工作量，类型均为bigint和初赛保持一致，每表数据量均为10亿行。
 格式如下：
 ```
 L_ORDERKEY,L_PARTKEY
