@@ -137,6 +137,8 @@ public class MyAnalyticDB implements AnalyticDB {
       File dataFile = files[i];
       System.out.println("stable target file name is " + dataFile.getName() + ", target file size is " + dataFile.length());
       operateFirstFile = i == 0;
+      totalFinishThreadNum.set(0);
+      finishThreadNum.set(0);
       storeBlockData(dataFile);
     }
     loadCostTime = System.currentTimeMillis() - begin;
