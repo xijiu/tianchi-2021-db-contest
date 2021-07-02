@@ -267,16 +267,14 @@ public class MyAnalyticDB implements AnalyticDB {
         }
         totalFinishThreadNum.incrementAndGet();
 
-        if (finishNum < 3) {
-          while (true) {
-            if (totalFinishThreadNum.get() == cpuThreadNum) {
-              long sortBegin = System.currentTimeMillis();
-              sortDataTest();
-              sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
-              break;
-            } else {
-              Thread.sleep(1);
-            }
+        while (true) {
+          if (totalFinishThreadNum.get() == cpuThreadNum) {
+            long sortBegin = System.currentTimeMillis();
+            sortDataTest();
+            sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
+            break;
+          } else {
+            Thread.sleep(1);
           }
         }
       } catch (Exception e) {
