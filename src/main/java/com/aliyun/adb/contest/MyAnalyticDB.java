@@ -176,7 +176,7 @@ public class MyAnalyticDB implements AnalyticDB {
   }
 
   public void storeBlockData(File dataFile) throws Exception {
-    if (1 == 1) {
+    if (2 == 2) {
       BufferedReader br = new BufferedReader(new FileReader(dataFile));
       System.out.println("first :" + br.readLine());
       System.out.println("first2 :" + br.readLine());
