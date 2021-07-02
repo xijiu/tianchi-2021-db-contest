@@ -2,7 +2,9 @@ package com.aliyun.adb.contest;
 
 import com.aliyun.adb.contest.spi.AnalyticDB;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -174,6 +176,12 @@ public class MyAnalyticDB implements AnalyticDB {
   }
 
   public void storeBlockData(File dataFile) throws Exception {
+    if (1 == 1) {
+      BufferedReader br = new BufferedReader(new FileReader(dataFile));
+      System.out.println("first :" + br.readLine());
+      System.out.println("first2 :" + br.readLine());
+      return;
+    }
     long begin = System.currentTimeMillis();
     FileChannel fileChannel = FileChannel.open(dataFile.toPath(), StandardOpenOption.READ);
     // 跳过第一行
@@ -298,7 +306,7 @@ public class MyAnalyticDB implements AnalyticDB {
           List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData2 : diskBlockData4;
           diskBlocks.get(index).query();
         }
-        System.out.println("sort index is " + index + ", cost time is " + (System.currentTimeMillis() - totalBeginTime));
+//        System.out.println("sort index is " + index + ", cost time is " + (System.currentTimeMillis() - totalBeginTime));
       }
     }
 
