@@ -122,6 +122,7 @@ public class DiskBlock {
     ByteBuffer buffer = ByteBuffer.allocate(7 * 1024 * 128);
     byte[] batchWriteArr = buffer.array();
     int idx = 0;
+    fileChannel.position(0);
     while (true) {
       buffer.clear();
       int flag = fileChannel.read(buffer);
