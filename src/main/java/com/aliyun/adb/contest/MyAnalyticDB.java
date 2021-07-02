@@ -83,6 +83,8 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final AtomicLong writeFileTime = new AtomicLong();
 
+  private final AtomicLong sortDataTime = new AtomicLong();
+
   public MyAnalyticDB() {
     try {
       long begin = System.currentTimeMillis();
@@ -132,8 +134,10 @@ public class MyAnalyticDB implements AnalyticDB {
       storeBlockData(dataFile);
     }
     loadCostTime = System.currentTimeMillis() - begin;
-    System.out.println("============> read file cost time : " + readFileTime.get());
-    System.out.println("============> write file cost time : " + writeFileTime.get());
+    System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
+    System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
+    System.out.println("============> sort data cost time : " + sortDataTime.get() / cpuThreadNum);
+    System.out.println("");
     System.out.println("============> stable load cost time : " + loadCostTime);
   }
 
@@ -255,7 +259,9 @@ public class MyAnalyticDB implements AnalyticDB {
         totalFinishThreadNum.incrementAndGet();
 
         while (totalFinishThreadNum.get() == cpuThreadNum) {
+          long sortBegin = System.currentTimeMillis();
           sortDataTest();
+          sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
           break;
         }
       } catch (Exception e) {
