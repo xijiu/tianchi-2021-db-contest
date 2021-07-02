@@ -6,6 +6,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -69,6 +70,8 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private volatile long loadCostTime = 1000000000L;
 
+  private static volatile boolean operateFirstFile = true;
+
   public MyAnalyticDB() {
     try {
       long begin = System.currentTimeMillis();
@@ -85,11 +88,20 @@ public class MyAnalyticDB implements AnalyticDB {
    */
   private void init() throws InterruptedException {
     for (int i = 0; i < blockNum; i++) {
-      diskBlockData1.add(new DiskBlock(1, i));
-      diskBlockData2.add(new DiskBlock(2, i));
-      diskBlockData3.add(new DiskBlock(3, i));
-      diskBlockData4.add(new DiskBlock(4, i));
+      diskBlockData1.add(new DiskBlock("1", 1, i));
+      diskBlockData2.add(new DiskBlock("1", 2, i));
+      diskBlockData3.add(new DiskBlock("2", 1, i));
+      diskBlockData4.add(new DiskBlock("2", 2, i));
     }
+    Thread thread = new Thread(() -> {
+      try {
+        Thread.sleep(1000 * 5 * 60);
+        System.exit(0);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    });
+    thread.start();
   }
 
 
@@ -101,16 +113,13 @@ public class MyAnalyticDB implements AnalyticDB {
     DiskBlock.workspaceDir = workspaceDir;
     File dir = new File(tpchDataFileDir);
 
-    for (File dataFile : Objects.requireNonNull(dir.listFiles())) {
+    File[] files = dir.listFiles();
+    for (int i = 0; i < files.length; i++) {
+      File dataFile = files[i];
       System.out.println("stable target file name is " + dataFile.getName() + ", target file size is " + dataFile.length());
+      operateFirstFile = i == 0;
       storeBlockData(dataFile);
     }
-
-    System.out.println("stable thread prepare join");
-    for (int i = DiskBlock.concurrenceQueryDiskNum - 1; i < cpuThreadNum; i++) {
-      cpuThread[i].join();
-    }
-
     loadCostTime = System.currentTimeMillis() - begin;
     System.out.println("============> stable load cost time : " + loadCostTime);
   }
@@ -140,6 +149,7 @@ public class MyAnalyticDB implements AnalyticDB {
   }
 
   public void storeBlockData(File dataFile) throws Exception {
+    long begin = System.currentTimeMillis();
     FileChannel fileChannel = FileChannel.open(dataFile.toPath(), StandardOpenOption.READ);
     // 跳过第一行
     fileChannel.position(21);
@@ -158,6 +168,11 @@ public class MyAnalyticDB implements AnalyticDB {
       cpuThread[i].setName("stable-thread-" + i);
       cpuThread[i].start();
     }
+
+    for (int i = 0; i < cpuThreadNum; i++) {
+      cpuThread[i].join();
+    }
+    System.out.println("operate file " + dataFile.toPath() + ", cost time is " + (System.currentTimeMillis() - begin));
   }
 
   public class CpuThread extends Thread {
@@ -186,18 +201,13 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private long[] bucketLongArr = new long[readFileLen / 8 / 2];
 
-    private int bucketLongArrIndex = 0;
-
     private int bucket = -1;
-
-    private final int tmp;
 
     public CpuThread(int index, FileChannel fileChannel, AtomicInteger number) throws Exception {
       this.threadIndex = index;
       this.fileChannel = fileChannel;
       this.fileSize = fileChannel.size();
       this.number = number;
-      this.tmp = threadIndex * blockNum;
     }
 
     public void run() {
@@ -228,42 +238,12 @@ public class MyAnalyticDB implements AnalyticDB {
           }
         }
         totalFinishThreadNum.incrementAndGet();
-
-
-        if (threadIndex < DiskBlock.concurrenceQueryDiskNum - 1) {
-          while (true) {
-            if (DiskBlock.queryDiskFlag.get(threadIndex) == 0) {
-              Thread.sleep(2);
-              continue;
-            } else {
-              DiskBlock.queryDiskFlag.set(threadIndex, 0);
-              int count = DiskBlock.countArr[threadIndex];
-              int index = DiskBlock.indexArr[threadIndex];
-
-              byte[] batchWriteArr = new byte[count * 7];
-
-              ByteBuffer buffer = ByteBuffer.wrap(batchWriteArr);
-              DiskBlock.totalFileChannel.read(buffer, index * 7L);
-              buffer.flip();
-
-              int idx = 0;
-              int endCount = index + count;
-              for (int i = index; i < endCount; i++) {
-                MyAnalyticDB.sortArr[i] = DiskBlock.makeLong(
-                        DiskBlock.totalBytePrev, batchWriteArr[idx++], batchWriteArr[idx++], batchWriteArr[idx++],
-                        batchWriteArr[idx++], batchWriteArr[idx++], batchWriteArr[idx++], batchWriteArr[idx++]);
-              }
-
-              DiskBlock.finishQueryThreadNum.incrementAndGet();
-            }
-          }
-        }
       } catch (Exception e) {
         finishThreadNum.incrementAndGet();
         e.printStackTrace();
       }
       long cost = System.currentTimeMillis() - begin;
-      System.out.println("stable " + Thread.currentThread().getName() + " cost time : " + cost);
+      System.out.println(Thread.currentThread().getName() + " cost time : " + cost);
     }
 
     private int tmpBlockIndex = -1;
@@ -418,7 +398,8 @@ public class MyAnalyticDB implements AnalyticDB {
       firstColDataLen[(threadIndex << 7) + blockIndex] += length;
 
       putToByteBuffer(firstThreadCacheArr[blockIndex], length);
-      diskBlockData1.get(blockIndex).storeArr(batchWriteBuffer);
+      List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData1 : diskBlockData3;
+      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -428,7 +409,8 @@ public class MyAnalyticDB implements AnalyticDB {
       secondColDataLen[(threadIndex << 7) + blockIndex] += length;
 
       putToByteBuffer(secondThreadCacheArr[blockIndex], length);
-      diskBlockData2.get(blockIndex).storeArr(batchWriteBuffer);
+      List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData2 : diskBlockData4;
+      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
     }
 
     private void putToByteBuffer(long[] data, int length) {
@@ -468,7 +450,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-    if (++time == 10) {
+    if (1 == 1) {
       return "0";
     }
 

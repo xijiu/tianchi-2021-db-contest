@@ -45,11 +45,14 @@ public class DiskBlock {
 
   public static AtomicInteger finishQueryThreadNum = new AtomicInteger();
 
+  private final String tableName;
 
 
 
 
-  public DiskBlock(int col, int blockIndex) {
+
+  public DiskBlock(String tableName, int col, int blockIndex) {
+    this.tableName = tableName;
     this.col = col;
     this.blockIndex = blockIndex;
     this.bytePrev = (byte) blockIndex;
@@ -129,7 +132,7 @@ public class DiskBlock {
     if (fileChannel == null) {
       synchronized (this) {
         if (fileChannel == null) {
-          file = new File(workspaceDir + "/" + col + "_" + blockIndex + ".data");
+          file = new File(workspaceDir + "/" + tableName + "/" + col + "_" + blockIndex + ".data");
           if (file.exists()) {
             file.delete();
           }
