@@ -85,6 +85,8 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final AtomicLong sortDataTime = new AtomicLong();
 
+  private final long totalBeginTime = System.currentTimeMillis();
+
   public MyAnalyticDB() {
     try {
       long begin = System.currentTimeMillis();
@@ -296,7 +298,7 @@ public class MyAnalyticDB implements AnalyticDB {
           List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData2 : diskBlockData4;
           diskBlocks.get(index).query();
         }
-        System.out.println("sort index is " + index);
+        System.out.println("sort index is " + index + ", cost time is " + (System.currentTimeMillis() - totalBeginTime));
       }
     }
 
