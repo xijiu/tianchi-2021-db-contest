@@ -188,21 +188,21 @@ public class DiskBlock {
     Arrays.sort(result, 0, size);
 
 
-//    buffer.clear();
-//    for (int i = 0; i < size; i++) {
-//      if (!buffer.hasRemaining()) {
-//        buffer.flip();
-//        sortedFileChannel.write(buffer);
-//        buffer.clear();
-//      }
-//      long element = result[i];
-//      buffer.put((byte)(element >> 48));
-//      buffer.put((byte)(element >> 40));
-//      buffer.put((byte)(element >> 32));
-//      buffer.put((byte)(element >> 24));
-//      buffer.put((byte)(element >> 16));
-//      buffer.put((byte)(element >> 8));
-//      buffer.put((byte)(element));
-//    }
+    buffer.clear();
+    for (int i = 0; i < size; i++) {
+      if (!buffer.hasRemaining()) {
+        buffer.flip();
+        sortedFileChannel.write(buffer);
+        buffer.clear();
+      }
+      long element = result[i];
+      buffer.put((byte)(element >> 48));
+      buffer.put((byte)(element >> 40));
+      buffer.put((byte)(element >> 32));
+      buffer.put((byte)(element >> 24));
+      buffer.put((byte)(element >> 16));
+      buffer.put((byte)(element >> 8));
+      buffer.put((byte)(element));
+    }
   }
 }
