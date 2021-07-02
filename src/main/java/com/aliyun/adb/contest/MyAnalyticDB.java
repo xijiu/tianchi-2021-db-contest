@@ -183,6 +183,7 @@ public class MyAnalyticDB implements AnalyticDB {
     }
     System.out.println("table 1 firstSum is " + firstSum);
 
+    firstSum = 0;
     for (int i = 0; i < table_1_BlockDataNumArr2.length; i++) {
       int tmp = 0;
       for (int j = 0; j < cpuThreadNum; j++) {
@@ -190,6 +191,7 @@ public class MyAnalyticDB implements AnalyticDB {
         tmp += cpuThread[j].secondCacheLengthArr[i];
       }
       table_1_BlockDataNumArr2[i] = tmp;
+      firstSum += tmp;
     }
     System.out.println("table 1 secondSum is " + firstSum);
   }
@@ -205,8 +207,9 @@ public class MyAnalyticDB implements AnalyticDB {
       table_2_BlockDataNumArr1[i] = tmp;
       firstSum += tmp;
     }
-    System.out.println("table 1 firstSum is " + firstSum);
+    System.out.println("table 2 firstSum is " + firstSum);
 
+    firstSum = 0;
     for (int i = 0; i < table_2_BlockDataNumArr2.length; i++) {
       int tmp = 0;
       for (int j = 0; j < cpuThreadNum; j++) {
@@ -214,8 +217,9 @@ public class MyAnalyticDB implements AnalyticDB {
         tmp += cpuThread[j].secondCacheLengthArr[i];
       }
       table_2_BlockDataNumArr2[i] = tmp;
+      firstSum += tmp;
     }
-    System.out.println("table 1 secondSum is " + firstSum);
+    System.out.println("table 2 secondSum is " + firstSum);
   }
 
   public void storeBlockData(File dataFile) throws Exception {
