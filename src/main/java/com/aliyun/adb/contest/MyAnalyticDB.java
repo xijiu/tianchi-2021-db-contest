@@ -142,9 +142,11 @@ public class MyAnalyticDB implements AnalyticDB {
     System.out.println("stable load invoked, time is " + begin);
 
     DiskBlock.workspaceDir = workspaceDir;
-    File dir = new File(tpchDataFileDir);
 
-    File[] files = dir.listFiles();
+    File file1 = new File(tpchDataFileDir + "/lineitem");
+    File file2 = new File(tpchDataFileDir + "/orders");
+
+    File[] files = {file1, file2};
     for (int i = 0; i < files.length; i++) {
       File dataFile = files[i];
       System.out.println("stable target file name is " + dataFile.getName() + ", target file size is " + dataFile.length());
@@ -675,7 +677,7 @@ public class MyAnalyticDB implements AnalyticDB {
       total += count;
       if (total >= number) {
         int index = number - beforeTotal - 1;
-        System.out.println("stable second number read disk");
+        System.out.println("second number read disk, block index is " + i);
         return String.valueOf(diskBlockData4.get(i).get(index, count));
       }
     }

@@ -73,7 +73,7 @@ public class DiskBlock {
     sortedFileChannel.read(byteBuffer, index * 7L);
     byte[] array = byteBuffer.array();
     int i = 0;
-    return makeLong(bytePrev, array[i++], array[i++], array[i++], array[i++], array[i++], array[i++], array[i++]);
+    return makeLong(bytePrev, array[0], array[1], array[2], array[3], array[4], array[5], array[6]);
   }
 
   private void currentThreadQuery() throws Exception {
