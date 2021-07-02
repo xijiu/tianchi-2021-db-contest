@@ -26,7 +26,11 @@ public class DiskBlock {
 
   private File file = null;
 
+  private File sortedFile = null;
+
   private volatile FileChannel fileChannel = null;
+
+  private volatile FileChannel sortedFileChannel = null;
 
   public static final int cacheLength = 4096 * 3;
 
@@ -137,13 +141,21 @@ public class DiskBlock {
           if (!path.exists()) {
             path.mkdirs();
           }
+
           file = new File(workspaceDir + "/" + tableName + "/" + col + "_" + blockIndex + ".data");
           if (file.exists()) {
             file.delete();
           }
           file.createNewFile();
           fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
-//          mappedBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, 25 * 1024 * 1024);
+
+          // sorted file
+          sortedFile = new File(workspaceDir + "/" + tableName + "/sorted_" + col + "_" + blockIndex + ".data");
+          if (sortedFile.exists()) {
+            sortedFile.delete();
+          }
+          sortedFile.createNewFile();
+          sortedFileChannel = FileChannel.open(sortedFile.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
         }
       }
     }
@@ -171,5 +183,24 @@ public class DiskBlock {
     }
 
     Arrays.sort(result);
+
+
+    buffer.clear();
+
+    for (int i = 0; i < size; i++) {
+      if (!buffer.hasRemaining()) {
+        buffer.flip();
+        sortedFileChannel.write(buffer);
+        buffer.clear();
+      }
+      long element = result[i];
+      buffer.put((byte)(element >> 48));
+      buffer.put((byte)(element >> 40));
+      buffer.put((byte)(element >> 32));
+      buffer.put((byte)(element >> 24));
+      buffer.put((byte)(element >> 16));
+      buffer.put((byte)(element >> 8));
+      buffer.put((byte)(element));
+    }
   }
 }
