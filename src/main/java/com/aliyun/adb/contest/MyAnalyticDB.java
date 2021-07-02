@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class MyAnalyticDB implements AnalyticDB {
 
@@ -72,6 +73,12 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private static volatile boolean operateFirstFile = true;
 
+  private final AtomicLong readFileTime = new AtomicLong();
+
+  private final AtomicLong cpuTime = new AtomicLong();
+
+  private final AtomicLong writeFileTime = new AtomicLong();
+
   public MyAnalyticDB() {
     try {
       long begin = System.currentTimeMillis();
@@ -121,6 +128,8 @@ public class MyAnalyticDB implements AnalyticDB {
       storeBlockData(dataFile);
     }
     loadCostTime = System.currentTimeMillis() - begin;
+    System.out.println("============> read file cost time : " + readFileTime.get());
+    System.out.println("============> write file cost time : " + writeFileTime.get());
     System.out.println("============> stable load cost time : " + loadCostTime);
   }
 
@@ -217,7 +226,9 @@ public class MyAnalyticDB implements AnalyticDB {
       long begin = System.currentTimeMillis();
       try {
         while (true) {
+          long readTime1 = System.currentTimeMillis();
           byte[] data = threadReadData();
+          readFileTime.addAndGet(System.currentTimeMillis() - readTime1);
 
           if (data != null) {
             operate(data);
@@ -399,7 +410,10 @@ public class MyAnalyticDB implements AnalyticDB {
 
       putToByteBuffer(firstThreadCacheArr[blockIndex], length);
       List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData1 : diskBlockData3;
+
+      long writeTime1 = System.currentTimeMillis();
       diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
+      writeFileTime.addAndGet(System.currentTimeMillis() - writeTime1);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -410,7 +424,10 @@ public class MyAnalyticDB implements AnalyticDB {
 
       putToByteBuffer(secondThreadCacheArr[blockIndex], length);
       List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData2 : diskBlockData4;
+
+      long writeTime1 = System.currentTimeMillis();
       diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
+      writeFileTime.addAndGet(System.currentTimeMillis() - writeTime1);
     }
 
     private void putToByteBuffer(long[] data, int length) {
