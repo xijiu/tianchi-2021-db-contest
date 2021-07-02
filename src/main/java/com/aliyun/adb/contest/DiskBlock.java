@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
@@ -146,5 +147,22 @@ public class DiskBlock {
         }
       }
     }
+  }
+
+  public void query() throws Exception {
+    ByteBuffer buffer = ByteBuffer.allocate((int) file.length());
+    fileChannel.read(buffer);
+
+    byte[] batchWriteArr = buffer.array();
+    int size = (int) (file.length() / 7);
+    long[] result = new long[size];
+
+    int idx = 0;
+    for (int i = 0; i < size; i++) {
+      result[i] = DiskBlock.makeLong(
+              DiskBlock.totalBytePrev, batchWriteArr[idx++], batchWriteArr[idx++], batchWriteArr[idx++],
+              batchWriteArr[idx++], batchWriteArr[idx++], batchWriteArr[idx++], batchWriteArr[idx++]);
+    }
+    Arrays.sort(result);
   }
 }

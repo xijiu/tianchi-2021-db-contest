@@ -63,7 +63,11 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final List<DiskBlock> diskBlockData1 = new ArrayList<>(blockNum);
 
+  private final AtomicInteger tableHelper1 = new AtomicInteger();
+
   private final List<DiskBlock> diskBlockData2 = new ArrayList<>(blockNum);
+
+  private final AtomicInteger tableHelper2 = new AtomicInteger();
 
   private final List<DiskBlock> diskBlockData3 = new ArrayList<>(blockNum);
 
@@ -249,12 +253,33 @@ public class MyAnalyticDB implements AnalyticDB {
           }
         }
         totalFinishThreadNum.incrementAndGet();
+
+        while (totalFinishThreadNum.get() == cpuThreadNum) {
+          sortDataTest();
+          break;
+        }
       } catch (Exception e) {
         finishThreadNum.incrementAndGet();
         e.printStackTrace();
       }
       long cost = System.currentTimeMillis() - begin;
       System.out.println(Thread.currentThread().getName() + " cost time : " + cost);
+    }
+
+    private void sortDataTest() throws Exception {
+      AtomicInteger num = operateFirstFile ? tableHelper1 : tableHelper2;
+      int totalNum = blockNum * 2;
+      int index;
+      while ((index = num.getAndIncrement()) < totalNum) {
+        if (index < blockNum) {
+          List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData1 : diskBlockData3;
+          diskBlocks.get(index).query();
+        } else {
+          index -= blockNum;
+          List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData2 : diskBlockData4;
+          diskBlocks.get(index).query();
+        }
+      }
     }
 
     private int tmpBlockIndex = -1;
