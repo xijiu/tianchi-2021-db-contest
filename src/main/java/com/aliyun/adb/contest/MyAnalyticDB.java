@@ -267,7 +267,7 @@ public class MyAnalyticDB implements AnalyticDB {
         }
         totalFinishThreadNum.incrementAndGet();
 
-        if (finishNum < 5) {
+        if (finishNum < 3) {
           while (true) {
             if (totalFinishThreadNum.get() == cpuThreadNum) {
               long sortBegin = System.currentTimeMillis();
