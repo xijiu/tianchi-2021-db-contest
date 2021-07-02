@@ -258,12 +258,17 @@ public class MyAnalyticDB implements AnalyticDB {
         }
         totalFinishThreadNum.incrementAndGet();
 
-        while (totalFinishThreadNum.get() == cpuThreadNum) {
-          long sortBegin = System.currentTimeMillis();
-          sortDataTest();
-          sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
-          break;
+        while (true) {
+          if (totalFinishThreadNum.get() == cpuThreadNum) {
+            long sortBegin = System.currentTimeMillis();
+            sortDataTest();
+            sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
+            break;
+          } else {
+            Thread.sleep(1);
+          }
         }
+
       } catch (Exception e) {
         finishThreadNum.incrementAndGet();
         e.printStackTrace();
@@ -285,6 +290,7 @@ public class MyAnalyticDB implements AnalyticDB {
           List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData2 : diskBlockData4;
           diskBlocks.get(index).query();
         }
+        System.out.println("sort index is " + index);
       }
     }
 
