@@ -634,7 +634,7 @@ public class MyAnalyticDB implements AnalyticDB {
       total += count;
       if (total >= number) {
         int index = number - beforeTotal - 1;
-        System.out.println("stable first number read disk");
+        System.out.println("stable first number read disk, block index is " + i);
         return String.valueOf(diskBlockData1.get(i).get(index, count));
       }
     }
@@ -649,7 +649,7 @@ public class MyAnalyticDB implements AnalyticDB {
       total += count;
       if (total >= number) {
         int index = number - beforeTotal - 1;
-        System.out.println("stable first number read disk");
+        System.out.println("stable first number read disk, block index is " + i);
         return String.valueOf(diskBlockData3.get(i).get(index, count));
       }
     }
@@ -666,7 +666,7 @@ public class MyAnalyticDB implements AnalyticDB {
       total += count;
       if (total >= number) {
         int index = number - beforeTotal - 1;
-        System.out.println("stable second number read disk");
+        System.out.println("stable second number read disk, block index is " + i);
         return String.valueOf(diskBlockData2.get(i).get(index, count));
       }
     }
