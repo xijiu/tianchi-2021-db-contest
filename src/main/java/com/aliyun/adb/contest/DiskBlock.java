@@ -164,7 +164,7 @@ public class DiskBlock {
   public void query() throws Exception {
     System.out.println("file length is " + (file.length()));
     int size = (int) (file.length() / 7);
-    long[] result = new long[size];
+//    long[] result = new long[size];
 //    ByteBuffer buffer = ByteBuffer.allocate(7 * 1024 * 128);
 //    byte[] batchWriteArr = buffer.array();
 //    int idx = 0;
