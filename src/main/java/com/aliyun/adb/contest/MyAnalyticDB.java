@@ -164,6 +164,7 @@ public class MyAnalyticDB implements AnalyticDB {
   private void setInvokeFlag(String workspaceDir) {
     File file = new File(workspaceDir);
     File[] files = file.listFiles();
+    System.out.println("files is " + files.length);
     isFirstInvoke = files == null || files.length <= 0;
   }
 

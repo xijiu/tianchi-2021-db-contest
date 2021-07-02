@@ -16,6 +16,9 @@ public class ReadCharTest {
 
   @Test
   public void test3() throws Exception {
+    // lineitem L_ORDERKEY,L_PARTKEY
+    // orders   O_ORDERKEY,O_CUSTKEY
+
     String str = "L_ORDERKEY,L_PARTKEY";
     System.out.println(str.getBytes().length);
 
@@ -85,7 +88,7 @@ public class ReadCharTest {
 
   public static void main(String[] args) throws Exception {
     MyAnalyticDB myAnalyticDB = new MyAnalyticDB();
-    myAnalyticDB.load("/Users/likangning/test/char_files", "/Users/likangning/test/tmp");
+    myAnalyticDB.load("/Users/likangning/test/sourceFile", "/Users/likangning/test/tmp");
     // L_ORDERKEY  L_PARTKEY
 
     Assert.assertEquals("1272464117860178902", myAnalyticDB.quantile("a", "L_ORDERKEY", 0.138D));
