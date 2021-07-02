@@ -122,19 +122,20 @@ public class DiskBlock {
     ByteBuffer buffer = ByteBuffer.allocate(7 * 1024 * 128);
     byte[] batchWriteArr = buffer.array();
     int idx = 0;
-    fileChannel.position(0);
+    long pos = 0;
     while (true) {
       buffer.clear();
-      int flag = fileChannel.read(buffer);
-      if (flag == -1) {
-        break;
-      }
+      fileChannel.read(buffer, pos);
       buffer.flip();
       int length = buffer.position();
       for (int i = 0; i < length; i += 7) {
         result[idx++] = DiskBlock.makeLong(
                 bytePrev, batchWriteArr[i], batchWriteArr[i + 1], batchWriteArr[i + 2],
                 batchWriteArr[i + 3], batchWriteArr[i + 4], batchWriteArr[i + 5], batchWriteArr[i + 6]);
+      }
+      pos += length;
+      if (pos >= file.length()) {
+        break;
       }
     }
 
