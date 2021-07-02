@@ -241,13 +241,13 @@ public class MyAnalyticDB implements AnalyticDB {
       cpuThread[i].join();
     }
 
-    if (operateFirstFile) {
-      statPerBlockCount1();
-      Arrays.fill(firstColDataLen, 0);
-      Arrays.fill(secondColDataLen, 0);
-    } else {
-      statPerBlockCount2();
-    }
+//    if (operateFirstFile) {
+//      statPerBlockCount1();
+//      Arrays.fill(firstColDataLen, 0);
+//      Arrays.fill(secondColDataLen, 0);
+//    } else {
+//      statPerBlockCount2();
+//    }
     System.out.println("operate file " + dataFile.toPath() + ", cost time is " + (System.currentTimeMillis() - begin));
   }
 
