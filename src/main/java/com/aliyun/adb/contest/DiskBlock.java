@@ -70,7 +70,6 @@ public class DiskBlock {
     ByteBuffer byteBuffer = ByteBuffer.allocate(7);
     sortedFileChannel.read(byteBuffer, index * 7L);
     byte[] array = byteBuffer.array();
-    int i = 0;
     return makeLong(bytePrev, array[0], array[1], array[2], array[3], array[4], array[5], array[6]);
   }
 
@@ -137,6 +136,9 @@ public class DiskBlock {
                 batchWriteArr[i + 3], batchWriteArr[i + 4], batchWriteArr[i + 5], batchWriteArr[i + 6]);
       }
     }
+
+    System.out.println("sort idx is " + idx);
+    System.out.println("sort size is " + size);
 
     Arrays.sort(result, 0, size);
 
