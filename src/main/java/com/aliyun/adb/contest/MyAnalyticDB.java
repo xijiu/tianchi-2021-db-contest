@@ -109,6 +109,10 @@ public class MyAnalyticDB implements AnalyticDB {
     Thread thread = new Thread(() -> {
       try {
         Thread.sleep(1000 * 5 * 60);
+        for (int i = 0; i < 10; i++) {
+          System.out.println(i + "termination!!!");
+          Thread.sleep(100);
+        }
         System.exit(0);
       } catch (InterruptedException e) {
         e.printStackTrace();
@@ -233,6 +237,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
       long begin = System.currentTimeMillis();
       try {
+        int finishNum = 0;
         while (true) {
           long readTime1 = System.currentTimeMillis();
           byte[] data = threadReadData();
@@ -241,7 +246,7 @@ public class MyAnalyticDB implements AnalyticDB {
           if (data != null) {
             operate(data);
           } else {
-            int finishNum = finishThreadNum.incrementAndGet();
+            finishNum = finishThreadNum.incrementAndGet();
             if (finishNum == cpuThreadNum) {
               operateGapData();
             }
@@ -258,17 +263,18 @@ public class MyAnalyticDB implements AnalyticDB {
         }
         totalFinishThreadNum.incrementAndGet();
 
-        while (true) {
-          if (totalFinishThreadNum.get() == cpuThreadNum) {
-            long sortBegin = System.currentTimeMillis();
-            sortDataTest();
-            sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
-            break;
-          } else {
-            Thread.sleep(1);
+        if (finishNum < 5) {
+          while (true) {
+            if (totalFinishThreadNum.get() == cpuThreadNum) {
+              long sortBegin = System.currentTimeMillis();
+              sortDataTest();
+              sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
+              break;
+            } else {
+              Thread.sleep(1);
+            }
           }
         }
-
       } catch (Exception e) {
         finishThreadNum.incrementAndGet();
         e.printStackTrace();
