@@ -336,6 +336,7 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     private void sortDataTest() throws Exception {
+      System.out.println("sortDataTest begin");
       AtomicInteger num = operateFirstFile ? tableHelper1 : tableHelper2;
       int totalNum = blockNum * 2;
       int index;
@@ -348,7 +349,7 @@ public class MyAnalyticDB implements AnalyticDB {
           List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData2 : diskBlockData4;
           diskBlocks.get(index).query();
         }
-//        System.out.println("sort index is " + index + ", cost time is " + (System.currentTimeMillis() - totalBeginTime));
+        System.out.println("sort index is " + index + ", cost time is " + (System.currentTimeMillis() - totalBeginTime));
       }
     }
 
