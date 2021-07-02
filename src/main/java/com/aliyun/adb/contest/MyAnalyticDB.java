@@ -321,7 +321,7 @@ public class MyAnalyticDB implements AnalyticDB {
         while (true) {
           if (totalFinishThreadNum.get() == cpuThreadNum) {
             long sortBegin = System.currentTimeMillis();
-            sortDataTest();
+//            sortDataTest();
             sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
             break;
           } else {
