@@ -594,6 +594,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
+    System.out.println("table is " + table);
+    System.out.println("column is " + column);
+    System.out.println("percentile is " + percentile);
     System.out.println("number is " + number);
     System.out.println("222222 number is " + (1000000000L * percentile));
 
