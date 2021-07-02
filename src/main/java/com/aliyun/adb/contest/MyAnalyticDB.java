@@ -337,7 +337,6 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     private void sortDataTest() throws Exception {
-      System.out.println("sortDataTest begin");
       AtomicInteger num = operateFirstFile ? tableHelper1 : tableHelper2;
       int totalNum = blockNum * 2;
       int index;
@@ -350,7 +349,7 @@ public class MyAnalyticDB implements AnalyticDB {
           List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData2 : diskBlockData4;
           diskBlocks.get(index).query();
         }
-        System.out.println("sort index is " + index + ", cost time is " + (System.currentTimeMillis() - totalBeginTime));
+//        System.out.println("sort index is " + index + ", cost time is " + (System.currentTimeMillis() - totalBeginTime));
       }
     }
 
@@ -564,9 +563,10 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-    if (1 == 1) {
-      return "0";
-    }
+    System.out.println(table);
+//    if (1 == 1) {
+//      return "0";
+//    }
 
     if (!isFirstInvoke) {
       return "0";
@@ -579,10 +579,10 @@ public class MyAnalyticDB implements AnalyticDB {
 //      statPerBlockCount1();
 //      loadFinish = true;
 //    }
-    return tmp(column, percentile);
+    return tmp(table, column, percentile);
   }
 
-  public String tmp(String column, double percentile) throws Exception {
+  public String tmp(String table, String column, double percentile) throws Exception {
     long begin = System.currentTimeMillis();
 
     int number = (int) Math.ceil(300000000L * percentile);
@@ -595,11 +595,20 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     String result;
-    if (column.startsWith("L_O")) {
-      result = firstQuantile(number);
+    if (table.startsWith("lineitem")) {
+      if (column.startsWith("L_O")) {
+        result = firstQuantile(number);
+      } else {
+        result = secondQuantile(number);
+      }
     } else {
-      result = secondQuantile(number);
+      if (column.startsWith("O_O")) {
+        result = firstQuantileForTable2(number);
+      } else {
+        result = secondQuantileForTable2(number);
+      }
     }
+
     System.out.println("=====> stable quantile cost time is " + (System.currentTimeMillis() - begin) + ", result is " + result);
     return result;
   }
@@ -620,6 +629,21 @@ public class MyAnalyticDB implements AnalyticDB {
     return null;
   }
 
+  private String firstQuantileForTable2(int number) throws Exception {
+    int total = 0;
+    for (int i = 0; i < table_2_BlockDataNumArr1.length; i++) {
+      int count = table_2_BlockDataNumArr1[i];
+      int beforeTotal = total;
+      total += count;
+      if (total >= number) {
+        int index = number - beforeTotal - 1;
+        System.out.println("stable first number read disk");
+        return String.valueOf(diskBlockData3.get(i).get(index, count));
+      }
+    }
+    return null;
+  }
+
   public static long[] sortArr = new long[2600000];
 
   private String secondQuantile(int number) throws Exception {
@@ -632,6 +656,21 @@ public class MyAnalyticDB implements AnalyticDB {
         int index = number - beforeTotal - 1;
         System.out.println("stable second number read disk");
         return String.valueOf(diskBlockData2.get(i).get(index, count));
+      }
+    }
+    return null;
+  }
+
+  private String secondQuantileForTable2(int number) throws Exception {
+    int total = 0;
+    for (int i = 0; i < table_2_BlockDataNumArr2.length; i++) {
+      int count = table_2_BlockDataNumArr2[i];
+      int beforeTotal = total;
+      total += count;
+      if (total >= number) {
+        int index = number - beforeTotal - 1;
+        System.out.println("stable second number read disk");
+        return String.valueOf(diskBlockData4.get(i).get(index, count));
       }
     }
     return null;

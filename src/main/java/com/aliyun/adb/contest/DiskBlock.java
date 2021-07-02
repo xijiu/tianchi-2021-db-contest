@@ -69,33 +69,11 @@ public class DiskBlock {
   }
 
   public long get(int index, int count) throws Exception {
-    int totalCount = count;
-    totalBytePrev = bytePrev;
-    totalFileChannel = fileChannel;
-
-    int tmpCount = 0;
-
-    for (int i = 0; i < concurrenceQueryDiskNum; i++) {
-      if (i == concurrenceQueryDiskNum - 1) {
-        countArr[i] = count - tmpCount;
-        indexArr[i] = tmpCount;
-        queryDiskFlag.set(i, 1);
-      } else {
-        countArr[i] = count / concurrenceQueryDiskNum;
-        indexArr[i] = tmpCount;
-        queryDiskFlag.set(i, 1);
-        tmpCount += count / concurrenceQueryDiskNum;
-      }
-    }
-
-    currentThreadQuery();
-
-    while (finishQueryThreadNum.get() != concurrenceQueryDiskNum) {
-      Thread.sleep(2);
-    }
-    finishQueryThreadNum.set(0);
-
-    return PubTools.solve(MyAnalyticDB.sortArr, 0, totalCount - 1, index);
+    ByteBuffer byteBuffer = ByteBuffer.allocate(7);
+    sortedFileChannel.read(byteBuffer, index * 7L);
+    byte[] array = byteBuffer.array();
+    int i = 0;
+    return makeLong(bytePrev, array[i++], array[i++], array[i++], array[i++], array[i++], array[i++], array[i++]);
   }
 
   private void currentThreadQuery() throws Exception {
