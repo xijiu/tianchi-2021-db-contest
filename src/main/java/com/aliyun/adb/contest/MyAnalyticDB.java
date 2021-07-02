@@ -59,9 +59,13 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final int[] secondColDataLen = new int[cpuThreadNum * blockNum];
 
-  private final List<DiskBlock> firstDiskBlockData = new ArrayList<>(blockNum);
+  private final List<DiskBlock> diskBlockData1 = new ArrayList<>(blockNum);
 
-  private final List<DiskBlock> secondDiskBlockData = new ArrayList<>(blockNum);
+  private final List<DiskBlock> diskBlockData2 = new ArrayList<>(blockNum);
+
+  private final List<DiskBlock> diskBlockData3 = new ArrayList<>(blockNum);
+
+  private final List<DiskBlock> diskBlockData4 = new ArrayList<>(blockNum);
 
   private volatile long loadCostTime = 1000000000L;
 
@@ -81,8 +85,10 @@ public class MyAnalyticDB implements AnalyticDB {
    */
   private void init() throws InterruptedException {
     for (int i = 0; i < blockNum; i++) {
-      firstDiskBlockData.add(new DiskBlock(1, i));
-      secondDiskBlockData.add(new DiskBlock(2, i));
+      diskBlockData1.add(new DiskBlock(1, i));
+      diskBlockData2.add(new DiskBlock(2, i));
+      diskBlockData3.add(new DiskBlock(3, i));
+      diskBlockData4.add(new DiskBlock(4, i));
     }
   }
 
@@ -412,7 +418,7 @@ public class MyAnalyticDB implements AnalyticDB {
       firstColDataLen[(threadIndex << 7) + blockIndex] += length;
 
       putToByteBuffer(firstThreadCacheArr[blockIndex], length);
-      firstDiskBlockData.get(blockIndex).storeArr(batchWriteBuffer);
+      diskBlockData1.get(blockIndex).storeArr(batchWriteBuffer);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -422,7 +428,7 @@ public class MyAnalyticDB implements AnalyticDB {
       secondColDataLen[(threadIndex << 7) + blockIndex] += length;
 
       putToByteBuffer(secondThreadCacheArr[blockIndex], length);
-      secondDiskBlockData.get(blockIndex).storeArr(batchWriteBuffer);
+      diskBlockData2.get(blockIndex).storeArr(batchWriteBuffer);
     }
 
     private void putToByteBuffer(long[] data, int length) {
@@ -508,7 +514,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
         System.out.println("stable first number read disk");
-        return String.valueOf(firstDiskBlockData.get(i).get(index, count));
+        return String.valueOf(diskBlockData1.get(i).get(index, count));
       }
     }
     return null;
@@ -525,7 +531,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
         System.out.println("stable second number read disk");
-        return String.valueOf(secondDiskBlockData.get(i).get(index, count));
+        return String.valueOf(diskBlockData2.get(i).get(index, count));
       }
     }
     return null;
