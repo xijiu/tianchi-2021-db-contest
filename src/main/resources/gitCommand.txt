@@ -1,0 +1,12 @@
+git co 10034
+git br -D master
+git co -b master
+git push --force origin master
+
+
+
+
+git ci -am "test"
+git push origin master
+
+
