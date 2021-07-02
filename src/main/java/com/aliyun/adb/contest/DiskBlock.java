@@ -142,7 +142,6 @@ public class DiskBlock {
   private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[8000000]);
 
   public void query() throws Exception {
-    System.out.println("file length is " + (file.length()));
     int size = (int) (file.length() / 7);
     long[] result = helper.get();
     ByteBuffer buffer = ByteBuffer.allocate(7 * 1024 * 128);

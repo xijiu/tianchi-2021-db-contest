@@ -585,7 +585,7 @@ public class MyAnalyticDB implements AnalyticDB {
   public String tmp(String table, String column, double percentile) throws Exception {
     long begin = System.currentTimeMillis();
 
-    int number = (int) Math.ceil(300000000L * percentile);
+    int number = (int) Math.ceil(1000000000L * percentile);
     if (number % 2 != 0) {
       if (number % 10 == 9) {
         number++;
