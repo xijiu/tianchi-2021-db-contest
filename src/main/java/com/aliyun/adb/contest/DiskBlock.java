@@ -132,6 +132,10 @@ public class DiskBlock {
     if (fileChannel == null) {
       synchronized (this) {
         if (fileChannel == null) {
+          File path = new File(workspaceDir + "/" + tableName);
+          if (!path.exists()) {
+            path.mkdirs();
+          }
           file = new File(workspaceDir + "/" + tableName + "/" + col + "_" + blockIndex + ".data");
           if (file.exists()) {
             file.delete();
