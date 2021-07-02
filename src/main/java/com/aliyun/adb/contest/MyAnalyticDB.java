@@ -2,16 +2,13 @@ package com.aliyun.adb.contest;
 
 import com.aliyun.adb.contest.spi.AnalyticDB;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
-import java.time.Year;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -54,10 +51,16 @@ public class MyAnalyticDB implements AnalyticDB {
   private AtomicInteger totalFinishThreadNum = new AtomicInteger();
 
   /** 第一列的所有块的元素个数 */
-  private final int[] firstBlockDataNumArr = new int[blockNum];
+  private final int[] table_1_BlockDataNumArr1 = new int[blockNum];
 
   /** 第二列的所有块的元素个数 */
-  private final int[] secondBlockDataNumArr = new int[blockNum];
+  private final int[] table_1_BlockDataNumArr2 = new int[blockNum];
+
+  /** 第一列的所有块的元素个数 */
+  private final int[] table_2_BlockDataNumArr1 = new int[blockNum];
+
+  /** 第二列的所有块的元素个数 */
+  private final int[] table_2_BlockDataNumArr2 = new int[blockNum];
 
   private final int[] firstColDataLen = new int[cpuThreadNum * blockNum];
 
@@ -88,6 +91,8 @@ public class MyAnalyticDB implements AnalyticDB {
   private final AtomicLong sortDataTime = new AtomicLong();
 
   private final long totalBeginTime = System.currentTimeMillis();
+
+  private static volatile boolean isFirstInvoke = true;
 
   public MyAnalyticDB() {
     try {
@@ -128,6 +133,11 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public void load(String tpchDataFileDir, String workspaceDir) throws Exception {
+    setInvokeFlag(workspaceDir);
+    if (!isFirstInvoke) {
+      return ;
+    }
+
     long begin = System.currentTimeMillis();
     System.out.println("stable load invoked, time is " + begin);
 
@@ -151,37 +161,61 @@ public class MyAnalyticDB implements AnalyticDB {
     System.out.println("============> stable load cost time : " + loadCostTime);
   }
 
-  private void statPerBlockCount() {
+  private void setInvokeFlag(String workspaceDir) {
+    File file = new File(workspaceDir);
+    File[] files = file.listFiles();
+    isFirstInvoke = files == null || files.length <= 0;
+  }
+
+  private void statPerBlockCount1() {
     long firstSum = 0;
-    for (int i = 0; i < firstBlockDataNumArr.length; i++) {
+    for (int i = 0; i < table_1_BlockDataNumArr1.length; i++) {
       int tmp = 0;
       for (int j = 0; j < cpuThreadNum; j++) {
         tmp += firstColDataLen[j * blockNum + i];
         tmp += cpuThread[j].firstCacheLengthArr[i];
       }
-      firstBlockDataNumArr[i] = tmp;
+      table_1_BlockDataNumArr1[i] = tmp;
       firstSum += tmp;
     }
-    System.out.println("stable firstSum is " + firstSum);
+    System.out.println("table 1 firstSum is " + firstSum);
 
-    for (int i = 0; i < secondBlockDataNumArr.length; i++) {
+    for (int i = 0; i < table_1_BlockDataNumArr2.length; i++) {
       int tmp = 0;
       for (int j = 0; j < cpuThreadNum; j++) {
         tmp += secondColDataLen[j * blockNum + i];
         tmp += cpuThread[j].secondCacheLengthArr[i];
       }
-      secondBlockDataNumArr[i] = tmp;
+      table_1_BlockDataNumArr2[i] = tmp;
     }
-    System.out.println("stable secondSum is " + firstSum);
+    System.out.println("table 1 secondSum is " + firstSum);
+  }
+
+  private void statPerBlockCount2() {
+    long firstSum = 0;
+    for (int i = 0; i < table_2_BlockDataNumArr1.length; i++) {
+      int tmp = 0;
+      for (int j = 0; j < cpuThreadNum; j++) {
+        tmp += firstColDataLen[j * blockNum + i];
+        tmp += cpuThread[j].firstCacheLengthArr[i];
+      }
+      table_2_BlockDataNumArr1[i] = tmp;
+      firstSum += tmp;
+    }
+    System.out.println("table 1 firstSum is " + firstSum);
+
+    for (int i = 0; i < table_2_BlockDataNumArr2.length; i++) {
+      int tmp = 0;
+      for (int j = 0; j < cpuThreadNum; j++) {
+        tmp += secondColDataLen[j * blockNum + i];
+        tmp += cpuThread[j].secondCacheLengthArr[i];
+      }
+      table_2_BlockDataNumArr2[i] = tmp;
+    }
+    System.out.println("table 1 secondSum is " + firstSum);
   }
 
   public void storeBlockData(File dataFile) throws Exception {
-    if (2 == 2) {
-      BufferedReader br = new BufferedReader(new FileReader(dataFile));
-      System.out.println("first :" + br.readLine());
-      System.out.println("first2 :" + br.readLine());
-      return;
-    }
     long begin = System.currentTimeMillis();
     FileChannel fileChannel = FileChannel.open(dataFile.toPath(), StandardOpenOption.READ);
     // 跳过第一行
@@ -204,6 +238,14 @@ public class MyAnalyticDB implements AnalyticDB {
 
     for (int i = 0; i < cpuThreadNum; i++) {
       cpuThread[i].join();
+    }
+
+    if (operateFirstFile) {
+      statPerBlockCount1();
+      Arrays.fill(firstColDataLen, 0);
+      Arrays.fill(secondColDataLen, 0);
+    } else {
+      statPerBlockCount2();
     }
     System.out.println("operate file " + dataFile.toPath() + ", cost time is " + (System.currentTimeMillis() - begin));
   }
@@ -524,13 +566,17 @@ public class MyAnalyticDB implements AnalyticDB {
       return "0";
     }
 
-    while (totalFinishThreadNum.get() != cpuThreadNum) {
-      Thread.sleep(1);
+    if (!isFirstInvoke) {
+      return "0";
     }
-    if (!loadFinish) {
-      statPerBlockCount();
-      loadFinish = true;
-    }
+
+//    while (totalFinishThreadNum.get() != cpuThreadNum) {
+//      Thread.sleep(1);
+//    }
+//    if (!loadFinish) {
+//      statPerBlockCount1();
+//      loadFinish = true;
+//    }
     return tmp(column, percentile);
   }
 
@@ -559,8 +605,8 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private String firstQuantile(int number) throws Exception {
     int total = 0;
-    for (int i = 0; i < firstBlockDataNumArr.length; i++) {
-      int count = firstBlockDataNumArr[i];
+    for (int i = 0; i < table_1_BlockDataNumArr1.length; i++) {
+      int count = table_1_BlockDataNumArr1[i];
       int beforeTotal = total;
       total += count;
       if (total >= number) {
@@ -576,8 +622,8 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private String secondQuantile(int number) throws Exception {
     int total = 0;
-    for (int i = 0; i < secondBlockDataNumArr.length; i++) {
-      int count = secondBlockDataNumArr[i];
+    for (int i = 0; i < table_1_BlockDataNumArr2.length; i++) {
+      int count = table_1_BlockDataNumArr2[i];
       int beforeTotal = total;
       total += count;
       if (total >= number) {
