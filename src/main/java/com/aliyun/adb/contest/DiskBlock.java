@@ -44,11 +44,9 @@ public class DiskBlock {
 
   public static int[] indexArr = new int[concurrenceQueryDiskNum];
 
-  public static volatile byte totalBytePrev = 0;
-
-  public static volatile FileChannel totalFileChannel = null;
-
-  public static AtomicInteger finishQueryThreadNum = new AtomicInteger();
+//  public static volatile FileChannel totalFileChannel = null;
+//
+//  public static AtomicInteger finishQueryThreadNum = new AtomicInteger();
 
   private final String tableName;
 
@@ -76,28 +74,6 @@ public class DiskBlock {
     return makeLong(bytePrev, array[0], array[1], array[2], array[3], array[4], array[5], array[6]);
   }
 
-  private void currentThreadQuery() throws Exception {
-    int threadIndex = concurrenceQueryDiskNum - 1;
-    DiskBlock.queryDiskFlag.set(threadIndex, 0);
-    int count = DiskBlock.countArr[threadIndex];
-    int index = DiskBlock.indexArr[threadIndex];
-
-    byte[] batchWriteArr = new byte[count * 7];
-
-    ByteBuffer buffer = ByteBuffer.wrap(batchWriteArr);
-    DiskBlock.totalFileChannel.read(buffer, index * 7L);
-    buffer.flip();
-
-    int idx = 0;
-    int endCount = index + count;
-    for (int i = index; i < endCount; i++) {
-      MyAnalyticDB.sortArr[i] = DiskBlock.makeLong(
-              DiskBlock.totalBytePrev, batchWriteArr[idx++], batchWriteArr[idx++], batchWriteArr[idx++],
-              batchWriteArr[idx++], batchWriteArr[idx++], batchWriteArr[idx++], batchWriteArr[idx++]);
-    }
-
-    DiskBlock.finishQueryThreadNum.incrementAndGet();
-  }
 
   public static long makeLong(byte b7, byte b6, byte b5, byte b4,
                                byte b3, byte b2, byte b1, byte b0){
@@ -157,7 +133,7 @@ public class DiskBlock {
       int length = buffer.position();
       for (int i = 0; i < length; i += 7) {
         result[idx++] = DiskBlock.makeLong(
-                DiskBlock.totalBytePrev, batchWriteArr[i], batchWriteArr[i + 1], batchWriteArr[i + 2],
+                bytePrev, batchWriteArr[i], batchWriteArr[i + 1], batchWriteArr[i + 2],
                 batchWriteArr[i + 3], batchWriteArr[i + 4], batchWriteArr[i + 5], batchWriteArr[i + 6]);
       }
     }
