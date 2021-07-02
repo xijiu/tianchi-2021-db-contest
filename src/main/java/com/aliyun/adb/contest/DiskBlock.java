@@ -150,12 +150,12 @@ public class DiskBlock {
           fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
 
           // sorted file
-//          sortedFile = new File(workspaceDir + "/" + tableName + "/sorted_" + col + "_" + blockIndex + ".data");
-//          if (sortedFile.exists()) {
-//            sortedFile.delete();
-//          }
-//          sortedFile.createNewFile();
-//          sortedFileChannel = FileChannel.open(sortedFile.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
+          sortedFile = new File(workspaceDir + "/" + tableName + "/sorted_" + col + "_" + blockIndex + ".data");
+          if (sortedFile.exists()) {
+            sortedFile.delete();
+          }
+          sortedFile.createNewFile();
+          sortedFileChannel = FileChannel.open(sortedFile.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
         }
       }
     }
@@ -165,25 +165,25 @@ public class DiskBlock {
     System.out.println("file length is " + (file.length()));
     int size = (int) (file.length() / 7);
     long[] result = new long[size];
-    ByteBuffer buffer = ByteBuffer.allocate(7 * 1024 * 128);
-    byte[] batchWriteArr = buffer.array();
-    int idx = 0;
-    while (true) {
-      buffer.clear();
-      int flag = fileChannel.read(buffer);
-      if (flag == -1) {
-        break;
-      }
-      buffer.flip();
-      int length = buffer.position();
-      for (int i = 0; i < length; i += 7) {
-        result[idx++] = DiskBlock.makeLong(
-                DiskBlock.totalBytePrev, batchWriteArr[i], batchWriteArr[i + 1], batchWriteArr[i + 2],
-                batchWriteArr[i + 3], batchWriteArr[i + 4], batchWriteArr[i + 5], batchWriteArr[i + 6]);
-      }
-    }
-
-    Arrays.sort(result);
+//    ByteBuffer buffer = ByteBuffer.allocate(7 * 1024 * 128);
+//    byte[] batchWriteArr = buffer.array();
+//    int idx = 0;
+//    while (true) {
+//      buffer.clear();
+//      int flag = fileChannel.read(buffer);
+//      if (flag == -1) {
+//        break;
+//      }
+//      buffer.flip();
+//      int length = buffer.position();
+//      for (int i = 0; i < length; i += 7) {
+//        result[idx++] = DiskBlock.makeLong(
+//                DiskBlock.totalBytePrev, batchWriteArr[i], batchWriteArr[i + 1], batchWriteArr[i + 2],
+//                batchWriteArr[i + 3], batchWriteArr[i + 4], batchWriteArr[i + 5], batchWriteArr[i + 6]);
+//      }
+//    }
+//
+//    Arrays.sort(result);
 
 
 //    buffer.clear();
