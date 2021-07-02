@@ -119,23 +119,24 @@ public class DiskBlock {
   public void query() throws Exception {
     int size = (int) (file.length() / 7);
     long[] result = helper.get();
-    ByteBuffer buffer = ByteBuffer.allocate(7 * 1024 * 128);
+    int readLen = 7 * 1024 * 128;
+    ByteBuffer buffer = ByteBuffer.allocate(readLen);
     byte[] batchWriteArr = buffer.array();
     int idx = 0;
-    long pos = 0;
+    fileChannel.position(0);
     while (true) {
       buffer.clear();
-      fileChannel.read(buffer, pos);
+      int flag = fileChannel.read(buffer);
+      if (flag == -1 || flag == 0) {
+        System.out.println("flag is " + flag);
+        break;
+      }
       buffer.flip();
       int length = buffer.position();
       for (int i = 0; i < length; i += 7) {
         result[idx++] = DiskBlock.makeLong(
                 bytePrev, batchWriteArr[i], batchWriteArr[i + 1], batchWriteArr[i + 2],
                 batchWriteArr[i + 3], batchWriteArr[i + 4], batchWriteArr[i + 5], batchWriteArr[i + 6]);
-      }
-      pos += length;
-      if (pos >= file.length()) {
-        break;
       }
     }
 
