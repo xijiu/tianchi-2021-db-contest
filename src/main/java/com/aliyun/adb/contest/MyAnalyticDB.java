@@ -25,7 +25,7 @@ public class MyAnalyticDB implements AnalyticDB {
   /** 每一块存储long值的个数 */
   private final int perBlockDataNum = 2350000;
 
-  private static final int cpuThreadNum = 12;
+  private static final int cpuThreadNum = 20;
 
   private final int perThreadBlockDataNum = 2400000 / cpuThreadNum;
 
@@ -321,7 +321,7 @@ public class MyAnalyticDB implements AnalyticDB {
         while (true) {
           if (totalFinishThreadNum.get() == cpuThreadNum) {
             long sortBegin = System.currentTimeMillis();
-//            sortDataTest();
+            sortDataTest();
             sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
             break;
           } else {
