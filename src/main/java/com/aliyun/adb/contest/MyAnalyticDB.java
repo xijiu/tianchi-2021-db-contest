@@ -594,6 +594,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
+    System.out.println("number is " + number);
+    System.out.println("222222 number is " + (1000000000L * percentile));
+
     String result;
     if (table.startsWith("lineitem")) {
       if (column.startsWith("L_O")) {
