@@ -1,5 +1,6 @@
 package com.aliyun.adb.contest;
 
+import com.aliyun.adb.contest.utils.PubTools;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -155,20 +156,8 @@ public class ReadCharTest {
 
   @Test
   public void aaab4() throws Exception {
-    File file = new File("/Users/likangning/test/test.data");
-    FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
-
-    int readLen = 7 * 1024 * 128;
-    ByteBuffer buffer = ByteBuffer.allocate(readLen);
-    buffer.clear();
-
-    int flag = fileChannel.read(buffer);
-
-    int length = buffer.position();
-    buffer.flip();
-
-    System.out.println(flag);
-    System.out.println(length);
+    long[] nums = {10, 8, 1, 1, 2, 3, 5, 7, 2, 4, 6, 9, 9};
+    System.out.println(PubTools.solve(nums, 0, nums.length - 1, 9));
   }
 
 

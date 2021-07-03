@@ -167,56 +167,56 @@ public class DiskBlock {
 
   }
 
-  private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[8000000]);
+  private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[8200000]);
 
-  public void query() throws Exception {
-    int size = (int) (file.length() / 7);
-    long[] result = helper.get();
-    int readLen = 7 * 1024 * 128;
-    ByteBuffer buffer = ByteBuffer.allocate(readLen);
-    byte[] batchWriteArr = buffer.array();
-    int idx = 0;
-    fileChannel.position(0);
-    while (true) {
-      buffer.clear();
-      int flag = fileChannel.read(buffer);
-      if (flag == -1 || flag == 0) {
-        break;
-      }
-      int length = buffer.position();
-//      buffer.flip();
-      for (int i = 0; i < length; i += 7) {
-        result[idx++] = DiskBlock.makeLong(
-                bytePrev, batchWriteArr[i], batchWriteArr[i + 1], batchWriteArr[i + 2],
-                batchWriteArr[i + 3], batchWriteArr[i + 4], batchWriteArr[i + 5], batchWriteArr[i + 6]);
-      }
-    }
-
-    if (idx != size) {
-      System.out.println("idx not equals size, idx is " + idx + ", size is " + size);
-    }
-
-    // 1s ~ 2s
-//    Arrays.sort(result, 0, size);
-
-    buffer.clear();
-    for (int i = 0; i < size; i++) {
-      if (!buffer.hasRemaining()) {
-        buffer.flip();
-        sortedFileChannel.write(buffer);
-        buffer.clear();
-      }
-      long element = result[i];
-      buffer.put((byte)(element >> 48));
-      buffer.put((byte)(element >> 40));
-      buffer.put((byte)(element >> 32));
-      buffer.put((byte)(element >> 24));
-      buffer.put((byte)(element >> 16));
-      buffer.put((byte)(element >> 8));
-      buffer.put((byte)(element));
-    }
-
-    buffer.flip();
-    sortedFileChannel.write(buffer);
-  }
+//  public void query() throws Exception {
+//    int size = (int) (file.length() / 7);
+//    long[] result = helper.get();
+//    int readLen = 7 * 1024 * 128;
+//    ByteBuffer buffer = ByteBuffer.allocate(readLen);
+//    byte[] batchWriteArr = buffer.array();
+//    int idx = 0;
+//    fileChannel.position(0);
+//    while (true) {
+//      buffer.clear();
+//      int flag = fileChannel.read(buffer);
+//      if (flag == -1 || flag == 0) {
+//        break;
+//      }
+//      int length = buffer.position();
+////      buffer.flip();
+//      for (int i = 0; i < length; i += 7) {
+//        result[idx++] = DiskBlock.makeLong(
+//                bytePrev, batchWriteArr[i], batchWriteArr[i + 1], batchWriteArr[i + 2],
+//                batchWriteArr[i + 3], batchWriteArr[i + 4], batchWriteArr[i + 5], batchWriteArr[i + 6]);
+//      }
+//    }
+//
+//    if (idx != size) {
+//      System.out.println("idx not equals size, idx is " + idx + ", size is " + size);
+//    }
+//
+//    // 1s ~ 2s
+////    Arrays.sort(result, 0, size);
+//
+//    buffer.clear();
+//    for (int i = 0; i < size; i++) {
+//      if (!buffer.hasRemaining()) {
+//        buffer.flip();
+//        sortedFileChannel.write(buffer);
+//        buffer.clear();
+//      }
+//      long element = result[i];
+//      buffer.put((byte)(element >> 48));
+//      buffer.put((byte)(element >> 40));
+//      buffer.put((byte)(element >> 32));
+//      buffer.put((byte)(element >> 24));
+//      buffer.put((byte)(element >> 16));
+//      buffer.put((byte)(element >> 8));
+//      buffer.put((byte)(element));
+//    }
+//
+//    buffer.flip();
+//    sortedFileChannel.write(buffer);
+//  }
 }
