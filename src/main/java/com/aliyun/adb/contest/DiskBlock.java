@@ -127,7 +127,7 @@ public class DiskBlock {
     ByteBuffer buffer = ByteBuffer.allocate(readLen);
     byte[] batchWriteArr = buffer.array();
     int idx = 0;
-    fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
+    fileChannel.position(0);
     while (true) {
       buffer.clear();
       int flag = fileChannel.read(buffer);
@@ -141,6 +141,10 @@ public class DiskBlock {
                 bytePrev, batchWriteArr[i], batchWriteArr[i + 1], batchWriteArr[i + 2],
                 batchWriteArr[i + 3], batchWriteArr[i + 4], batchWriteArr[i + 5], batchWriteArr[i + 6]);
       }
+    }
+
+    if (idx != size) {
+      System.out.println("idx not equals size, idx is " + idx + ", size is " + size);
     }
 
     // 1s ~ 2s
@@ -162,5 +166,8 @@ public class DiskBlock {
       buffer.put((byte)(element >> 8));
       buffer.put((byte)(element));
     }
+
+    buffer.flip();
+    sortedFileChannel.write(buffer);
   }
 }
