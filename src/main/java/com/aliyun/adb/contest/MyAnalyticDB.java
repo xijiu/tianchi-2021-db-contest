@@ -629,11 +629,11 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-//    int num = invokeTimes.incrementAndGet();
-//    if (num >= 4000) {
-//      System.out.println("=================> total cost : " + (System.currentTimeMillis() - totalBeginTime));
-//      return "0";
-//    }
+    int num = invokeTimes.incrementAndGet();
+    if (num >= 4000) {
+      System.out.println("=================> total cost : " + (System.currentTimeMillis() - totalBeginTime));
+      return "0";
+    }
 
 //    if (1 == 1) {
 //      return "0";
