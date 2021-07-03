@@ -72,7 +72,7 @@ public class DiskBlock {
   private AtomicInteger parSortNum = new AtomicInteger();
 
   private void storeLongArrToDisk() throws Exception {
-    Arrays.sort(cacheArr, 0, cacheArrIndex);
+//    Arrays.sort(cacheArr, 0, cacheArrIndex);
     int num = parSortNum.incrementAndGet();
     File file = new File(workspaceDir + "/" + tableName + "/partSorted_" + col + "_" + blockIndex + "_" + num + ".data");
     file.createNewFile();

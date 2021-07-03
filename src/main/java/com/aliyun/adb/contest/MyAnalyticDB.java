@@ -335,9 +335,6 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     public void run() {
-      long beginTmp = System.currentTimeMillis();
-      System.out.println("create space time is " + (System.currentTimeMillis() - beginTmp));
-
       long begin = System.currentTimeMillis();
       try {
         int finishNum = 0;
