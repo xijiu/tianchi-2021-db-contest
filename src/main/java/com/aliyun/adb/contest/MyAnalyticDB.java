@@ -605,13 +605,13 @@ public class MyAnalyticDB implements AnalyticDB {
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
     System.out.println(table);
-    if (1 == 1) {
-      return "0";
-    }
-
-//    if (!isFirstInvoke) {
+//    if (1 == 1) {
 //      return "0";
 //    }
+
+    if (!isFirstInvoke) {
+      return "0";
+    }
 
 //    while (totalFinishThreadNum.get() != cpuThreadNum) {
 //      Thread.sleep(1);
