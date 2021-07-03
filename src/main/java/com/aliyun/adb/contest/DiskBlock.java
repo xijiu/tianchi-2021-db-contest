@@ -1,6 +1,5 @@
 package com.aliyun.adb.contest;
 
-import com.aliyun.adb.contest.utils.PubTools;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,19 +35,13 @@ public class DiskBlock {
 
   public static final int secondCacheLength = (int) (cacheLength);
 
-  public static final int concurrenceQueryDiskNum = 4;
-
-  public static AtomicIntegerArray queryDiskFlag = new AtomicIntegerArray(concurrenceQueryDiskNum);
-
-  public static int[] countArr = new int[concurrenceQueryDiskNum];
-
-  public static int[] indexArr = new int[concurrenceQueryDiskNum];
-
-//  public static volatile FileChannel totalFileChannel = null;
-//
-//  public static AtomicInteger finishQueryThreadNum = new AtomicInteger();
-
   private final String tableName;
+
+  private final int cacheArrLen = 14 * 1024 * 1024 / 8;
+
+  private final long[] cacheArr = new long[cacheArrLen];
+
+  private volatile int cacheArrIndex = 0;
 
 
 
@@ -64,6 +57,37 @@ public class DiskBlock {
 
   public void storeArr(ByteBuffer byteBuffer) throws Exception {
     fileChannel.write(byteBuffer);
+  }
+
+  public synchronized void storeLongArr(long[] data, int len) throws Exception {
+    if (cacheArrIndex + len >= cacheArrLen) {
+      storeLongArrToDisk();
+      storeLongArr(data, len);
+    } else {
+      System.arraycopy(data, 0, cacheArr, cacheArrIndex, len);
+      cacheArrIndex += len;
+    }
+  }
+
+  private AtomicInteger parSortNum = new AtomicInteger();
+
+  private void storeLongArrToDisk() throws Exception {
+    Arrays.sort(cacheArr, 0, cacheArrIndex);
+    int num = parSortNum.incrementAndGet();
+    File file = new File(workspaceDir + "/" + tableName + "/partSorted_" + col + "_" + blockIndex + "_" + num + ".data");
+    FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE);
+    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1 * 1024 * 1024);
+    for (int i = 0; i < cacheArrIndex; i++) {
+      byteBuffer.putLong(cacheArr[i]);
+      if (!byteBuffer.hasRemaining()) {
+        byteBuffer.flip();
+        fileChannel.write(byteBuffer);
+        byteBuffer.clear();
+      }
+    }
+    byteBuffer.flip();
+    fileChannel.write(byteBuffer);
+    cacheArrIndex = 0;
   }
 
   public long get(int index, int count) throws Exception {

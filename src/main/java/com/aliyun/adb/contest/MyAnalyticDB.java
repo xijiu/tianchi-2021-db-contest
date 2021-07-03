@@ -366,16 +366,16 @@ public class MyAnalyticDB implements AnalyticDB {
         }
         totalFinishThreadNum.incrementAndGet();
 
-        while (true) {
-          if (totalFinishThreadNum.get() == cpuThreadNum) {
-            long sortBegin = System.currentTimeMillis();
+//        while (true) {
+//          if (totalFinishThreadNum.get() == cpuThreadNum) {
+//            long sortBegin = System.currentTimeMillis();
 //            sortDataTest();
-            sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
-            break;
-          } else {
-            Thread.sleep(1);
-          }
-        }
+//            sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
+//            break;
+//          } else {
+//            Thread.sleep(1);
+//          }
+//        }
       } catch (Exception e) {
         finishThreadNum.incrementAndGet();
         e.printStackTrace();
@@ -384,22 +384,21 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println(Thread.currentThread().getName() + " cost time : " + cost);
     }
 
-    private void sortDataTest() throws Exception {
-      AtomicInteger num = operateFirstFile ? tableHelper1 : tableHelper2;
-      int totalNum = blockNum * 2;
-      int index;
-      while ((index = num.getAndIncrement()) < totalNum) {
-        if (index < blockNum) {
-          List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_1 : diskBlockData_2_1;
-          diskBlocks.get(index).query();
-        } else {
-          index -= blockNum;
-          List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
-          diskBlocks.get(index).query();
-        }
-//        System.out.println("sort index is " + index + ", cost time is " + (System.currentTimeMillis() - totalBeginTime));
-      }
-    }
+//    private void sortDataTest() throws Exception {
+//      AtomicInteger num = operateFirstFile ? tableHelper1 : tableHelper2;
+//      int totalNum = blockNum * 2;
+//      int index;
+//      while ((index = num.getAndIncrement()) < totalNum) {
+//        if (index < blockNum) {
+//          List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_1 : diskBlockData_2_1;
+//          diskBlocks.get(index).query();
+//        } else {
+//          index -= blockNum;
+//          List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
+//          diskBlocks.get(index).query();
+//        }
+//      }
+//    }
 
     private int tmpBlockIndex = -1;
 
@@ -552,12 +551,11 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       firstColDataLen[(threadIndex << 7) + blockIndex] += length;
 
-      putToByteBuffer(firstThreadCacheArr[blockIndex], length);
       List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_1 : diskBlockData_2_1;
 
-      long writeTime1 = System.currentTimeMillis();
-      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
-      writeFileTime.addAndGet(System.currentTimeMillis() - writeTime1);
+//      putToByteBuffer(firstThreadCacheArr[blockIndex], length);
+//      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
+      diskBlocks.get(blockIndex).storeLongArr(firstThreadCacheArr[blockIndex], length);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -566,12 +564,10 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       secondColDataLen[(threadIndex << 7) + blockIndex] += length;
 
-      putToByteBuffer(secondThreadCacheArr[blockIndex], length);
       List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
-
-      long writeTime1 = System.currentTimeMillis();
-      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
-      writeFileTime.addAndGet(System.currentTimeMillis() - writeTime1);
+//      putToByteBuffer(secondThreadCacheArr[blockIndex], length);
+//      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
+      diskBlocks.get(blockIndex).storeLongArr(secondThreadCacheArr[blockIndex], length);
     }
 
     private void putToByteBuffer(long[] data, int length) {
