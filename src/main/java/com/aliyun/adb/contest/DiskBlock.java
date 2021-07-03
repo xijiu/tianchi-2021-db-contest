@@ -131,8 +131,8 @@ public class DiskBlock {
         System.out.println("flag is " + flag);
         break;
       }
-      buffer.flip();
       int length = buffer.position();
+//      buffer.flip();
       for (int i = 0; i < length; i += 7) {
         result[idx++] = DiskBlock.makeLong(
                 bytePrev, batchWriteArr[i], batchWriteArr[i + 1], batchWriteArr[i + 2],
@@ -143,8 +143,9 @@ public class DiskBlock {
     System.out.println("sort idx is " + idx);
     System.out.println("sort size is " + size);
 
+    long begin = System.currentTimeMillis();
     Arrays.sort(result, 0, size);
-
+    System.out.println("sort time cost : " + (System.currentTimeMillis() - begin));
 
     buffer.clear();
     for (int i = 0; i < size; i++) {
