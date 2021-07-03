@@ -166,7 +166,7 @@ public class MyAnalyticDB implements AnalyticDB {
   private void reloadBlockNumberFile() throws IOException {
     storeBlockNumberFile = new File(DiskBlock.workspaceDir + "/blockNumberInfo.data");
     FileChannel fileChannel = FileChannel.open(storeBlockNumberFile.toPath(), StandardOpenOption.READ);
-    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4);
+    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4 * 4);
     fileChannel.read(byteBuffer);
     for (int i = 0; i < blockNum; i++) {
       table_1_BlockDataNumArr1[i] = byteBuffer.getInt();
@@ -186,7 +186,7 @@ public class MyAnalyticDB implements AnalyticDB {
     storeBlockNumberFile = new File(DiskBlock.workspaceDir + "/blockNumberInfo.data");
     storeBlockNumberFile.createNewFile();
     FileChannel fileChannel = FileChannel.open(storeBlockNumberFile.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE);
-    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4);
+    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4 * 4);
     for (int num : table_1_BlockDataNumArr1) {
       byteBuffer.putInt(num);
     }
