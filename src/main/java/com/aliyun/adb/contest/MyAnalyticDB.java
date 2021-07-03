@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -154,6 +152,7 @@ public class MyAnalyticDB implements AnalyticDB {
       storeBlockData(dataFile);
     }
 
+    printForTest();
     storeBlockNumberFile();
     loadCostTime = System.currentTimeMillis() - begin;
     System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
@@ -161,6 +160,32 @@ public class MyAnalyticDB implements AnalyticDB {
     System.out.println("============> sort data cost time : " + sortDataTime.get() / cpuThreadNum);
     System.out.println("");
     System.out.println("============> stable load cost time : " + loadCostTime);
+  }
+
+  private void printForTest() {
+    Set<Integer> set = new TreeSet<>();
+    for (int num : table_1_BlockDataNumArr1) {
+      set.add(num);
+    }
+    System.out.println("table_1_BlockDataNumArr1 count is : " + set);
+
+    Set<Integer> set2 = new TreeSet<>();
+    for (int num : table_1_BlockDataNumArr2) {
+      set2.add(num);
+    }
+    System.out.println("table_1_BlockDataNumArr2 count is : " + set2);
+
+    Set<Integer> set3 = new TreeSet<>();
+    for (int num : table_2_BlockDataNumArr1) {
+      set3.add(num);
+    }
+    System.out.println("table_2_BlockDataNumArr1 count is : " + set3);
+
+    Set<Integer> set4 = new TreeSet<>();
+    for (int num : table_2_BlockDataNumArr2) {
+      set4.add(num);
+    }
+    System.out.println("table_2_BlockDataNumArr2 count is : " + set4);
   }
 
   private void reloadBlockNumberFile() throws IOException {
