@@ -168,6 +168,7 @@ public class MyAnalyticDB implements AnalyticDB {
     FileChannel fileChannel = FileChannel.open(storeBlockNumberFile.toPath(), StandardOpenOption.READ);
     ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4 * 4);
     fileChannel.read(byteBuffer);
+    byteBuffer.flip();
     for (int i = 0; i < blockNum; i++) {
       table_1_BlockDataNumArr1[i] = byteBuffer.getInt();
     }
