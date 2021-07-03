@@ -129,8 +129,8 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public void load(String tpchDataFileDir, String workspaceDir) throws Exception {
-    init(workspaceDir);
     setInvokeFlag(workspaceDir);
+    init(workspaceDir);
     if (!isFirstInvoke) {
       reloadBlockNumberFile();
       return ;
@@ -208,7 +208,6 @@ public class MyAnalyticDB implements AnalyticDB {
   private void setInvokeFlag(String workspaceDir) {
     File file = new File(workspaceDir);
     File[] files = file.listFiles();
-    System.out.println("files is " + files.length);
     isFirstInvoke = files == null || files.length <= 0;
   }
 
