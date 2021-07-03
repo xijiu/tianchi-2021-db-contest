@@ -105,6 +105,7 @@ public class DiskBlock {
     ByteBuffer byteBuffer = ByteBuffer.allocate(7 * 1024 * 128);
     byte[] array = byteBuffer.array();
     int idx = 0;
+    fileChannel.position(0);
     while (true) {
       byteBuffer.clear();
       int flag = fileChannel.read(byteBuffer);
