@@ -148,7 +148,7 @@ public class DiskBlock {
     }
 
     // 1s ~ 2s
-    Arrays.sort(result, 0, size);
+//    Arrays.sort(result, 0, size);
 
     buffer.clear();
     for (int i = 0; i < size; i++) {
