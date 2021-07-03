@@ -59,10 +59,10 @@ public class DiskBlock {
     this.col = col;
     this.blockIndex = blockIndex;
     this.bytePrev = (byte) blockIndex;
+    this.initFileChannel();
   }
 
   public void storeArr(ByteBuffer byteBuffer) throws Exception {
-    initFileChannel();
     fileChannel.write(byteBuffer);
   }
 
@@ -86,32 +86,36 @@ public class DiskBlock {
             (((long)b0 & 0xff)      ));
   }
 
-  private void initFileChannel() throws IOException {
-    if (fileChannel == null) {
-      synchronized (this) {
-        if (fileChannel == null) {
-          File path = new File(workspaceDir + "/" + tableName);
-          if (!path.exists()) {
-            path.mkdirs();
-          }
+  private void initFileChannel() {
+    try {
+      if (fileChannel == null) {
+        synchronized (this) {
+          if (fileChannel == null) {
+            File path = new File(workspaceDir + "/" + tableName);
+            if (!path.exists()) {
+              path.mkdirs();
+            }
 
-          file = new File(workspaceDir + "/" + tableName + "/" + col + "_" + blockIndex + ".data");
-          if (file.exists()) {
-            file.delete();
-          }
-          file.createNewFile();
-          fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
+            file = new File(workspaceDir + "/" + tableName + "/" + col + "_" + blockIndex + ".data");
+            if (!file.exists()) {
+              file.createNewFile();
+            }
+            fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
 
-          // sorted file
-          sortedFile = new File(workspaceDir + "/" + tableName + "/sorted_" + col + "_" + blockIndex + ".data");
-          if (sortedFile.exists()) {
-            sortedFile.delete();
+            // sorted file
+            sortedFile = new File(workspaceDir + "/" + tableName + "/sorted_" + col + "_" + blockIndex + ".data");
+            if (!sortedFile.exists()) {
+              sortedFile.createNewFile();
+            }
+            sortedFileChannel = FileChannel.open(sortedFile.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
           }
-          sortedFile.createNewFile();
-          sortedFileChannel = FileChannel.open(sortedFile.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
         }
       }
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
     }
+
   }
 
   private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[8000000]);

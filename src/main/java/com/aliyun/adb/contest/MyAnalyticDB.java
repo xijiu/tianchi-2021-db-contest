@@ -3,6 +3,7 @@ package com.aliyun.adb.contest;
 import com.aliyun.adb.contest.spi.AnalyticDB;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -62,6 +63,8 @@ public class MyAnalyticDB implements AnalyticDB {
   /** 第二列的所有块的元素个数 */
   private final int[] table_2_BlockDataNumArr2 = new int[blockNum];
 
+  private File storeBlockNumberFile = null;
+
   private final int[] firstColDataLen = new int[cpuThreadNum * blockNum];
 
   private final int[] secondColDataLen = new int[cpuThreadNum * blockNum];
@@ -95,20 +98,13 @@ public class MyAnalyticDB implements AnalyticDB {
   private static volatile boolean isFirstInvoke = true;
 
   public MyAnalyticDB() {
-    try {
-      long begin = System.currentTimeMillis();
-      System.out.println("stable init prepare, time is " + begin);
-      init();
-      System.out.println("stable init time cost : " + (System.currentTimeMillis() - begin));
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
   }
 
   /**
    * 初始化
    */
-  private void init() throws InterruptedException {
+  private void init(String workspaceDir) throws InterruptedException {
+    DiskBlock.workspaceDir = workspaceDir;
     for (int i = 0; i < blockNum; i++) {
       diskBlockData1.add(new DiskBlock("1", 1, i));
       diskBlockData2.add(new DiskBlock("1", 2, i));
@@ -133,8 +129,10 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public void load(String tpchDataFileDir, String workspaceDir) throws Exception {
+    init(workspaceDir);
     setInvokeFlag(workspaceDir);
     if (!isFirstInvoke) {
+      reloadBlockNumberFile();
       return ;
     }
 
@@ -155,12 +153,56 @@ public class MyAnalyticDB implements AnalyticDB {
       finishThreadNum.set(0);
       storeBlockData(dataFile);
     }
+
+    storeBlockNumberFile();
     loadCostTime = System.currentTimeMillis() - begin;
     System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
     System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
     System.out.println("============> sort data cost time : " + sortDataTime.get() / cpuThreadNum);
     System.out.println("");
     System.out.println("============> stable load cost time : " + loadCostTime);
+  }
+
+  private void reloadBlockNumberFile() throws IOException {
+    storeBlockNumberFile = new File(DiskBlock.workspaceDir + "/blockNumberInfo.data");
+    FileChannel fileChannel = FileChannel.open(storeBlockNumberFile.toPath(), StandardOpenOption.READ);
+    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4);
+    fileChannel.read(byteBuffer);
+    for (int i = 0; i < blockNum; i++) {
+      table_1_BlockDataNumArr1[i] = byteBuffer.getInt();
+    }
+    for (int i = 0; i < blockNum; i++) {
+      table_1_BlockDataNumArr2[i] = byteBuffer.getInt();
+    }
+    for (int i = 0; i < blockNum; i++) {
+      table_2_BlockDataNumArr1[i] = byteBuffer.getInt();
+    }
+    for (int i = 0; i < blockNum; i++) {
+      table_2_BlockDataNumArr2[i] = byteBuffer.getInt();
+    }
+  }
+
+  private void storeBlockNumberFile() throws Exception {
+    storeBlockNumberFile = new File(DiskBlock.workspaceDir + "/blockNumberInfo.data");
+    storeBlockNumberFile.createNewFile();
+    FileChannel fileChannel = FileChannel.open(storeBlockNumberFile.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE);
+    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4);
+    for (int num : table_1_BlockDataNumArr1) {
+      byteBuffer.putInt(num);
+    }
+    for (int num : table_1_BlockDataNumArr2) {
+      byteBuffer.putInt(num);
+    }
+    for (int num : table_2_BlockDataNumArr1) {
+      byteBuffer.putInt(num);
+    }
+    for (int num : table_2_BlockDataNumArr2) {
+      byteBuffer.putInt(num);
+    }
+
+    byteBuffer.flip();
+    fileChannel.write(byteBuffer);
+    fileChannel.close();
   }
 
   private void setInvokeFlag(String workspaceDir) {
