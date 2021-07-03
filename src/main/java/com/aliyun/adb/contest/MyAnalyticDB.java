@@ -550,9 +550,9 @@ public class MyAnalyticDB implements AnalyticDB {
 
       List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_1 : diskBlockData_2_1;
 
-//      putToByteBuffer(firstThreadCacheArr[blockIndex], length);
-//      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
-      diskBlocks.get(blockIndex).storeLongArr(firstThreadCacheArr[blockIndex], length);
+      putToByteBuffer(firstThreadCacheArr[blockIndex], length);
+      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
+//      diskBlocks.get(blockIndex).storeLongArr(firstThreadCacheArr[blockIndex], length);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -562,9 +562,9 @@ public class MyAnalyticDB implements AnalyticDB {
       secondColDataLen[(threadIndex << 7) + blockIndex] += length;
 
       List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
-//      putToByteBuffer(secondThreadCacheArr[blockIndex], length);
-//      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
-      diskBlocks.get(blockIndex).storeLongArr(secondThreadCacheArr[blockIndex], length);
+      putToByteBuffer(secondThreadCacheArr[blockIndex], length);
+      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
+//      diskBlocks.get(blockIndex).storeLongArr(secondThreadCacheArr[blockIndex], length);
     }
 
     private void putToByteBuffer(long[] data, int length) {
