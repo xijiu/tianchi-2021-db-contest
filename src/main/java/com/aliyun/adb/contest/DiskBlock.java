@@ -119,7 +119,7 @@ public class DiskBlock {
       }
     }
 
-    return PubTools.solve(data, 0, idx, index);
+    return PubTools.solve(data, 0, idx - 1, index);
   }
 
 
