@@ -75,6 +75,7 @@ public class DiskBlock {
     Arrays.sort(cacheArr, 0, cacheArrIndex);
     int num = parSortNum.incrementAndGet();
     File file = new File(workspaceDir + "/" + tableName + "/partSorted_" + col + "_" + blockIndex + "_" + num + ".data");
+    file.createNewFile();
     FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE);
     ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1 * 1024 * 1024);
     for (int i = 0; i < cacheArrIndex; i++) {
