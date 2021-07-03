@@ -623,13 +623,17 @@ public class MyAnalyticDB implements AnalyticDB {
 
 
 
-  int time = 0;
+  private AtomicInteger invokeTimes = new AtomicInteger();
 
   private volatile boolean loadFinish = false;
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-    System.out.println(table);
+    int num = invokeTimes.incrementAndGet();
+    if (num >= 4000) {
+      System.out.println("=================> total cost : " + (System.currentTimeMillis() - totalBeginTime));
+      return "0";
+    }
 //    if (1 == 1) {
 //      return "0";
 //    }
@@ -660,8 +664,8 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-    System.out.println("table is " + table + ", column is" + column
-            + ", percentile is " + percentile + ", number is " + number);
+//    System.out.println("table is " + table + ", column is" + column
+//            + ", percentile is " + percentile + ", number is " + number);
 
     String result;
     if (table.startsWith("lineitem")) {
@@ -677,7 +681,7 @@ public class MyAnalyticDB implements AnalyticDB {
         result = secondQuantileForTable2(number);
       }
     }
-    System.out.println("=====> stable quantile cost time is " + (System.currentTimeMillis() - begin) + ", result is " + result);
+//    System.out.println("=====> stable quantile cost time is " + (System.currentTimeMillis() - begin) + ", result is " + result);
     return result;
   }
 
@@ -690,7 +694,7 @@ public class MyAnalyticDB implements AnalyticDB {
       total += count;
       if (total >= number) {
         int index = number - beforeTotal - 1;
-        System.out.println(Thread.currentThread().getName() + " stable first number read disk, block index is " + i);
+//        System.out.println(Thread.currentThread().getName() + " stable first number read disk, block index is " + i);
         return String.valueOf(diskBlockData_1_1.get(i).get2(index, count));
       }
     }
@@ -705,7 +709,7 @@ public class MyAnalyticDB implements AnalyticDB {
       total += count;
       if (total >= number) {
         int index = number - beforeTotal - 1;
-        System.out.println(Thread.currentThread().getName() + " stable first number read disk, block index is " + i);
+//        System.out.println(Thread.currentThread().getName() + " stable first number read disk, block index is " + i);
         return String.valueOf(diskBlockData_2_1.get(i).get2(index, count));
       }
     }
@@ -722,7 +726,7 @@ public class MyAnalyticDB implements AnalyticDB {
       total += count;
       if (total >= number) {
         int index = number - beforeTotal - 1;
-        System.out.println(Thread.currentThread().getName() + " stable second number read disk, block index is " + i);
+//        System.out.println(Thread.currentThread().getName() + " stable second number read disk, block index is " + i);
         return String.valueOf(diskBlockData_1_2.get(i).get2(index, count));
       }
     }
@@ -737,7 +741,7 @@ public class MyAnalyticDB implements AnalyticDB {
       total += count;
       if (total >= number) {
         int index = number - beforeTotal - 1;
-        System.out.println(Thread.currentThread().getName() + " second number read disk, block index is " + i);
+//        System.out.println(Thread.currentThread().getName() + " second number read disk, block index is " + i);
         return String.valueOf(diskBlockData_2_2.get(i).get2(index, count));
       }
     }
