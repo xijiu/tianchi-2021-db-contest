@@ -102,13 +102,15 @@ public class DiskBlock {
 
   public long get2(int index, int count) throws Exception {
     long[] data = helper.get();
-    ByteBuffer byteBuffer = ByteBuffer.allocate(7 * 1024 * 128);
+    int readSize = 7 * 1024 * 128;
+    ByteBuffer byteBuffer = ByteBuffer.allocate(readSize);
     byte[] array = byteBuffer.array();
     int idx = 0;
-    fileChannel.position(0);
+    long pos = 0;
     while (true) {
       byteBuffer.clear();
-      int flag = fileChannel.read(byteBuffer);
+      int flag = fileChannel.read(byteBuffer, pos);
+      pos += readSize;
       if (flag == -1) {
         break;
       }
@@ -167,7 +169,7 @@ public class DiskBlock {
 
   }
 
-  private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[8200000]);
+  private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[8000000]);
 
 //  public void query() throws Exception {
 //    int size = (int) (file.length() / 7);
