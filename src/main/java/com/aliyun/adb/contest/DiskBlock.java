@@ -1,6 +1,8 @@
 package com.aliyun.adb.contest;
 
 
+import com.aliyun.adb.contest.utils.PubTools;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -96,6 +98,27 @@ public class DiskBlock {
     sortedFileChannel.read(byteBuffer, index * 7L);
     byte[] array = byteBuffer.array();
     return makeLong(bytePrev, array[0], array[1], array[2], array[3], array[4], array[5], array[6]);
+  }
+
+  public long get2(int index, int count) throws Exception {
+    long[] data = helper.get();
+    ByteBuffer byteBuffer = ByteBuffer.allocate(7 * 1024 * 128);
+    byte[] array = byteBuffer.array();
+    int idx = 0;
+    while (true) {
+      byteBuffer.clear();
+      int flag = fileChannel.read(byteBuffer);
+      if (flag == -1) {
+        break;
+      }
+      int length = byteBuffer.position();
+      for (int i = 0; i < length; i += 7) {
+        data[idx++] = makeLong(bytePrev, array[i], array[i + 1], array[i + 2],
+                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
+      }
+    }
+
+    return PubTools.solve(data, 0, idx, index);
   }
 
 
