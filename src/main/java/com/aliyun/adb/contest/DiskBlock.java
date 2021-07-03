@@ -37,7 +37,7 @@ public class DiskBlock {
 
   private final String tableName;
 
-  private final int cacheArrLen = 14 * 1024 * 1024 / 8;
+  private final int cacheArrLen = 7 * 1024 * 1024 / 8;
 
   private final long[] cacheArr = new long[cacheArrLen];
 
