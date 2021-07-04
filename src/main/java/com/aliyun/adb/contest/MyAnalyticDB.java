@@ -599,7 +599,7 @@ public class MyAnalyticDB implements AnalyticDB {
       long time = System.currentTimeMillis();
       System.out.println("finish time is : " + time);
       System.out.println("=================> total cost : " + (time - totalBeginTime));
-      return "0";
+//      return "0";
     }
 
 //    if (1 == 1) {
