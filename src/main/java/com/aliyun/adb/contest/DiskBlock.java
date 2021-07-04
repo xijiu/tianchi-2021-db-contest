@@ -53,7 +53,7 @@ public class DiskBlock {
     this.tableName = tableName;
     this.col = col;
     this.blockIndex = blockIndex;
-    this.bytePrev = (byte) blockIndex;
+    this.bytePrev = (byte) (blockIndex >> (MyAnalyticDB.power - 8 + 1));
     this.initFileChannel();
   }
 
