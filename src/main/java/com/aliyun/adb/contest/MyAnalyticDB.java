@@ -21,17 +21,7 @@ public class MyAnalyticDB implements AnalyticDB {
   /** 每一列数据分多少块 */
   private static final int blockNum = (int) Math.pow(2, power);
 
-//  private final int beginDirectMemoryIndex = 120;
-
-  /** 当前block块，及以上的数据，均存内存；以下的块存硬盘 */
-//  private final int beginMemoryIndex = 126;
-
-  /** 每一块存储long值的个数 */
-  private final int perBlockDataNum = 2350000;
-
   private static final int cpuThreadNum = 20;
-
-  private final int perThreadBlockDataNum = 2400000 / cpuThreadNum;
 
   /** 单次读取文件的大小，单位字节 */
   private final int readFileLen = 1 * 1024 * 1024;
@@ -74,11 +64,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final List<DiskBlock> diskBlockData_1_1 = new ArrayList<>(blockNum);
 
-  private final AtomicInteger tableHelper1 = new AtomicInteger();
-
   private final List<DiskBlock> diskBlockData_1_2 = new ArrayList<>(blockNum);
-
-  private final AtomicInteger tableHelper2 = new AtomicInteger();
 
   private final List<DiskBlock> diskBlockData_2_1 = new ArrayList<>(blockNum);
 
@@ -392,17 +378,6 @@ public class MyAnalyticDB implements AnalyticDB {
           }
         }
         totalFinishThreadNum.incrementAndGet();
-
-//        while (true) {
-//          if (totalFinishThreadNum.get() == cpuThreadNum) {
-//            long sortBegin = System.currentTimeMillis();
-//            sortDataTest();
-//            sortDataTime.addAndGet(System.currentTimeMillis() - sortBegin);
-//            break;
-//          } else {
-//            Thread.sleep(1);
-//          }
-//        }
       } catch (Exception e) {
         finishThreadNum.incrementAndGet();
         e.printStackTrace();
@@ -410,22 +385,6 @@ public class MyAnalyticDB implements AnalyticDB {
       long cost = System.currentTimeMillis() - begin;
       System.out.println(Thread.currentThread().getName() + " cost time : " + cost);
     }
-
-//    private void sortDataTest() throws Exception {
-//      AtomicInteger num = operateFirstFile ? tableHelper1 : tableHelper2;
-//      int totalNum = blockNum * 2;
-//      int index;
-//      while ((index = num.getAndIncrement()) < totalNum) {
-//        if (index < blockNum) {
-//          List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_1 : diskBlockData_2_1;
-//          diskBlocks.get(index).query();
-//        } else {
-//          index -= blockNum;
-//          List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
-//          diskBlocks.get(index).query();
-//        }
-//      }
-//    }
 
     private int tmpBlockIndex = -1;
 
@@ -637,7 +596,7 @@ public class MyAnalyticDB implements AnalyticDB {
     int num = invokeTimes.incrementAndGet();
     if (num >= 4000) {
       System.out.println("=================> total cost : " + (System.currentTimeMillis() - totalBeginTime));
-      return "0";
+//      return "0";
     }
 
 //    if (1 == 1) {
