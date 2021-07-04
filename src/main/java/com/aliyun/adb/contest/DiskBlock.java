@@ -27,7 +27,7 @@ public class DiskBlock {
 
   private volatile FileChannel fileChannel = null;
 
-  public static final int cacheLength = 4096 * 2;
+  public static final int cacheLength = 4096 * 3;
 
   public static final int secondCacheLength = (int) (cacheLength);
 
@@ -228,6 +228,6 @@ public class DiskBlock {
    * 512- 2000000
    * 1024-1000000
    *  */
-  private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[1000000]);
+  private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[2000000]);
 
 }
