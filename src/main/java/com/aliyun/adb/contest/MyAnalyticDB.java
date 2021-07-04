@@ -21,7 +21,7 @@ public class MyAnalyticDB implements AnalyticDB {
   /** 每一列数据分多少块 */
   private static final int blockNum = (int) Math.pow(2, power);
 
-  private static final int cpuThreadNum = 24;
+  private static final int cpuThreadNum = 20;
 
   /** 单次读取文件的大小，单位字节 */
   private final int readFileLen = 1 * 1024 * 1024;
@@ -595,6 +595,15 @@ public class MyAnalyticDB implements AnalyticDB {
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
     int num = invokeTimes.incrementAndGet();
+    if (num % 100 == 0) {
+      Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
+      Set<Thread> threads = map.keySet();
+      System.out.println("begin--------------------------");
+      for (Thread thread : threads) {
+        System.out.println(thread.getId() + " : " + thread.getName());
+      }
+      System.out.println("end--------------------------");
+    }
     if (num >= 4000) {
       long time = System.currentTimeMillis();
       System.out.println("finish time is : " + time);
