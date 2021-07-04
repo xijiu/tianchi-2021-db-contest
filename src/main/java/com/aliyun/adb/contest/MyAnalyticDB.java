@@ -595,15 +595,6 @@ public class MyAnalyticDB implements AnalyticDB {
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
     int num = invokeTimes.incrementAndGet();
-    if (num % 100 == 0) {
-      Map<Thread, StackTraceElement[]> map = Thread.getAllStackTraces();
-      Set<Thread> threads = map.keySet();
-      System.out.println("begin--------------------------");
-      for (Thread thread : threads) {
-        System.out.println(thread.getId() + " : " + thread.getName());
-      }
-      System.out.println("end--------------------------");
-    }
     if (num >= 4000) {
       long time = System.currentTimeMillis();
       System.out.println("finish time is : " + time);
