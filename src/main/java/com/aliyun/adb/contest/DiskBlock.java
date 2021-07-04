@@ -27,13 +27,13 @@ public class DiskBlock {
 
   private File file = null;
 
-  private File sortedFile = null;
+//  private File sortedFile = null;
 
   private volatile FileChannel fileChannel = null;
 
-  private volatile FileChannel sortedFileChannel = null;
+//  private volatile FileChannel sortedFileChannel = null;
 
-  public static final int cacheLength = 4096 * 3;
+  public static final int cacheLength = 4096 * 2;
 
   public static final int secondCacheLength = (int) (cacheLength);
 
@@ -71,7 +71,7 @@ public class DiskBlock {
 //    }
 //  }
 
-  private AtomicInteger parSortNum = new AtomicInteger();
+//  private AtomicInteger parSortNum = new AtomicInteger();
 
 //  private void storeLongArrToDisk() throws Exception {
 //    Arrays.sort(cacheArr, 0, cacheArrIndex);
@@ -93,12 +93,12 @@ public class DiskBlock {
 //    cacheArrIndex = 0;
 //  }
 
-  public long get(int index, int count) throws Exception {
-    ByteBuffer byteBuffer = ByteBuffer.allocate(7);
-    sortedFileChannel.read(byteBuffer, index * 7L);
-    byte[] array = byteBuffer.array();
-    return makeLong(bytePrev, array[0], array[1], array[2], array[3], array[4], array[5], array[6]);
-  }
+//  public long get(int index, int count) throws Exception {
+//    ByteBuffer byteBuffer = ByteBuffer.allocate(7);
+//    sortedFileChannel.read(byteBuffer, index * 7L);
+//    byte[] array = byteBuffer.array();
+//    return makeLong(bytePrev, array[0], array[1], array[2], array[3], array[4], array[5], array[6]);
+//  }
 
   public long get2(int index, int count) throws Exception {
     long[] data = helper.get();
@@ -154,11 +154,11 @@ public class DiskBlock {
             fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
 
             // sorted file
-            sortedFile = new File(workspaceDir + "/" + tableName + "/sorted_" + col + "_" + blockIndex + ".data");
-            if (!sortedFile.exists()) {
-              sortedFile.createNewFile();
-            }
-            sortedFileChannel = FileChannel.open(sortedFile.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
+//            sortedFile = new File(workspaceDir + "/" + tableName + "/sorted_" + col + "_" + blockIndex + ".data");
+//            if (!sortedFile.exists()) {
+//              sortedFile.createNewFile();
+//            }
+//            sortedFileChannel = FileChannel.open(sortedFile.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
           }
         }
       }
