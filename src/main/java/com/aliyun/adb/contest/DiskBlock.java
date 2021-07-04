@@ -27,7 +27,7 @@ public class DiskBlock {
 
   private volatile FileChannel fileChannel = null;
 
-  public static final int cacheLength = 4096 * 2;
+  public static final int cacheLength = 4096 * 1;
 
   public static final int secondCacheLength = (int) (cacheLength);
 
