@@ -35,7 +35,7 @@ public class DiskBlock {
 
   private static final int perReadSize = 7 * 1024 * 128;
 
-  private static final int concurrentQueryThreadNum = 3;
+  private static final int concurrentQueryThreadNum = 2;
 
   private final long[] beginReadPosArr = new long[concurrentQueryThreadNum];
 
