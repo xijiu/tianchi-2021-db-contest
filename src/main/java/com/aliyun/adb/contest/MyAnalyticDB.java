@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MyAnalyticDB implements AnalyticDB {
 
   /** 7=128  8=256  9=512 */
-  public static final int power = 10;
+  public static final int power = 9;
 
   private final int drift = 64 - (power + 1);
 
@@ -599,7 +599,7 @@ public class MyAnalyticDB implements AnalyticDB {
       long time = System.currentTimeMillis();
       System.out.println("finish time is : " + time);
       System.out.println("=================> total cost : " + (time - totalBeginTime));
-//      return "0";
+      return "0";
     }
 
 //    if (1 == 1) {
