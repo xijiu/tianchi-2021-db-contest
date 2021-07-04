@@ -590,6 +590,8 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private AtomicInteger invokeTimes = new AtomicInteger();
 
+  public static AtomicLong cpuSloveTime = new AtomicLong();
+
   private volatile boolean loadFinish = false;
 
   @Override
@@ -598,6 +600,7 @@ public class MyAnalyticDB implements AnalyticDB {
     if (num >= 4000) {
       long time = System.currentTimeMillis();
       System.out.println("finish time is : " + time);
+      System.out.println("=================> cpuSloveTime cost : " + (cpuSloveTime.get() / 8));
       System.out.println("=================> total cost : " + (time - totalBeginTime));
       return "0";
     }
