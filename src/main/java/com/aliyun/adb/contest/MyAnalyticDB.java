@@ -13,8 +13,13 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class MyAnalyticDB implements AnalyticDB {
 
+  /** 7=128  8=256  9=512 */
+  public static final int power = 7;
+
+  private final int drift = 64 - (power + 1);
+
   /** 每一列数据分多少块 */
-  private final int blockNum = 128;
+  private static final int blockNum = (int) Math.pow(2, power);
 
 //  private final int beginDirectMemoryIndex = 120;
 
@@ -465,7 +470,7 @@ public class MyAnalyticDB implements AnalyticDB {
         long headData = bucketHeadArr[bucket + 1];
         long data = tailData * bucketBaseArr[bucket + 1] + headData;
         int number = bucketDataPosArr[bucket + 1];
-        int blockIndex = (int) (data >> 56);
+        int blockIndex = (int) (data >> drift);
         if (number == 1) {
           firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data;
           if (firstCacheLengthArr[blockIndex] == cacheLength) {
@@ -531,13 +536,13 @@ public class MyAnalyticDB implements AnalyticDB {
       for (; i < endIndex; i = i + 2) {
         long data1 = bucketLongArr[i];
         long data2 = bucketLongArr[i + 1];
-        int blockIndex = (int) (data1 >> 56);
+        int blockIndex = (int) (data1 >> drift);
         firstThreadCacheArr[blockIndex][helperNum = firstCacheLengthArr[blockIndex]++] = data1;
         if (helperNum + 1 == cacheLength) {
           batchSaveFirstCol(blockIndex);
         }
 
-        blockIndex = (int) (data2 >> 56);
+        blockIndex = (int) (data2 >> drift);
         secondThreadCacheArr[blockIndex][helperNum = secondCacheLengthArr[blockIndex]++] = data2;
         if (helperNum + 1 == secondCacheLength) {
           batchSaveSecondCol(blockIndex);
@@ -545,7 +550,7 @@ public class MyAnalyticDB implements AnalyticDB {
       }
       if (!normal) {
         long data2 = bucketLongArr[0];
-        int blockIndex = (int) (data2 >> 56);
+        int blockIndex = (int) (data2 >> drift);
         secondThreadCacheArr[blockIndex][helperNum = secondCacheLengthArr[blockIndex]++] = data2;
         if (helperNum + 1 == secondCacheLength) {
           batchSaveSecondCol(blockIndex);
@@ -553,7 +558,7 @@ public class MyAnalyticDB implements AnalyticDB {
       }
       if (i - 2 != endIndex - 1) {
         long data1 = bucketLongArr[endIndex];
-        int blockIndex = (int) (data1 >> 56);
+        int blockIndex = (int) (data1 >> drift);
         firstThreadCacheArr[blockIndex][helperNum = firstCacheLengthArr[blockIndex]++] = data1;
         if (helperNum + 1 == cacheLength) {
           batchSaveFirstCol(blockIndex);
@@ -571,7 +576,7 @@ public class MyAnalyticDB implements AnalyticDB {
       int length = firstCacheLengthArr[blockIndex];
       firstCacheLengthArr[blockIndex] = 0;
       // 标记已经在内存存储的位置
-      firstColDataLen[(threadIndex << 7) + blockIndex] += length;
+      firstColDataLen[(threadIndex << power) + blockIndex] += length;
 
       List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_1 : diskBlockData_2_1;
 
@@ -584,7 +589,7 @@ public class MyAnalyticDB implements AnalyticDB {
       int length = secondCacheLengthArr[blockIndex];
       secondCacheLengthArr[blockIndex] = 0;
       // 标记已经在内存存储的位置
-      secondColDataLen[(threadIndex << 7) + blockIndex] += length;
+      secondColDataLen[(threadIndex << power) + blockIndex] += length;
 
       List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
       putToByteBuffer(secondThreadCacheArr[blockIndex], length);
