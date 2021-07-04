@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MyAnalyticDB implements AnalyticDB {
 
   /** 7=128  8=256  9=512 */
-  public static final int power = 9;
+  public static final int power = 10;
 
   private final int drift = 64 - (power + 1);
 
