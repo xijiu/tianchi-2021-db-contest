@@ -87,6 +87,7 @@ public class MyAnalyticDB implements AnalyticDB {
   private static volatile boolean isFirstInvoke = true;
 
   public MyAnalyticDB() {
+    System.out.println("current time is " + System.currentTimeMillis());
   }
 
   /**
@@ -595,8 +596,10 @@ public class MyAnalyticDB implements AnalyticDB {
   public String quantile(String table, String column, double percentile) throws Exception {
     int num = invokeTimes.incrementAndGet();
     if (num >= 4000) {
-      System.out.println("=================> total cost : " + (System.currentTimeMillis() - totalBeginTime));
-//      return "0";
+      long time = System.currentTimeMillis();
+      System.out.println("finish time is : " + time);
+      System.out.println("=================> total cost : " + (time - totalBeginTime));
+      return "0";
     }
 
 //    if (1 == 1) {
