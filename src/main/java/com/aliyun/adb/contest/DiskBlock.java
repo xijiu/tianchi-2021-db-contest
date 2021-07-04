@@ -228,6 +228,6 @@ public class DiskBlock {
    * 512- 2000000
    * 1024-1000000
    *  */
-  private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[2000000]);
+  private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[1000000]);
 
 }
