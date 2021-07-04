@@ -10,6 +10,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -43,7 +44,7 @@ public class DiskBlock {
 
   private final int[] readSizeArr = new int[concurrentQueryThreadNum];
 
-//  private static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+  private static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
 
 
 
@@ -64,46 +65,71 @@ public class DiskBlock {
   public long get2(int index, int count) throws Exception {
     long[] data = helper.get();
     fillThreadReadFileInfo();
-//    System.out.println("::: test 1 ====>  " + Arrays.toString(beginReadPosArr) + "  *****, " + Arrays.toString(readSizeArr));
 
-    Thread[] threads = new Thread[concurrentQueryThreadNum - 1];
-    for (int i = 0; i < threads.length; i++) {
-      int finalI = i;
-      threads[i] = new Thread(() -> {
-        try {
-          ByteBuffer byteBuffer = threadLocal.get();
-          byte[] array = byteBuffer.array();
-          long pos = beginReadPosArr[finalI];
-          int idx = (int) (pos / 7);
-          int endIdx = idx + readSizeArr[finalI];
-          while (true) {
-            byteBuffer.clear();
-            int flag = fileChannel.read(byteBuffer, pos);
-            pos += perReadSize;
-            if (flag == -1) {
-              break;
-            }
-            int length = byteBuffer.position();
-            for (int j = 0; j < length; j += 7) {
-              data[idx++] = makeLong(bytePrev, array[j], array[j + 1], array[j + 2],
-                      array[j + 3], array[j + 4], array[j + 5], array[j + 6]);
-            }
-            if (idx >= endIdx) {
-              break;
-            }
+    int finalI = 0;
+    Future<?> future = executor.submit(() -> {
+      try {
+        ByteBuffer byteBuffer = threadLocal.get();
+        byte[] array = byteBuffer.array();
+        long pos = beginReadPosArr[finalI];
+        int idx = (int) (pos / 7);
+        int endIdx = idx + readSizeArr[finalI];
+        while (true) {
+          byteBuffer.clear();
+          int flag = fileChannel.read(byteBuffer, pos);
+          pos += perReadSize;
+          if (flag == -1) {
+            break;
           }
-        } catch (Exception e) {
-          e.printStackTrace();
+          int length = byteBuffer.position();
+          for (int j = 0; j < length; j += 7) {
+            data[idx++] = makeLong(bytePrev, array[j], array[j + 1], array[j + 2],
+                    array[j + 3], array[j + 4], array[j + 5], array[j + 6]);
+          }
+          if (idx >= endIdx) {
+            break;
+          }
         }
-      });
-      threads[i].start();
-    }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
+
+//    Thread[] threads = new Thread[concurrentQueryThreadNum - 1];
+//    for (int i = 0; i < threads.length; i++) {
+//      int finalI = i;
+//      threads[i] = new Thread(() -> {
+//        try {
+//          ByteBuffer byteBuffer = threadLocal.get();
+//          byte[] array = byteBuffer.array();
+//          long pos = beginReadPosArr[finalI];
+//          int idx = (int) (pos / 7);
+//          int endIdx = idx + readSizeArr[finalI];
+//          while (true) {
+//            byteBuffer.clear();
+//            int flag = fileChannel.read(byteBuffer, pos);
+//            pos += perReadSize;
+//            if (flag == -1) {
+//              break;
+//            }
+//            int length = byteBuffer.position();
+//            for (int j = 0; j < length; j += 7) {
+//              data[idx++] = makeLong(bytePrev, array[j], array[j + 1], array[j + 2],
+//                      array[j + 3], array[j + 4], array[j + 5], array[j + 6]);
+//            }
+//            if (idx >= endIdx) {
+//              break;
+//            }
+//          }
+//        } catch (Exception e) {
+//          e.printStackTrace();
+//        }
+//      });
+//      threads[i].start();
+//    }
 
     currentThreadRead();
-
-    for (Thread thread : threads) {
-      thread.join();
-    }
+    future.get();
     return PubTools.solve(data, 0, (int) (file.length() / 7 - 1), index);
   }
 
@@ -190,7 +216,7 @@ public class DiskBlock {
 
 
   public static long makeLong(byte b7, byte b6, byte b5, byte b4,
-                               byte b3, byte b2, byte b1, byte b0){
+                              byte b3, byte b2, byte b1, byte b0){
     return ((((long)b7       ) << 56) |
             (((long)b6 & 0xff) << 48) |
             (((long)b5 & 0xff) << 40) |
