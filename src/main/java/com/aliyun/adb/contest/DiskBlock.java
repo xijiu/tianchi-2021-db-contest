@@ -232,6 +232,19 @@ public class DiskBlock {
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index, int count) throws Exception {
+    FileChannel partFileChannel = null;
+    long lastTmpSize = 0;
+    long tmpSize = 0;
+    for (int i = 0; i < splitNum; i++) {
+      tmpSize += partFileChannels[i].size();
+      if (tmpSize > index * 7) {
+        partFileChannel = partFileChannels[i];
+        index = (int) (index - (lastTmpSize / 7));
+        break;
+      }
+      lastTmpSize = tmpSize;
+    }
+
     long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
     byte[] array = byteBuffer.array();
@@ -240,7 +253,7 @@ public class DiskBlock {
     while (true) {
       byteBuffer.clear();
       long begin1 = System.currentTimeMillis();
-      int flag = fileChannel.read(byteBuffer, pos);
+      int flag = partFileChannel.read(byteBuffer, pos);
       MyAnalyticDB.diskReadFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
       pos += perReadSize;
@@ -254,10 +267,7 @@ public class DiskBlock {
       }
     }
 
-    long begin = System.currentTimeMillis();
-    long solve = PubTools.solve(data, 0, idx - 1, index);
-    MyAnalyticDB.cpuSloveTime.addAndGet(System.currentTimeMillis() - begin);
-    return solve;
+    return PubTools.solve(data, 0, idx - 1, index);
   }
 
 
