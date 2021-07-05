@@ -50,17 +50,17 @@ public class DiskBlock {
 
   private final FileChannel[] partFileChannels = new FileChannel[splitNum];
 
-  private long[][] dataCache1 = new long[splitNum][cacheLength];
+  private long[][] dataCache1 = null;
 
-  private short[] dataCacheLen1 = new short[splitNum];
+  private short[] dataCacheLen1 = null;
 
-  private long[][] dataCache2 = new long[splitNum][secondCacheLength];
+  private long[][] dataCache2 = null;
 
-  private short[] dataCacheLen2 = new short[splitNum];
+  private short[] dataCacheLen2 = null;
 
-  private byte[] batchWriteArr = new byte[secondCacheLength * 7];
+  private byte[] batchWriteArr = null;
 
-  private ByteBuffer batchWriteBuffer = ByteBuffer.wrap(batchWriteArr);
+  private ByteBuffer batchWriteBuffer = null;
 
 
   public DiskBlock(String tableName, int col, int blockIndex) {
@@ -68,6 +68,14 @@ public class DiskBlock {
     this.col = col;
     this.blockIndex = blockIndex;
     this.bytePrev = (byte) (blockIndex >> (MyAnalyticDB.power - 8 + 1));
+    if (MyAnalyticDB.isFirstInvoke) {
+      dataCache1 = new long[splitNum][cacheLength];
+      dataCacheLen1 = new short[splitNum];
+      dataCache2 = new long[splitNum][secondCacheLength];
+      dataCacheLen2 = new short[splitNum];
+      batchWriteArr = new byte[secondCacheLength * 7];
+      batchWriteBuffer = ByteBuffer.wrap(batchWriteArr);
+    }
     this.initFileChannel();
   }
 

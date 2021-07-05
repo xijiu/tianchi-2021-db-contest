@@ -96,7 +96,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final boolean isTest = step2BeginTime < 1627749928000L;
 
-  private static volatile boolean isFirstInvoke = true;
+  public static volatile boolean isFirstInvoke = true;
 
   public MyAnalyticDB() {
     System.out.println("current time is " + System.currentTimeMillis());
