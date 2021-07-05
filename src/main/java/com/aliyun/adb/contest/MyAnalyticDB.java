@@ -108,12 +108,33 @@ public class MyAnalyticDB implements AnalyticDB {
   private void init(String workspaceDir) throws InterruptedException {
     DiskBlock.workspaceDir = workspaceDir;
     long begin = System.currentTimeMillis();
+    Thread thread1 = new Thread(() -> {
+      for (int i = 0; i < blockNum; i++) {
+        diskBlockData_1_1.add(new DiskBlock("1", 1, i));
+      }
+    });
+    thread1.start();
+
+    Thread thread2 = new Thread(() -> {
+      for (int i = 0; i < blockNum; i++) {
+        diskBlockData_1_2.add(new DiskBlock("1", 2, i));
+      }
+    });
+    thread2.start();
+
+    Thread thread3 = new Thread(() -> {
+      for (int i = 0; i < blockNum; i++) {
+        diskBlockData_2_1.add(new DiskBlock("2", 1, i));
+      }
+    });
+    thread3.start();
+
     for (int i = 0; i < blockNum; i++) {
-      diskBlockData_1_1.add(new DiskBlock("1", 1, i));
-      diskBlockData_1_2.add(new DiskBlock("1", 2, i));
-      diskBlockData_2_1.add(new DiskBlock("2", 1, i));
       diskBlockData_2_2.add(new DiskBlock("2", 2, i));
     }
+    thread1.join();
+    thread2.join();
+    thread3.join();
     System.out.println("init cost time : " + (System.currentTimeMillis() - begin));
 //    Thread thread = new Thread(() -> {
 //      try {
@@ -133,6 +154,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public void load(String tpchDataFileDir, String workspaceDir) throws Exception {
+    long begin = System.currentTimeMillis();
     setInvokeFlag(workspaceDir);
     init(workspaceDir);
     if (!isFirstInvoke) {
@@ -140,7 +162,6 @@ public class MyAnalyticDB implements AnalyticDB {
       return ;
     }
 
-    long begin = System.currentTimeMillis();
     System.out.println("stable load invoked, time is " + begin);
 
     DiskBlock.workspaceDir = workspaceDir;
