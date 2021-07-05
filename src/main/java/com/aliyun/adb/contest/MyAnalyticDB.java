@@ -22,7 +22,7 @@ public class MyAnalyticDB implements AnalyticDB {
    * 512- 2000000
    * 1024-1000000
    */
-  public static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[1000000]);
+  public static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[8000000]);
 
   private final int drift = 64 - (power + 1);
 
