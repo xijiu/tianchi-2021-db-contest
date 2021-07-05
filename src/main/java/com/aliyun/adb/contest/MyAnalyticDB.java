@@ -319,7 +319,9 @@ public class MyAnalyticDB implements AnalyticDB {
       cpuThread[i].join();
     }
 
+    long finalBeginTime = System.currentTimeMillis();
     storeFinalDataToDisk();
+    System.out.println("storeFinalDataToDisk time cost : " + (System.currentTimeMillis() - finalBeginTime));
 
     if (operateFirstFile) {
       statPerBlockCount1();
