@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MyAnalyticDB implements AnalyticDB {
 
   /** 7-128  8-256  9-512  10-1024  11-2048 */
-  public static final int power = 8;
+  public static final int power = 9;
 
   /**
    * 128- 8000000
@@ -22,7 +22,7 @@ public class MyAnalyticDB implements AnalyticDB {
    * 512- 2000000
    * 1024-1000000
    */
-  public static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[4000000]);
+  public static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[2000000]);
 
   private final int drift = 64 - (power + 1);
 
@@ -372,6 +372,7 @@ public class MyAnalyticDB implements AnalyticDB {
           long readTime1 = System.currentTimeMillis();
           byte[] data = threadReadData();
           readFileTime.addAndGet(System.currentTimeMillis() - readTime1);
+
 
           if (data != null) {
             operate(data);
