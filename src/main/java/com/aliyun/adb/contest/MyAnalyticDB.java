@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MyAnalyticDB implements AnalyticDB {
 
   /** 7-128  8-256  9-512  10-1024  11-2048 */
-  public static final int power = 7;
+  public static final int power = 6;
 
   /**
    * 128- 8000000
