@@ -36,7 +36,7 @@ public class DiskBlock {
 
   private final String tableName;
 
-  private static final int perReadSize = 7 * 1024 * 128;
+  private static final int perReadSize = 8 * 1024 * 1024;
 
   private static final int concurrentQueryThreadNum = 2;
 
