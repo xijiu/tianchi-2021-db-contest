@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MyAnalyticDB implements AnalyticDB {
 
   /** 7-128  8-256  9-512  10-1024  11-2048 */
-  public static final int power = 8;
+  public static final int power = 7;
 
   /**
    * 128- 8000000
@@ -22,7 +22,7 @@ public class MyAnalyticDB implements AnalyticDB {
    * 512- 2000000
    * 1024-1000000
    */
-  public static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[4000000]);
+  public static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[8000000]);
 
   private final int drift = 64 - (power + 1);
 
@@ -70,13 +70,13 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final int[] secondColDataLen = new int[cpuThreadNum * blockNum];
 
-  private final List<DiskBlock> diskBlockData_1_1 = new ArrayList<>(blockNum);
+  private final DiskBlock[] diskBlockData_1_1 = new DiskBlock[blockNum];
 
-  private final List<DiskBlock> diskBlockData_1_2 = new ArrayList<>(blockNum);
+  private final DiskBlock[]  diskBlockData_1_2 = new DiskBlock[blockNum];
 
-  private final List<DiskBlock> diskBlockData_2_1 = new ArrayList<>(blockNum);
+  private final DiskBlock[]  diskBlockData_2_1 = new DiskBlock[blockNum];
 
-  private final List<DiskBlock> diskBlockData_2_2 = new ArrayList<>(blockNum);
+  private final DiskBlock[]  diskBlockData_2_2 = new DiskBlock[blockNum];
 
   private volatile long loadCostTime = 1000000000L;
 
@@ -108,33 +108,67 @@ public class MyAnalyticDB implements AnalyticDB {
   private void init(String workspaceDir) throws InterruptedException {
     DiskBlock.workspaceDir = workspaceDir;
     long begin = System.currentTimeMillis();
+
     Thread thread1 = new Thread(() -> {
-      for (int i = 0; i < blockNum; i++) {
-        diskBlockData_1_1.add(new DiskBlock("1", 1, i));
+      for (int i = 0; i < blockNum / 2; i++) {
+        diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
+      }
+    });
+    Thread thread1_1 = new Thread(() -> {
+      for (int i = blockNum / 2; i < blockNum; i++) {
+        diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
       }
     });
     thread1.start();
+    thread1_1.start();
+
+
 
     Thread thread2 = new Thread(() -> {
-      for (int i = 0; i < blockNum; i++) {
-        diskBlockData_1_2.add(new DiskBlock("1", 2, i));
+      for (int i = 0; i < blockNum / 2; i++) {
+        diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
+      }
+    });
+    Thread thread2_1 = new Thread(() -> {
+      for (int i = blockNum / 2; i < blockNum; i++) {
+        diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
       }
     });
     thread2.start();
+    thread2_1.start();
+
 
     Thread thread3 = new Thread(() -> {
-      for (int i = 0; i < blockNum; i++) {
-        diskBlockData_2_1.add(new DiskBlock("2", 1, i));
+      for (int i = 0; i < blockNum / 2; i++) {
+        diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
+      }
+    });
+    Thread thread3_1 = new Thread(() -> {
+      for (int i = blockNum / 2; i < blockNum; i++) {
+        diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
       }
     });
     thread3.start();
+    thread3_1.start();
 
-    for (int i = 0; i < blockNum; i++) {
-      diskBlockData_2_2.add(new DiskBlock("2", 2, i));
+
+    Thread thread4_1 = new Thread(() -> {
+      for (int i = 0; i < blockNum / 2; i++) {
+        diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
+      }
+    });
+    thread4_1.start();
+
+    for (int i = blockNum / 2; i < blockNum; i++) {
+      diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
     }
     thread1.join();
+    thread1_1.join();
     thread2.join();
+    thread2_1.join();
     thread3.join();
+    thread3_1.join();
+    thread4_1.join();
     System.out.println("init cost time : " + (System.currentTimeMillis() - begin));
 //    Thread thread = new Thread(() -> {
 //      try {
@@ -628,8 +662,8 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       firstColDataLen[(threadIndex << power) + blockIndex] += length;
 
-      List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_1 : diskBlockData_2_1;
-      diskBlocks.get(blockIndex).storeLongArr1(firstThreadCacheArr[blockIndex], length);
+      DiskBlock[] diskBlocks = operateFirstFile ? diskBlockData_1_1 : diskBlockData_2_1;
+      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr[blockIndex], length);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -638,8 +672,8 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       secondColDataLen[(threadIndex << power) + blockIndex] += length;
 
-      List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
-      diskBlocks.get(blockIndex).storeLongArr2(secondThreadCacheArr[blockIndex], length);
+      DiskBlock[] diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
+      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr[blockIndex], length);
     }
 
     private void putToByteBuffer(long[] data, int length) {
@@ -765,7 +799,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " stable first number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_1_1.get(i).get2(index, count));
+        return String.valueOf(diskBlockData_1_1[i].get2(index, count));
       }
     }
     return null;
@@ -780,7 +814,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " stable first number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_2_1.get(i).get2(index, count));
+        return String.valueOf(diskBlockData_2_1[i].get2(index, count));
       }
     }
     return null;
@@ -797,7 +831,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " stable second number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_1_2.get(i).get2(index, count));
+        return String.valueOf(diskBlockData_1_2[i].get2(index, count));
       }
     }
     return null;
@@ -812,7 +846,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " second number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_2_2.get(i).get2(index, count));
+        return String.valueOf(diskBlockData_2_2[i].get2(index, count));
       }
     }
     return null;
