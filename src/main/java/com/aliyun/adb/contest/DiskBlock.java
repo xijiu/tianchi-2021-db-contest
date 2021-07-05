@@ -38,15 +38,27 @@ public class DiskBlock {
 
   private static final int perReadSize = 8 * 1024 * 1024;
 
-  private static final int concurrentQueryThreadNum = 2;
+//  private static final int concurrentQueryThreadNum = 2;
 
-  private final long[] beginReadPosArr = new long[concurrentQueryThreadNum];
+//  private final long[] beginReadPosArr = new long[concurrentQueryThreadNum];
+//
+//  private final int[] readSizeArr = new int[concurrentQueryThreadNum];
+//
+//  private static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
 
-  private final int[] readSizeArr = new int[concurrentQueryThreadNum];
+  private static final int splitNum = 8;
 
-  private static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+  private long[][] dataCache1 = new long[splitNum][cacheLength];
 
+  private int[] dataCacheLen1 = new int[splitNum];
 
+  private long[][] dataCache2 = new long[splitNum][secondCacheLength];
+
+  private int[] dataCacheLen2 = new int[splitNum];
+
+  private byte[] batchWriteArr = new byte[secondCacheLength * 7];
+
+  private ByteBuffer batchWriteBuffer = ByteBuffer.wrap(batchWriteArr);
 
 
   public DiskBlock(String tableName, int col, int blockIndex) {
@@ -59,6 +71,52 @@ public class DiskBlock {
 
   public void storeArr(ByteBuffer byteBuffer) throws Exception {
     fileChannel.write(byteBuffer);
+  }
+
+  public void storeLongArr1(long[] dataArr, int length) throws Exception {
+    for (int i = 0; i < length; i++) {
+      long data = dataArr[i];
+      int index = (int) (data % splitNum);
+      int pos = dataCacheLen1[index]++;
+      dataCache1[index][pos] = data;
+      if (pos + 1 == cacheLength) {
+        putToByteBuffer(dataCache1[index], cacheLength);
+        fileChannel.write(batchWriteBuffer);
+        dataCacheLen1[index] = 0;
+      }
+    }
+  }
+
+  public void storeLongArr2(long[] dataArr, int length) throws Exception {
+    for (int i = 0; i < length; i++) {
+      long data = dataArr[i];
+      int index = (int) (data % splitNum);
+      int pos = dataCacheLen2[index]++;
+      dataCache2[index][pos] = data;
+      if (pos + 1 == secondCacheLength) {
+        putToByteBuffer(dataCache2[index], secondCacheLength);
+        fileChannel.write(batchWriteBuffer);
+        dataCacheLen2[index] = 0;
+      }
+    }
+  }
+
+  private void putToByteBuffer(long[] data, int length) {
+    int index = 0;
+    for (int i = 0; i < length; i++) {
+      long element = data[i];
+      batchWriteArr[index++] = (byte)(element >> 48);
+      batchWriteArr[index++] = (byte)(element >> 40);
+      batchWriteArr[index++] = (byte)(element >> 32);
+      batchWriteArr[index++] = (byte)(element >> 24);
+      batchWriteArr[index++] = (byte)(element >> 16);
+      batchWriteArr[index++] = (byte)(element >> 8);
+      batchWriteArr[index++] = (byte)(element);
+    }
+
+    batchWriteBuffer.clear();
+    batchWriteBuffer.position(index);
+    batchWriteBuffer.flip();
   }
 
 
