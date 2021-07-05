@@ -642,12 +642,12 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
       System.out.println("=======================> actual total cost : " + totalCost);
 
-      if (1 == 1) {
-        return "0";
-      }
+//      if (1 == 1) {
+//        return "0";
+//      }
 
       if (isTest) {
-        if (totalCost > 56000) {
+        if (totalCost > 52000) {
           return "0";
         }
       }
