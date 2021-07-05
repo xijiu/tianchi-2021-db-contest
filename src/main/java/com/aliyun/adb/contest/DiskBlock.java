@@ -48,6 +48,8 @@ public class DiskBlock {
 
   private static final int splitNum = 8;
 
+  private final FileChannel[] partFileChannels = new FileChannel[splitNum];
+
   private long[][] dataCache1 = new long[splitNum][cacheLength];
 
   private int[] dataCacheLen1 = new int[splitNum];
@@ -76,12 +78,12 @@ public class DiskBlock {
   public synchronized void storeLongArr1(long[] dataArr, int length) throws Exception {
     for (int i = 0; i < length; i++) {
       long data = dataArr[i];
-      int index = (int) (data % splitNum);
+      int index = (int) ((data & 63050394783186944L) >> 53);
       int pos = dataCacheLen1[index]++;
       dataCache1[index][pos] = data;
       if (pos + 1 == cacheLength) {
         putToByteBuffer(dataCache1[index], cacheLength);
-        fileChannel.write(batchWriteBuffer);
+        partFileChannels[index].write(batchWriteBuffer);
         dataCacheLen1[index] = 0;
       }
     }
@@ -90,12 +92,12 @@ public class DiskBlock {
   public synchronized void storeLongArr2(long[] dataArr, int length) throws Exception {
     for (int i = 0; i < length; i++) {
       long data = dataArr[i];
-      int index = (int) (data % splitNum);
+      int index = (int) ((data & 63050394783186944L) >> 53);
       int pos = dataCacheLen2[index]++;
       dataCache2[index][pos] = data;
       if (pos + 1 == secondCacheLength) {
         putToByteBuffer(dataCache2[index], secondCacheLength);
-        fileChannel.write(batchWriteBuffer);
+        partFileChannels[index].write(batchWriteBuffer);
         dataCacheLen2[index] = 0;
       }
     }
@@ -263,6 +265,13 @@ public class DiskBlock {
               file.createNewFile();
             }
             fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
+            for (int i = 0; i < splitNum; i++) {
+              File file = new File(workspaceDir + "/" + tableName + "/partFile_" + i + "_" + col + "_" + blockIndex + ".data");
+              if (!file.exists()) {
+                file.createNewFile();
+              }
+              partFileChannels[i] = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
+            }
           }
         }
       }

@@ -156,8 +156,18 @@ public class ReadCharTest {
 
   @Test
   public void aaab4() throws Exception {
-    long[] nums = {10, 8, 1, 1, 2, 3, 5, 7, 2, 4, 6, 9, 9};
-    System.out.println(PubTools.solve(nums, 0, nums.length - 1, 9));
+    System.out.println(Integer.parseInt("11100000", 2));
+    int standard = Integer.parseInt("11100000", 2);
+    System.out.println(standard);
+    System.out.println((224 & 224) >> 5);
+
+
+    System.out.println(Long.parseLong("0000000011100000000000000000000000000000000000000000000000000000", 2));
+    System.out.println(Long.parseLong("0101000010100000000000000000000000000000000000001100000000000000", 2));
+
+    long data = 5809643519307988992L;
+
+    System.out.println(((data & 63050394783186944L) >> 53));
   }
 
 
