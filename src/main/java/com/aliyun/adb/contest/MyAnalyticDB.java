@@ -145,7 +145,7 @@ public class MyAnalyticDB implements AnalyticDB {
     }
   }
 
-  private void firstInit() {
+  private void firstInit() throws InterruptedException {
     Thread thread1 = new Thread(() -> {
       for (int i = 0; i < blockNum / 2; i++) {
         diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
