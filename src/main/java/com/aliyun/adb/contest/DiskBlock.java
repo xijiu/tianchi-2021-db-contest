@@ -30,13 +30,13 @@ public class DiskBlock {
 
   private volatile FileChannel fileChannel = null;
 
-  public static final int cacheLength = 4096 * 2;
+  public static final int cacheLength = 4096 * 3;
 
   public static final int secondCacheLength = (int) (cacheLength);
 
   private final String tableName;
 
-  private static final int perReadSize = 7 * 1024 * 128;
+  private static final int perReadSize = 8 * 1024 * 1024;
 
   private static final int concurrentQueryThreadNum = 2;
 
