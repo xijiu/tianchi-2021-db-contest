@@ -605,6 +605,8 @@ public class MyAnalyticDB implements AnalyticDB {
 
   public static AtomicLong cpuSloveTime = new AtomicLong();
 
+  public static AtomicLong diskReadFileTime = new AtomicLong();
+
   private volatile boolean loadFinish = false;
 
   @Override
@@ -614,6 +616,7 @@ public class MyAnalyticDB implements AnalyticDB {
       long time = System.currentTimeMillis();
       System.out.println("finish time is : " + time);
       System.out.println("=================> cpuSloveTime cost : " + (cpuSloveTime.get() / 8));
+      System.out.println("=================> diskReadFileTime cost : " + (diskReadFileTime.get() / 8));
       System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
       System.out.println("=======================> actual total cost : " + (time - totalBeginTime));
       return "0";

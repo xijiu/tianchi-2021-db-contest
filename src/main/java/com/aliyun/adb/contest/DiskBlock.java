@@ -154,7 +154,10 @@ public class DiskBlock {
     long pos = 0;
     while (true) {
       byteBuffer.clear();
+      long begin1 = System.currentTimeMillis();
       int flag = fileChannel.read(byteBuffer, pos);
+      MyAnalyticDB.diskReadFileTime.addAndGet(System.currentTimeMillis() - begin1);
+
       pos += perReadSize;
       if (flag == -1) {
         break;
