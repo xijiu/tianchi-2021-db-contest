@@ -67,7 +67,7 @@ public class DiskBlock {
     fillThreadReadFileInfo();
 
     Future[] futures = new Future[1];
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < futures.length; i++) {
       int finalI = i;
       futures[i] = executor.submit(() -> {
         try {
