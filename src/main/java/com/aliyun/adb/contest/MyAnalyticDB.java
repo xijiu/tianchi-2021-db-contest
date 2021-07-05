@@ -639,13 +639,13 @@ public class MyAnalyticDB implements AnalyticDB {
       return "0";
     }
 
-    if (1 == 1) {
-      return "0";
-    }
-
-//    if (!isFirstInvoke) {
+//    if (1 == 1) {
 //      return "0";
 //    }
+
+    if (!isFirstInvoke) {
+      return "0";
+    }
 
 //    while (totalFinishThreadNum.get() != cpuThreadNum) {
 //      Thread.sleep(1);
