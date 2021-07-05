@@ -73,7 +73,7 @@ public class DiskBlock {
     fileChannel.write(byteBuffer);
   }
 
-  public void storeLongArr1(long[] dataArr, int length) throws Exception {
+  public synchronized void storeLongArr1(long[] dataArr, int length) throws Exception {
     for (int i = 0; i < length; i++) {
       long data = dataArr[i];
       int index = (int) (data % splitNum);
@@ -87,7 +87,7 @@ public class DiskBlock {
     }
   }
 
-  public void storeLongArr2(long[] dataArr, int length) throws Exception {
+  public synchronized void storeLongArr2(long[] dataArr, int length) throws Exception {
     for (int i = 0; i < length; i++) {
       long data = dataArr[i];
       int index = (int) (data % splitNum);
