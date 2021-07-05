@@ -319,6 +319,8 @@ public class MyAnalyticDB implements AnalyticDB {
       cpuThread[i].join();
     }
 
+    storeFinalDataToDisk();
+
     if (operateFirstFile) {
       statPerBlockCount1();
       Arrays.fill(firstColDataLen, 0);
@@ -327,6 +329,25 @@ public class MyAnalyticDB implements AnalyticDB {
       statPerBlockCount2();
     }
     System.out.println("operate file " + dataFile.toPath() + ", cost time is " + (System.currentTimeMillis() - begin));
+  }
+
+  private void storeFinalDataToDisk() throws Exception {
+    for (DiskBlock diskBlock : diskBlockData_1_1) {
+      diskBlock.forceStoreLongArr1();
+      diskBlock.forceStoreLongArr2();
+    }
+    for (DiskBlock diskBlock : diskBlockData_1_2) {
+      diskBlock.forceStoreLongArr1();
+      diskBlock.forceStoreLongArr2();
+    }
+    for (DiskBlock diskBlock : diskBlockData_2_1) {
+      diskBlock.forceStoreLongArr1();
+      diskBlock.forceStoreLongArr2();
+    }
+    for (DiskBlock diskBlock : diskBlockData_2_2) {
+      diskBlock.forceStoreLongArr1();
+      diskBlock.forceStoreLongArr2();
+    }
   }
 
   public class CpuThread extends Thread {
@@ -553,11 +574,7 @@ public class MyAnalyticDB implements AnalyticDB {
       firstColDataLen[(threadIndex << power) + blockIndex] += length;
 
       List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_1 : diskBlockData_2_1;
-
       diskBlocks.get(blockIndex).storeLongArr1(firstThreadCacheArr[blockIndex], length);
-
-//      putToByteBuffer(firstThreadCacheArr[blockIndex], length);
-//      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -567,12 +584,7 @@ public class MyAnalyticDB implements AnalyticDB {
       secondColDataLen[(threadIndex << power) + blockIndex] += length;
 
       List<DiskBlock> diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
-
       diskBlocks.get(blockIndex).storeLongArr2(secondThreadCacheArr[blockIndex], length);
-
-
-//      putToByteBuffer(secondThreadCacheArr[blockIndex], length);
-//      diskBlocks.get(blockIndex).storeArr(batchWriteBuffer);
     }
 
     private void putToByteBuffer(long[] data, int length) {

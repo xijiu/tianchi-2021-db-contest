@@ -103,6 +103,31 @@ public class DiskBlock {
     }
   }
 
+
+  public synchronized void forceStoreLongArr1() throws Exception {
+    for (int i = 0; i < dataCacheLen1.length; i++) {
+      int len = dataCacheLen1[i];
+      if (len > 0) {
+        putToByteBuffer(dataCache1[i], len);
+        partFileChannels[i].write(batchWriteBuffer);
+        dataCacheLen1[i] = 0;
+      }
+    }
+  }
+
+  public synchronized void forceStoreLongArr2() throws Exception {
+    for (int i = 0; i < dataCacheLen2.length; i++) {
+      int len = dataCacheLen2[i];
+      if (len > 0) {
+        putToByteBuffer(dataCache2[i], len);
+        partFileChannels[i].write(batchWriteBuffer);
+        dataCacheLen2[i] = 0;
+      }
+    }
+  }
+
+
+
   private void putToByteBuffer(long[] data, int length) {
     int index = 0;
     for (int i = 0; i < length; i++) {
