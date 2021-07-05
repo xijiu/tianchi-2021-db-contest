@@ -171,25 +171,25 @@ public class MyAnalyticDB implements AnalyticDB {
     for (int num : table_1_BlockDataNumArr1) {
       set.add(num);
     }
-    System.out.println("table_1_BlockDataNumArr1 count is : " + set);
+//    System.out.println("table_1_BlockDataNumArr1 count is : " + set);
 
     Set<Integer> set2 = new TreeSet<>();
     for (int num : table_1_BlockDataNumArr2) {
       set2.add(num);
     }
-    System.out.println("table_1_BlockDataNumArr2 count is : " + set2);
+//    System.out.println("table_1_BlockDataNumArr2 count is : " + set2);
 
     Set<Integer> set3 = new TreeSet<>();
     for (int num : table_2_BlockDataNumArr1) {
       set3.add(num);
     }
-    System.out.println("table_2_BlockDataNumArr1 count is : " + set3);
+//    System.out.println("table_2_BlockDataNumArr1 count is : " + set3);
 
     Set<Integer> set4 = new TreeSet<>();
     for (int num : table_2_BlockDataNumArr2) {
       set4.add(num);
     }
-    System.out.println("table_2_BlockDataNumArr2 count is : " + set4);
+//    System.out.println("table_2_BlockDataNumArr2 count is : " + set4);
   }
 
   private void reloadBlockNumberFile() throws IOException {
