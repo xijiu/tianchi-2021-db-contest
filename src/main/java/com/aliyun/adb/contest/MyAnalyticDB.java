@@ -107,25 +107,27 @@ public class MyAnalyticDB implements AnalyticDB {
    */
   private void init(String workspaceDir) throws InterruptedException {
     DiskBlock.workspaceDir = workspaceDir;
+    long begin = System.currentTimeMillis();
     for (int i = 0; i < blockNum; i++) {
       diskBlockData_1_1.add(new DiskBlock("1", 1, i));
       diskBlockData_1_2.add(new DiskBlock("1", 2, i));
       diskBlockData_2_1.add(new DiskBlock("2", 1, i));
       diskBlockData_2_2.add(new DiskBlock("2", 2, i));
     }
-    Thread thread = new Thread(() -> {
-      try {
-        Thread.sleep(1000 * 2 * 60);
-        for (int i = 0; i < 10; i++) {
-          System.out.println(i + "termination!!!");
-          Thread.sleep(100);
-        }
-        System.exit(0);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    });
-    thread.start();
+    System.out.println("init cost time : " + (System.currentTimeMillis() - begin));
+//    Thread thread = new Thread(() -> {
+//      try {
+//        Thread.sleep(1000 * 2 * 60);
+//        for (int i = 0; i < 10; i++) {
+//          System.out.println(i + "termination!!!");
+//          Thread.sleep(100);
+//        }
+//        System.exit(0);
+//      } catch (InterruptedException e) {
+//        e.printStackTrace();
+//      }
+//    });
+//    thread.start();
   }
 
 
