@@ -109,6 +109,43 @@ public class MyAnalyticDB implements AnalyticDB {
     DiskBlock.workspaceDir = workspaceDir;
     long begin = System.currentTimeMillis();
 
+    if (isFirstInvoke) {
+      firstInit();
+    } else {
+      secondInit();
+    }
+    System.out.println("init cost time : " + (System.currentTimeMillis() - begin));
+//    Thread thread = new Thread(() -> {
+//      try {
+//        Thread.sleep(1000 * 2 * 60);
+//        for (int i = 0; i < 10; i++) {
+//          System.out.println(i + "termination!!!");
+//          Thread.sleep(100);
+//        }
+//        System.exit(0);
+//      } catch (InterruptedException e) {
+//        e.printStackTrace();
+//      }
+//    });
+//    thread.start();
+  }
+
+  private void secondInit() {
+    for (int i = 0; i < blockNum; i++) {
+      diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
+    }
+    for (int i = 0; i < blockNum; i++) {
+      diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
+    }
+    for (int i = 0; i < blockNum; i++) {
+      diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
+    }
+    for (int i = 0; i < blockNum; i++) {
+      diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
+    }
+  }
+
+  private void firstInit() {
     Thread thread1 = new Thread(() -> {
       for (int i = 0; i < blockNum / 2; i++) {
         diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
@@ -169,20 +206,6 @@ public class MyAnalyticDB implements AnalyticDB {
     thread3.join();
     thread3_1.join();
     thread4_1.join();
-    System.out.println("init cost time : " + (System.currentTimeMillis() - begin));
-//    Thread thread = new Thread(() -> {
-//      try {
-//        Thread.sleep(1000 * 2 * 60);
-//        for (int i = 0; i < 10; i++) {
-//          System.out.println(i + "termination!!!");
-//          Thread.sleep(100);
-//        }
-//        System.exit(0);
-//      } catch (InterruptedException e) {
-//        e.printStackTrace();
-//      }
-//    });
-//    thread.start();
   }
 
 
