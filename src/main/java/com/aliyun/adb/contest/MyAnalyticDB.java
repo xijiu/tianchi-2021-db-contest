@@ -108,12 +108,7 @@ public class MyAnalyticDB implements AnalyticDB {
   private void init(String workspaceDir) throws InterruptedException {
     DiskBlock.workspaceDir = workspaceDir;
     long begin = System.currentTimeMillis();
-
-    if (isFirstInvoke) {
-      firstInit();
-    } else {
-      secondInit();
-    }
+    firstInit();
     System.out.println("init cost time : " + (System.currentTimeMillis() - begin));
 //    Thread thread = new Thread(() -> {
 //      try {
@@ -128,36 +123,6 @@ public class MyAnalyticDB implements AnalyticDB {
 //      }
 //    });
 //    thread.start();
-  }
-
-  private void secondInit() throws InterruptedException {
-    Thread thread1 = new Thread(() -> {
-      for (int i = 0; i < blockNum; i++) {
-        diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
-      }
-    });
-    thread1.start();
-
-    Thread thread2 = new Thread(() -> {
-      for (int i = 0; i < blockNum; i++) {
-        diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
-      }
-    });
-    thread2.start();
-
-    Thread thread3 = new Thread(() -> {
-      for (int i = 0; i < blockNum; i++) {
-        diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
-      }
-    });
-    thread3.start();
-
-    for (int i = 0; i < blockNum; i++) {
-      diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
-    }
-    thread1.join();
-    thread2.join();
-    thread3.join();
   }
 
   private void firstInit() throws InterruptedException {
