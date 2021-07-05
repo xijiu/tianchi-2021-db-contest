@@ -669,8 +669,8 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-//    System.out.println("table is " + table + ", column is" + column
-//            + ", percentile is " + percentile + ", number is " + number);
+    System.out.println("table is " + table + ", column is" + column
+            + ", percentile is " + percentile + ", number is " + number);
 
     String result;
     if (table.startsWith("lineitem")) {
@@ -686,7 +686,7 @@ public class MyAnalyticDB implements AnalyticDB {
         result = secondQuantileForTable2(number);
       }
     }
-//    System.out.println("=====> stable quantile cost time is " + (System.currentTimeMillis() - begin) + ", result is " + result);
+    System.out.println("=====> stable quantile cost time is " + (System.currentTimeMillis() - begin) + ", result is " + result);
     return result;
   }
 
