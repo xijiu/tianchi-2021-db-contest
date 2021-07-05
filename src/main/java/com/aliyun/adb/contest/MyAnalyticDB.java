@@ -22,14 +22,14 @@ public class MyAnalyticDB implements AnalyticDB {
    * 512- 2000000
    * 1024-1000000
    */
-  public static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[2000000]);
+  public static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[1000000]);
 
   private final int drift = 64 - (power + 1);
 
   /** 每一列数据分多少块 */
   private static final int blockNum = (int) Math.pow(2, power);
 
-  private static final int cpuThreadNum = 20;
+  private static final int cpuThreadNum = 16;
 
   /** 单次读取文件的大小，单位字节 */
   private final int readFileLen = 1 * 1024 * 1024;
