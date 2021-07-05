@@ -641,6 +641,11 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=================> diskReadFileTime cost : " + (diskReadFileTime.get() / 8));
       System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
       System.out.println("=======================> actual total cost : " + totalCost);
+
+      if (1 == 1) {
+        return "0";
+      }
+
       if (isTest) {
         if (totalCost > 56000) {
           return "0";

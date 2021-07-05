@@ -36,7 +36,7 @@ public class DiskBlock {
 
   private final String tableName;
 
-  private static final int perReadSize = 8 * 1024 * 1024;
+  private static final int perReadSize = 7 * 1024 * 128;
 
 //  private static final int concurrentQueryThreadNum = 2;
 
@@ -78,6 +78,8 @@ public class DiskBlock {
   public synchronized void storeLongArr1(long[] dataArr, int length) throws Exception {
     for (int i = 0; i < length; i++) {
       long data = dataArr[i];
+      // 8 part  : 63050394783186944L   >> 53
+      // 16 part : 67553994410557440L   >> 52
       int index = (int) ((data & 63050394783186944L) >> 53);
       int pos = dataCacheLen1[index]++;
       dataCache1[index][pos] = data;
