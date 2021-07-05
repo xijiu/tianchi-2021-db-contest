@@ -113,7 +113,7 @@ public class MyAnalyticDB implements AnalyticDB {
     }
     Thread thread = new Thread(() -> {
       try {
-        Thread.sleep(1000 * 5 * 60);
+        Thread.sleep(1000 * 2 * 60);
         for (int i = 0; i < 10; i++) {
           System.out.println(i + "termination!!!");
           Thread.sleep(100);
