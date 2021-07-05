@@ -108,7 +108,7 @@ public class DiskBlock {
 
   private void currentThreadRead() throws IOException {
     int finalI = concurrentQueryThreadNum - 1;
-    long[] data = helper.get();
+    long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = ByteBuffer.allocate(perReadSize);
     byte[] array = byteBuffer.array();
     long pos = beginReadPosArr[finalI];
@@ -135,7 +135,7 @@ public class DiskBlock {
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index, int count) throws Exception {
-    long[] data = helper.get();
+    long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
     byte[] array = byteBuffer.array();
     int idx = 0;
@@ -228,13 +228,6 @@ public class DiskBlock {
 
   }
 
-  /**
-   * 128- 8000000
-   * 256- 4000000
-   * 512- 2000000
-   * 1024-1000000
-   *  */
 
-  private static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[(11 - MyAnalyticDB.power) * 1000000]);
 
 }
