@@ -32,7 +32,7 @@ public class MyAnalyticDB implements AnalyticDB {
   private static final int cpuThreadNum = 20;
 
   /** 单次读取文件的大小，单位字节 */
-  private final int readFileLen = 2 * 1024 * 1024;
+  private final int readFileLen = 1 * 1024 * 1024;
 
   private volatile int lastBucketIndex = -1;
 
