@@ -38,7 +38,7 @@ public class DiskBlock {
 
   private static final int perReadSize = 7 * 1024 * 128;
 
-  private static final int concurrentQueryThreadNum = 3;
+  private static final int concurrentQueryThreadNum = 2;
 
   private final long[] beginReadPosArr = new long[concurrentQueryThreadNum];
 
@@ -62,49 +62,49 @@ public class DiskBlock {
   }
 
 
-//  public long get2(int index, int count) throws Exception {
-//    long[] data = helper.get();
-//    fillThreadReadFileInfo();
-//
-//    Future[] futures = new Future[2];
-//    for (int i = 0; i < 2; i++) {
-//      int finalI = i;
-//      futures[i] = executor.submit(() -> {
-//        try {
-//          ByteBuffer byteBuffer = threadLocal.get();
-//          byte[] array = byteBuffer.array();
-//          long pos = beginReadPosArr[finalI];
-//          int idx = (int) (pos / 7);
-//          int endIdx = idx + readSizeArr[finalI];
-//          while (true) {
-//            byteBuffer.clear();
-//            int flag = fileChannel.read(byteBuffer, pos);
-//            pos += perReadSize;
-//            if (flag == -1) {
-//              break;
-//            }
-//            int length = byteBuffer.position();
-//            for (int j = 0; j < length; j += 7) {
-//              data[idx++] = makeLong(bytePrev, array[j], array[j + 1], array[j + 2],
-//                      array[j + 3], array[j + 4], array[j + 5], array[j + 6]);
-//            }
-//            if (idx >= endIdx) {
-//              break;
-//            }
-//          }
-//        } catch (Exception e) {
-//          e.printStackTrace();
-//        }
-//      });
-//    }
-//
-//    currentThreadRead();
-//
-//    for (Future future : futures) {
-//      future.get();
-//    }
-//    return PubTools.solve(data, 0, (int) (file.length() / 7 - 1), index);
-//  }
+  public long get2(int index, int count) throws Exception {
+    long[] data = MyAnalyticDB.helper.get();
+    fillThreadReadFileInfo();
+
+    Future[] futures = new Future[1];
+    for (int i = 0; i < 2; i++) {
+      int finalI = i;
+      futures[i] = executor.submit(() -> {
+        try {
+          ByteBuffer byteBuffer = threadLocal.get();
+          byte[] array = byteBuffer.array();
+          long pos = beginReadPosArr[finalI];
+          int idx = (int) (pos / 7);
+          int endIdx = idx + readSizeArr[finalI];
+          while (true) {
+            byteBuffer.clear();
+            int flag = fileChannel.read(byteBuffer, pos);
+            pos += perReadSize;
+            if (flag == -1) {
+              break;
+            }
+            int length = byteBuffer.position();
+            for (int j = 0; j < length; j += 7) {
+              data[idx++] = makeLong(bytePrev, array[j], array[j + 1], array[j + 2],
+                      array[j + 3], array[j + 4], array[j + 5], array[j + 6]);
+            }
+            if (idx >= endIdx) {
+              break;
+            }
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      });
+    }
+
+    currentThreadRead();
+
+    for (Future future : futures) {
+      future.get();
+    }
+    return PubTools.solve(data, 0, (int) (file.length() / 7 - 1), index);
+  }
 
   private void currentThreadRead() throws IOException {
     int finalI = concurrentQueryThreadNum - 1;
@@ -132,34 +132,6 @@ public class DiskBlock {
     }
   }
 
-  private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
-
-  public long get2(int index, int count) throws Exception {
-    long[] data = MyAnalyticDB.helper.get();
-    ByteBuffer byteBuffer = threadLocal.get();
-    byte[] array = byteBuffer.array();
-    int idx = 0;
-    long pos = 0;
-    while (true) {
-      byteBuffer.clear();
-      int flag = fileChannel.read(byteBuffer, pos);
-      pos += perReadSize;
-      if (flag == -1) {
-        break;
-      }
-      int length = byteBuffer.position();
-      for (int i = 0; i < length; i += 7) {
-        data[idx++] = makeLong(bytePrev, array[i], array[i + 1], array[i + 2],
-                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
-      }
-    }
-
-    long begin = System.currentTimeMillis();
-    long solve = PubTools.solve(data, 0, idx - 1, index);
-    MyAnalyticDB.cpuSloveTime.addAndGet(System.currentTimeMillis() - begin);
-    return solve;
-  }
-
   private void fillThreadReadFileInfo() {
     long fileLen = file.length();
     int count = (int) (fileLen / 7 / concurrentQueryThreadNum);
@@ -172,23 +144,35 @@ public class DiskBlock {
     readSizeArr[concurrentQueryThreadNum - 1] = (int) ((fileLen / 7) - (count * (concurrentQueryThreadNum - 1)));
   }
 
-//  public static void main(String[] args) {
-//    long[] beginReadPosArr = new long[concurrentQueryThreadNum];
-//    int[] readSizeArr = new int[concurrentQueryThreadNum];
-//
-//    long fileLen = 91;
-//    int count = (int) (fileLen / 7 / concurrentQueryThreadNum);
+  private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
+
+//  public long get2(int index, int count) throws Exception {
+//    long[] data = MyAnalyticDB.helper.get();
+//    ByteBuffer byteBuffer = threadLocal.get();
+//    byte[] array = byteBuffer.array();
+//    int idx = 0;
 //    long pos = 0;
-//    for (int i = 0; i < concurrentQueryThreadNum; i++) {
-//      beginReadPosArr[i] = pos;
-//      pos += count * 7L;
-//      readSizeArr[i] = count;
+//    while (true) {
+//      byteBuffer.clear();
+//      int flag = fileChannel.read(byteBuffer, pos);
+//      pos += perReadSize;
+//      if (flag == -1) {
+//        break;
+//      }
+//      int length = byteBuffer.position();
+//      for (int i = 0; i < length; i += 7) {
+//        data[idx++] = makeLong(bytePrev, array[i], array[i + 1], array[i + 2],
+//                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
+//      }
 //    }
-//    readSizeArr[concurrentQueryThreadNum - 1] = (int) ((fileLen / 7) - (count * (concurrentQueryThreadNum - 1)));
 //
-//    System.out.println(Arrays.toString(beginReadPosArr));
-//    System.out.println(Arrays.toString(readSizeArr));
+//    long begin = System.currentTimeMillis();
+//    long solve = PubTools.solve(data, 0, idx - 1, index);
+//    MyAnalyticDB.cpuSloveTime.addAndGet(System.currentTimeMillis() - begin);
+//    return solve;
 //  }
+
+
 
 
   public static long makeLong(byte b7, byte b6, byte b5, byte b4,

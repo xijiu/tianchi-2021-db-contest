@@ -90,7 +90,9 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final AtomicLong sortDataTime = new AtomicLong();
 
-  private final long totalBeginTime = System.currentTimeMillis();
+  private long totalBeginTime = System.currentTimeMillis();
+
+  private long step2BeginTime = System.currentTimeMillis();
 
   private static volatile boolean isFirstInvoke = true;
 
@@ -191,7 +193,7 @@ public class MyAnalyticDB implements AnalyticDB {
   private void reloadBlockNumberFile() throws IOException {
     storeBlockNumberFile = new File(DiskBlock.workspaceDir + "/blockNumberInfo.data");
     FileChannel fileChannel = FileChannel.open(storeBlockNumberFile.toPath(), StandardOpenOption.READ);
-    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4 * 4);
+    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4 * 4 + 8);
     fileChannel.read(byteBuffer);
     byteBuffer.flip();
     for (int i = 0; i < blockNum; i++) {
@@ -206,13 +208,15 @@ public class MyAnalyticDB implements AnalyticDB {
     for (int i = 0; i < blockNum; i++) {
       table_2_BlockDataNumArr2[i] = byteBuffer.getInt();
     }
+
+    totalBeginTime = byteBuffer.getLong();
   }
 
   private void storeBlockNumberFile() throws Exception {
     storeBlockNumberFile = new File(DiskBlock.workspaceDir + "/blockNumberInfo.data");
     storeBlockNumberFile.createNewFile();
     FileChannel fileChannel = FileChannel.open(storeBlockNumberFile.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE);
-    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4 * 4);
+    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4 * 4 + 8);
     for (int num : table_1_BlockDataNumArr1) {
       byteBuffer.putInt(num);
     }
@@ -225,6 +229,7 @@ public class MyAnalyticDB implements AnalyticDB {
     for (int num : table_2_BlockDataNumArr2) {
       byteBuffer.putInt(num);
     }
+    byteBuffer.putLong(totalBeginTime);
 
     byteBuffer.flip();
     fileChannel.write(byteBuffer);
@@ -609,7 +614,8 @@ public class MyAnalyticDB implements AnalyticDB {
       long time = System.currentTimeMillis();
       System.out.println("finish time is : " + time);
       System.out.println("=================> cpuSloveTime cost : " + (cpuSloveTime.get() / 8));
-      System.out.println("=================> total cost : " + (time - totalBeginTime));
+      System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
+      System.out.println("=======================> actual total cost : " + (time - totalBeginTime));
       return "0";
     }
 
