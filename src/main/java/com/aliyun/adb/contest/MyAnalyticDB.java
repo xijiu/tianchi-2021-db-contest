@@ -136,16 +136,22 @@ public class MyAnalyticDB implements AnalyticDB {
         diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
       }
     });
+    thread1.start();
+
     Thread thread2 = new Thread(() -> {
       for (int i = 0; i < blockNum; i++) {
         diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
       }
     });
+    thread2.start();
+
     Thread thread3 = new Thread(() -> {
       for (int i = 0; i < blockNum; i++) {
         diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
       }
     });
+    thread3.start();
+
     for (int i = 0; i < blockNum; i++) {
       diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
     }
