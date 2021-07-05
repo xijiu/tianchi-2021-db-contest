@@ -30,9 +30,9 @@ public class DiskBlock {
 
   private volatile FileChannel fileChannel = null;
 
-  public static final int cacheLength = 4096 * 3;
+  public static final short cacheLength = 4096 * 3;
 
-  public static final int secondCacheLength = (int) (cacheLength);
+  public static final short secondCacheLength = (int) (cacheLength);
 
   private final String tableName;
 
@@ -52,11 +52,11 @@ public class DiskBlock {
 
   private long[][] dataCache1 = new long[splitNum][cacheLength];
 
-  private int[] dataCacheLen1 = new int[splitNum];
+  private short[] dataCacheLen1 = new short[splitNum];
 
   private long[][] dataCache2 = new long[splitNum][secondCacheLength];
 
-  private int[] dataCacheLen2 = new int[splitNum];
+  private short[] dataCacheLen2 = new short[splitNum];
 
   private byte[] batchWriteArr = new byte[secondCacheLength * 7];
 
@@ -81,7 +81,7 @@ public class DiskBlock {
       // 8 part  : 63050394783186944L   >> 53
       // 16 part : 67553994410557440L   >> 52
       int index = (int) ((data & 67553994410557440L) >> 52);
-      int pos = dataCacheLen1[index]++;
+      short pos = dataCacheLen1[index]++;
       dataCache1[index][pos] = data;
       if (pos + 1 == cacheLength) {
         putToByteBuffer(dataCache1[index], cacheLength);
@@ -95,7 +95,7 @@ public class DiskBlock {
     for (int i = 0; i < length; i++) {
       long data = dataArr[i];
       int index = (int) ((data & 67553994410557440L) >> 52);
-      int pos = dataCacheLen2[index]++;
+      short pos = dataCacheLen2[index]++;
       dataCache2[index][pos] = data;
       if (pos + 1 == secondCacheLength) {
         putToByteBuffer(dataCache2[index], secondCacheLength);
