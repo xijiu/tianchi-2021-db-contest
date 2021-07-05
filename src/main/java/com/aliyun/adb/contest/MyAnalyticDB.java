@@ -358,17 +358,17 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private int threadIndex;
 
-    public int cacheLength = DiskBlock.cacheLength;
+    public short cacheLength = DiskBlock.cacheLength;
 
-    public int secondCacheLength = DiskBlock.secondCacheLength;
+    public short secondCacheLength = DiskBlock.secondCacheLength;
 
     public long[][] firstThreadCacheArr = new long[blockNum][cacheLength];
 
-    public int[] firstCacheLengthArr = new int[blockNum];
+    public short[] firstCacheLengthArr = new short[blockNum];
 
     public long[][] secondThreadCacheArr = new long[blockNum][secondCacheLength];
 
-    public int[] secondCacheLengthArr = new int[blockNum];
+    public short[] secondCacheLengthArr = new short[blockNum];
 
     private FileChannel fileChannel;
 
@@ -529,7 +529,7 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     private void saveToMemoryOrDisk(int firstIndex, boolean normal) throws Exception {
-      int helperNum = 0;
+      short helperNum = 0;
       int i = normal ? 0 : 1;
       int endIndex = firstIndex - 1;
       for (; i < endIndex; i = i + 2) {
