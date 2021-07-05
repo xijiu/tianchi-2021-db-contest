@@ -130,19 +130,28 @@ public class MyAnalyticDB implements AnalyticDB {
 //    thread.start();
   }
 
-  private void secondInit() {
-    for (int i = 0; i < blockNum; i++) {
-      diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
-    }
-    for (int i = 0; i < blockNum; i++) {
-      diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
-    }
-    for (int i = 0; i < blockNum; i++) {
-      diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
-    }
+  private void secondInit() throws InterruptedException {
+    Thread thread1 = new Thread(() -> {
+      for (int i = 0; i < blockNum; i++) {
+        diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
+      }
+    });
+    Thread thread2 = new Thread(() -> {
+      for (int i = 0; i < blockNum; i++) {
+        diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
+      }
+    });
+    Thread thread3 = new Thread(() -> {
+      for (int i = 0; i < blockNum; i++) {
+        diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
+      }
+    });
     for (int i = 0; i < blockNum; i++) {
       diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
     }
+    thread1.join();
+    thread2.join();
+    thread3.join();
   }
 
   private void firstInit() throws InterruptedException {
