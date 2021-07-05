@@ -732,7 +732,7 @@ public class MyAnalyticDB implements AnalyticDB {
 //      }
 
       if (isTest) {
-        if (totalCost > 49000) {
+        if (totalCost > 50000) {
           return "0";
         }
       }
