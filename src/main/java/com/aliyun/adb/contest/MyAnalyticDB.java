@@ -8,6 +8,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -105,87 +109,61 @@ public class MyAnalyticDB implements AnalyticDB {
   /**
    * 初始化
    */
-  private void init(String workspaceDir) throws InterruptedException {
+  private void init(String workspaceDir) throws Exception {
     DiskBlock.workspaceDir = workspaceDir;
     long begin = System.currentTimeMillis();
     firstInit();
     System.out.println("init cost time : " + (System.currentTimeMillis() - begin));
-//    Thread thread = new Thread(() -> {
-//      try {
-//        Thread.sleep(1000 * 2 * 60);
-//        for (int i = 0; i < 10; i++) {
-//          System.out.println(i + "termination!!!");
-//          Thread.sleep(100);
-//        }
-//        System.exit(0);
-//      } catch (InterruptedException e) {
-//        e.printStackTrace();
-//      }
-//    });
-//    thread.start();
   }
 
-  private void firstInit() throws InterruptedException {
-    Thread thread1 = new Thread(() -> {
+  private void firstInit() throws Exception {
+    Future<?> future1 = executor.submit(() -> {
       for (int i = 0; i < blockNum / 2; i++) {
         diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
       }
     });
-    Thread thread1_1 = new Thread(() -> {
+    Future<?> future2 = executor.submit(() -> {
       for (int i = blockNum / 2; i < blockNum; i++) {
         diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
       }
     });
-    thread1.start();
-    thread1_1.start();
-
-
-
-    Thread thread2 = new Thread(() -> {
+    Future<?> future3 = executor.submit(() -> {
       for (int i = 0; i < blockNum / 2; i++) {
         diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
       }
     });
-    Thread thread2_1 = new Thread(() -> {
+    Future<?> future4 = executor.submit(() -> {
       for (int i = blockNum / 2; i < blockNum; i++) {
         diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
       }
     });
-    thread2.start();
-    thread2_1.start();
-
-
-    Thread thread3 = new Thread(() -> {
+    Future<?> future5 = executor.submit(() -> {
       for (int i = 0; i < blockNum / 2; i++) {
         diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
       }
     });
-    Thread thread3_1 = new Thread(() -> {
+    Future<?> future6 = executor.submit(() -> {
       for (int i = blockNum / 2; i < blockNum; i++) {
         diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
       }
     });
-    thread3.start();
-    thread3_1.start();
-
-
-    Thread thread4_1 = new Thread(() -> {
+    Future<?> future7 = executor.submit(() -> {
       for (int i = 0; i < blockNum / 2; i++) {
         diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
       }
     });
-    thread4_1.start();
 
     for (int i = blockNum / 2; i < blockNum; i++) {
       diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
     }
-    thread1.join();
-    thread1_1.join();
-    thread2.join();
-    thread2_1.join();
-    thread3.join();
-    thread3_1.join();
-    thread4_1.join();
+
+    future1.get();
+    future2.get();
+    future3.get();
+    future4.get();
+    future5.get();
+    future6.get();
+    future7.get();
   }
 
 
@@ -206,24 +184,18 @@ public class MyAnalyticDB implements AnalyticDB {
     File file1 = new File(tpchDataFileDir + "/lineitem");
     File file2 = new File(tpchDataFileDir + "/orders");
 
-    if (1 == 1) {
-      System.out.println(tpchDataFileDir + "/lineitem");
-      System.out.println(tpchDataFileDir + "/orders");
-      return;
-    }
-
     File[] files = {file1, file2};
     for (int i = 0; i < files.length; i++) {
       File dataFile = files[i];
-      System.out.println("stable target file name is " + dataFile.getName() + ", target file size is " + dataFile.length());
+      System.out.println("stable target file name is " + dataFile.getPath() + ", target file size is " + dataFile.length());
       operateFirstFile = i == 0;
       totalFinishThreadNum.set(0);
       finishThreadNum.set(0);
       storeBlockData(dataFile);
     }
 
-    printForTest();
     storeBlockNumberFile();
+
     loadCostTime = System.currentTimeMillis() - begin;
     System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
     System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
@@ -232,31 +204,27 @@ public class MyAnalyticDB implements AnalyticDB {
     System.out.println("============> stable load cost time : " + loadCostTime);
   }
 
-  private void printForTest() {
-    Set<Integer> set = new TreeSet<>();
-    for (int num : table_1_BlockDataNumArr1) {
-      set.add(num);
-    }
-//    System.out.println("table_1_BlockDataNumArr1 count is : " + set);
-
-    Set<Integer> set2 = new TreeSet<>();
-    for (int num : table_1_BlockDataNumArr2) {
-      set2.add(num);
-    }
-//    System.out.println("table_1_BlockDataNumArr2 count is : " + set2);
-
-    Set<Integer> set3 = new TreeSet<>();
-    for (int num : table_2_BlockDataNumArr1) {
-      set3.add(num);
-    }
-//    System.out.println("table_2_BlockDataNumArr1 count is : " + set3);
-
-    Set<Integer> set4 = new TreeSet<>();
-    for (int num : table_2_BlockDataNumArr2) {
-      set4.add(num);
-    }
-//    System.out.println("table_2_BlockDataNumArr2 count is : " + set4);
-  }
+//  private void printForTest() {
+//    Set<Integer> set = new TreeSet<>();
+//    for (int num : table_1_BlockDataNumArr1) {
+//      set.add(num);
+//    }
+//
+//    Set<Integer> set2 = new TreeSet<>();
+//    for (int num : table_1_BlockDataNumArr2) {
+//      set2.add(num);
+//    }
+//
+//    Set<Integer> set3 = new TreeSet<>();
+//    for (int num : table_2_BlockDataNumArr1) {
+//      set3.add(num);
+//    }
+//
+//    Set<Integer> set4 = new TreeSet<>();
+//    for (int num : table_2_BlockDataNumArr2) {
+//      set4.add(num);
+//    }
+//  }
 
   private void reloadBlockNumberFile() throws IOException {
     storeBlockNumberFile = new File(DiskBlock.workspaceDir + "/blockNumberInfo.data");
@@ -403,47 +371,83 @@ public class MyAnalyticDB implements AnalyticDB {
     System.out.println("operate file " + dataFile.toPath() + ", cost time is " + (System.currentTimeMillis() - begin));
   }
 
+  private static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+
   private void storeFinalDataToDisk() throws Exception {
-    Thread thread1 = new Thread(() -> {
+    Future<?> future1 = executor.submit(() -> {
       try {
-        for (DiskBlock diskBlock : diskBlockData_1_1) {
-          diskBlock.forceStoreLongArr1();
+        for (int i = 0; i < blockNum / 2; i++) {
+          diskBlockData_1_1[i].forceStoreLongArr1();
         }
       } catch (Exception e) {
         e.printStackTrace();
       }
     });
-    thread1.start();
-
-    Thread thread2 = new Thread(() -> {
+    Future<?> future2 = executor.submit(() -> {
       try {
-        for (DiskBlock diskBlock : diskBlockData_1_2) {
-          diskBlock.forceStoreLongArr2();
+        for (int i = blockNum / 2; i < blockNum; i++) {
+          diskBlockData_1_1[i].forceStoreLongArr1();
         }
       } catch (Exception e) {
         e.printStackTrace();
       }
     });
-    thread2.start();
-
-    Thread thread3 = new Thread(() -> {
+    Future<?> future3 = executor.submit(() -> {
       try {
-        for (DiskBlock diskBlock : diskBlockData_2_1) {
-          diskBlock.forceStoreLongArr1();
+        for (int i = 0; i < blockNum / 2; i++) {
+          diskBlockData_1_2[i].forceStoreLongArr2();
         }
       } catch (Exception e) {
         e.printStackTrace();
       }
     });
-    thread3.start();
-
-    for (DiskBlock diskBlock : diskBlockData_2_2) {
-      diskBlock.forceStoreLongArr2();
+    Future<?> future4 = executor.submit(() -> {
+      try {
+        for (int i = blockNum / 2; i < blockNum; i++) {
+          diskBlockData_1_2[i].forceStoreLongArr2();
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
+    Future<?> future5 = executor.submit(() -> {
+      try {
+        for (int i = 0; i < blockNum / 2; i++) {
+          diskBlockData_2_1[i].forceStoreLongArr1();
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
+    Future<?> future6 = executor.submit(() -> {
+      try {
+        for (int i = blockNum / 2; i < blockNum; i++) {
+          diskBlockData_2_1[i].forceStoreLongArr1();
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
+    Future<?> future7 = executor.submit(() -> {
+      try {
+        for (int i = 0; i < blockNum / 2; i++) {
+          diskBlockData_2_2[i].forceStoreLongArr2();
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
+    for (int i = blockNum / 2; i < blockNum; i++) {
+      diskBlockData_2_2[i].forceStoreLongArr2();
     }
 
-    thread1.join();
-    thread2.join();
-    thread3.join();
+    future1.get();
+    future2.get();
+    future3.get();
+    future4.get();
+    future5.get();
+    future6.get();
+    future7.get();
   }
 
   public class CpuThread extends Thread {
@@ -718,9 +722,6 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-    if (1 == 1) {
-      return "0";
-    }
     int num = invokeTimes.incrementAndGet();
     if (num >= 4000) {
       long time = System.currentTimeMillis();
