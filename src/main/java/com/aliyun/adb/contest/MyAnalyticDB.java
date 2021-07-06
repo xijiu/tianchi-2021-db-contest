@@ -371,7 +371,7 @@ public class MyAnalyticDB implements AnalyticDB {
     System.out.println("operate file " + dataFile.toPath() + ", cost time is " + (System.currentTimeMillis() - begin));
   }
 
-  private static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+  public static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
 
   private void storeFinalDataToDisk() throws Exception {
     Future<?> future1 = executor.submit(() -> {
