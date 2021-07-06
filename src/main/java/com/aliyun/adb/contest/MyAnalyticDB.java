@@ -392,7 +392,7 @@ public class MyAnalyticDB implements AnalyticDB {
     long beginThreadTime = System.currentTimeMillis();
     AtomicInteger number = new AtomicInteger();
     Thread helperThread1 = new Thread(() -> {
-      for (int i = 0; i < 4; i++) {
+      for (int i = 0; i < cpuThreadNum / 2; i++) {
         try {
           cpuThread[i] = new CpuThread(i, fileChannel, number);
           cpuThread[i].setName("stable-thread-" + i);
@@ -404,54 +404,12 @@ public class MyAnalyticDB implements AnalyticDB {
     });
     helperThread1.start();
 
-    Thread helperThread2 = new Thread(() -> {
-      for (int i = 4; i < 8; i++) {
-        try {
-          cpuThread[i] = new CpuThread(i, fileChannel, number);
-          cpuThread[i].setName("stable-thread-" + i);
-          cpuThread[i].start();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    });
-    helperThread2.start();
-
-    Thread helperThread3 = new Thread(() -> {
-      for (int i = 8; i < 12; i++) {
-        try {
-          cpuThread[i] = new CpuThread(i, fileChannel, number);
-          cpuThread[i].setName("stable-thread-" + i);
-          cpuThread[i].start();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    });
-    helperThread3.start();
-
-    Thread helperThread4 = new Thread(() -> {
-      for (int i = 12; i < 16; i++) {
-        try {
-          cpuThread[i] = new CpuThread(i, fileChannel, number);
-          cpuThread[i].setName("stable-thread-" + i);
-          cpuThread[i].start();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    });
-    helperThread4.start();
-
-    for (int i = 16; i < cpuThreadNum; i++) {
+    for (int i = cpuThreadNum / 2; i < cpuThreadNum; i++) {
       cpuThread[i] = new CpuThread(i, fileChannel, number);
       cpuThread[i].setName("stable-thread-" + i);
       cpuThread[i].start();
     }
     helperThread1.join();
-    helperThread2.join();
-    helperThread3.join();
-    helperThread4.join();
     System.out.println("create threads cost time is : " + (System.currentTimeMillis() - beginThreadTime));
   }
 
