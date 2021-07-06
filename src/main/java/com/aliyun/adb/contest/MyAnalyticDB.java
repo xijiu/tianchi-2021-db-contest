@@ -400,7 +400,6 @@ public class MyAnalyticDB implements AnalyticDB {
       try {
         for (DiskBlock diskBlock : diskBlockData_1_1) {
           diskBlock.forceStoreLongArr1();
-          diskBlock.forceStoreLongArr2();
         }
       } catch (Exception e) {
         e.printStackTrace();
@@ -411,7 +410,6 @@ public class MyAnalyticDB implements AnalyticDB {
     Thread thread2 = new Thread(() -> {
       try {
         for (DiskBlock diskBlock : diskBlockData_1_2) {
-          diskBlock.forceStoreLongArr1();
           diskBlock.forceStoreLongArr2();
         }
       } catch (Exception e) {
@@ -424,7 +422,6 @@ public class MyAnalyticDB implements AnalyticDB {
       try {
         for (DiskBlock diskBlock : diskBlockData_2_1) {
           diskBlock.forceStoreLongArr1();
-          diskBlock.forceStoreLongArr2();
         }
       } catch (Exception e) {
         e.printStackTrace();
@@ -433,7 +430,6 @@ public class MyAnalyticDB implements AnalyticDB {
     thread3.start();
 
     for (DiskBlock diskBlock : diskBlockData_2_2) {
-      diskBlock.forceStoreLongArr1();
       diskBlock.forceStoreLongArr2();
     }
 
