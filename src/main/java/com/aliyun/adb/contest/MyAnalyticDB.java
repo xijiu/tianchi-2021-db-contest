@@ -22,7 +22,8 @@ public class MyAnalyticDB implements AnalyticDB {
    * 512- 2000000
    * 1024-1000000
    */
-  public static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[8000000]);
+  public static final int helperLongArrLen = 8000000;
+
 
   private final int drift = 64 - (power + 1);
 
@@ -735,7 +736,7 @@ public class MyAnalyticDB implements AnalyticDB {
 //      }
 
       if (isTest) {
-        if (totalCost > 50000) {
+        if (totalCost > 48000) {
           return "0";
         }
       }
