@@ -721,6 +721,9 @@ public class MyAnalyticDB implements AnalyticDB {
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
     int num = invokeTimes.incrementAndGet();
+    if (isFirstInvoke && num == 10) {
+      System.out.println("first last invoke, time is " + System.currentTimeMillis());
+    }
     if (num >= 4000) {
       long time = System.currentTimeMillis();
       long totalCost = time - totalBeginTime;
