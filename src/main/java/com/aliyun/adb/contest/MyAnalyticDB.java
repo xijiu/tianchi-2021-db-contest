@@ -446,17 +446,17 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private int threadIndex;
 
-    public short cacheLength = DiskBlock.cacheLength;
+    public int cacheLength = DiskBlock.cacheLength;
 
-    public short secondCacheLength = DiskBlock.secondCacheLength;
+    public int secondCacheLength = DiskBlock.secondCacheLength;
 
     public long[][] firstThreadCacheArr = new long[blockNum][cacheLength];
 
-    public short[] firstCacheLengthArr = new short[blockNum];
+    public int[] firstCacheLengthArr = new int[blockNum];
 
     public long[][] secondThreadCacheArr = new long[blockNum][secondCacheLength];
 
-    public short[] secondCacheLengthArr = new short[blockNum];
+    public int[] secondCacheLengthArr = new int[blockNum];
 
     private FileChannel fileChannel;
 
@@ -617,7 +617,7 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     private void saveToMemoryOrDisk(int firstIndex, boolean normal) throws Exception {
-      short helperNum = 0;
+      int helperNum = 0;
       int i = normal ? 0 : 1;
       int endIndex = firstIndex - 1;
       for (; i < endIndex; i = i + 2) {
@@ -825,8 +825,6 @@ public class MyAnalyticDB implements AnalyticDB {
     }
     return null;
   }
-
-  public static long[] sortArr = new long[2600000];
 
   private String secondQuantile(int number) throws Exception {
     int total = 0;
