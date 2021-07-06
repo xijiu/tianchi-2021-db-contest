@@ -206,6 +206,12 @@ public class MyAnalyticDB implements AnalyticDB {
     File file1 = new File(tpchDataFileDir + "/lineitem");
     File file2 = new File(tpchDataFileDir + "/orders");
 
+    if (1 == 1) {
+      System.out.println(tpchDataFileDir + "/lineitem");
+      System.out.println(tpchDataFileDir + "/orders");
+      return;
+    }
+
     File[] files = {file1, file2};
     for (int i = 0; i < files.length; i++) {
       File dataFile = files[i];
@@ -368,7 +374,16 @@ public class MyAnalyticDB implements AnalyticDB {
     bucketBaseArr = new long[lastBucketIndex + 1];
     bucketDataPosArr = new byte[lastBucketIndex + 1];
 
-    startCpuThreads(fileChannel);
+
+    AtomicInteger number = new AtomicInteger();
+
+    long beginThreadTime = System.currentTimeMillis();
+    for (int i = 0; i < cpuThreadNum; i++) {
+      cpuThread[i] = new CpuThread(i, fileChannel, number);
+      cpuThread[i].setName("stable-thread-" + i);
+      cpuThread[i].start();
+    }
+    System.out.println("create threads cost time is : " + (System.currentTimeMillis() - beginThreadTime));
 
     for (int i = 0; i < cpuThreadNum; i++) {
       cpuThread[i].join();
@@ -386,31 +401,6 @@ public class MyAnalyticDB implements AnalyticDB {
       statPerBlockCount2();
     }
     System.out.println("operate file " + dataFile.toPath() + ", cost time is " + (System.currentTimeMillis() - begin));
-  }
-
-  private void startCpuThreads(FileChannel fileChannel) throws Exception {
-    long beginThreadTime = System.currentTimeMillis();
-    AtomicInteger number = new AtomicInteger();
-    Thread helperThread1 = new Thread(() -> {
-      for (int i = 0; i < cpuThreadNum / 2; i++) {
-        try {
-          cpuThread[i] = new CpuThread(i, fileChannel, number);
-          cpuThread[i].setName("stable-thread-" + i);
-          cpuThread[i].start();
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    });
-    helperThread1.start();
-
-    for (int i = cpuThreadNum / 2; i < cpuThreadNum; i++) {
-      cpuThread[i] = new CpuThread(i, fileChannel, number);
-      cpuThread[i].setName("stable-thread-" + i);
-      cpuThread[i].start();
-    }
-    helperThread1.join();
-    System.out.println("create threads cost time is : " + (System.currentTimeMillis() - beginThreadTime));
   }
 
   private void storeFinalDataToDisk() throws Exception {
@@ -728,6 +718,9 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
+    if (1 == 1) {
+      return "0";
+    }
     int num = invokeTimes.incrementAndGet();
     if (num >= 4000) {
       long time = System.currentTimeMillis();
