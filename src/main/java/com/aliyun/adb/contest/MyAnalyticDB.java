@@ -371,11 +371,13 @@ public class MyAnalyticDB implements AnalyticDB {
 
     AtomicInteger number = new AtomicInteger();
 
+    long beginThreadTime = System.currentTimeMillis();
     for (int i = 0; i < cpuThreadNum; i++) {
       cpuThread[i] = new CpuThread(i, fileChannel, number);
       cpuThread[i].setName("stable-thread-" + i);
       cpuThread[i].start();
     }
+    System.out.println("create threads cost time is : " + (System.currentTimeMillis() - beginThreadTime));
 
     for (int i = 0; i < cpuThreadNum; i++) {
       cpuThread[i].join();
@@ -719,7 +721,7 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=======================> actual total cost : " + totalCost);
 
       if (isTest) {
-        if (totalCost > 49000) {
+        if (totalCost > 48000) {
           return "0";
         }
       }
