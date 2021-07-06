@@ -62,10 +62,6 @@ public class DiskBlock {
 
   private ByteBuffer batchWriteBuffer = null;
 
-  private final Object colLock1 = new Object();
-
-  private final Object colLock2 = new Object();
-
 
   public DiskBlock(String tableName, int col, int blockIndex) {
     this.tableName = tableName;
@@ -87,63 +83,55 @@ public class DiskBlock {
     fileChannel.write(byteBuffer);
   }
 
-  public void storeLongArr1(long[] dataArr, int length) throws Exception {
-    synchronized (colLock1) {
-      for (int i = 0; i < length; i++) {
-        long data = dataArr[i];
-        // 8 part  : 63050394783186944L   >> 53
-        // 16 part : 67553994410557440L   >> 52
-        int index = (int) ((data & 67553994410557440L) >> 52);
-        short pos = dataCacheLen1[index]++;
-        dataCache1[index][pos] = data;
-        if (pos + 1 == cacheLength) {
-          putToByteBuffer(dataCache1[index], cacheLength);
-          partFileChannels[index].write(batchWriteBuffer);
-          dataCacheLen1[index] = 0;
-        }
+  public synchronized void storeLongArr1(long[] dataArr, int length) throws Exception {
+    for (int i = 0; i < length; i++) {
+      long data = dataArr[i];
+      // 8 part  : 63050394783186944L   >> 53
+      // 16 part : 67553994410557440L   >> 52
+      int index = (int) ((data & 67553994410557440L) >> 52);
+      short pos = dataCacheLen1[index]++;
+      dataCache1[index][pos] = data;
+      if (pos + 1 == cacheLength) {
+        putToByteBuffer(dataCache1[index], cacheLength);
+        partFileChannels[index].write(batchWriteBuffer);
+        dataCacheLen1[index] = 0;
       }
     }
   }
 
-  public void storeLongArr2(long[] dataArr, int length) throws Exception {
-    synchronized (colLock2) {
-      for (int i = 0; i < length; i++) {
-        long data = dataArr[i];
-        int index = (int) ((data & 67553994410557440L) >> 52);
-        short pos = dataCacheLen2[index]++;
-        dataCache2[index][pos] = data;
-        if (pos + 1 == secondCacheLength) {
-          putToByteBuffer(dataCache2[index], secondCacheLength);
-          partFileChannels[index].write(batchWriteBuffer);
-          dataCacheLen2[index] = 0;
-        }
+  public synchronized void storeLongArr2(long[] dataArr, int length) throws Exception {
+    for (int i = 0; i < length; i++) {
+      long data = dataArr[i];
+      int index = (int) ((data & 67553994410557440L) >> 52);
+      short pos = dataCacheLen2[index]++;
+      dataCache2[index][pos] = data;
+      if (pos + 1 == secondCacheLength) {
+        putToByteBuffer(dataCache2[index], secondCacheLength);
+        partFileChannels[index].write(batchWriteBuffer);
+        dataCacheLen2[index] = 0;
       }
     }
   }
 
 
-  public void forceStoreLongArr1() throws Exception {
-    synchronized (colLock1) {
-      for (int i = 0; i < dataCacheLen1.length; i++) {
-        int len = dataCacheLen1[i];
-        if (len > 0) {
-          putToByteBuffer(dataCache1[i], len);
-          partFileChannels[i].write(batchWriteBuffer);
-          dataCacheLen1[i] = 0;
-        }
+  public synchronized void forceStoreLongArr1() throws Exception {
+    for (int i = 0; i < dataCacheLen1.length; i++) {
+      int len = dataCacheLen1[i];
+      if (len > 0) {
+        putToByteBuffer(dataCache1[i], len);
+        partFileChannels[i].write(batchWriteBuffer);
+        dataCacheLen1[i] = 0;
       }
     }
   }
 
-  public void forceStoreLongArr2() throws Exception {
-    synchronized (colLock2) {
-      for (int i = 0; i < dataCacheLen2.length; i++) {
-        int len = dataCacheLen2[i];
-        if (len > 0) {
-          putToByteBuffer(dataCache2[i], len);
-          partFileChannels[i].write(batchWriteBuffer);
-          dataCacheLen2[i] = 0;
-        }
+  public synchronized void forceStoreLongArr2() throws Exception {
+    for (int i = 0; i < dataCacheLen2.length; i++) {
+      int len = dataCacheLen2[i];
+      if (len > 0) {
+        putToByteBuffer(dataCache2[i], len);
+        partFileChannels[i].write(batchWriteBuffer);
+        dataCacheLen2[i] = 0;
       }
     }
   }
@@ -251,8 +239,7 @@ public class DiskBlock {
 //    readSizeArr[concurrentQueryThreadNum - 1] = (int) ((fileLen / 7) - (count * (concurrentQueryThreadNum - 1)));
 //  }
 
-  private static ThreadLocal<ByteBuffer> threadLocal = new ThreadLocal<>();
-  private static ThreadLocal<long[]> helper = new ThreadLocal<>();
+  private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index, int count) throws Exception {
     FileChannel partFileChannel = null;
@@ -268,16 +255,8 @@ public class DiskBlock {
       lastTmpSize = tmpSize;
     }
 
-    long[] data = helper.get();
-    if (data == null) {
-      data = new long[MyAnalyticDB.helperLongArrLen];
-      helper.set(data);
-    }
+    long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
-    if (byteBuffer == null) {
-      byteBuffer = ByteBuffer.allocate(perReadSize);
-      threadLocal.set(byteBuffer);
-    }
     byte[] array = byteBuffer.array();
     int idx = 0;
     long pos = 0;
