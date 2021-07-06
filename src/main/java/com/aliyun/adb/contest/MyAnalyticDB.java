@@ -368,16 +368,7 @@ public class MyAnalyticDB implements AnalyticDB {
     bucketBaseArr = new long[lastBucketIndex + 1];
     bucketDataPosArr = new byte[lastBucketIndex + 1];
 
-
-    AtomicInteger number = new AtomicInteger();
-
-    long beginThreadTime = System.currentTimeMillis();
-    for (int i = 0; i < cpuThreadNum; i++) {
-      cpuThread[i] = new CpuThread(i, fileChannel, number);
-      cpuThread[i].setName("stable-thread-" + i);
-      cpuThread[i].start();
-    }
-    System.out.println("create threads cost time is : " + (System.currentTimeMillis() - beginThreadTime));
+    startCpuThreads(fileChannel);
 
     for (int i = 0; i < cpuThreadNum; i++) {
       cpuThread[i].join();
@@ -395,6 +386,73 @@ public class MyAnalyticDB implements AnalyticDB {
       statPerBlockCount2();
     }
     System.out.println("operate file " + dataFile.toPath() + ", cost time is " + (System.currentTimeMillis() - begin));
+  }
+
+  private void startCpuThreads(FileChannel fileChannel) throws Exception {
+    long beginThreadTime = System.currentTimeMillis();
+    AtomicInteger number = new AtomicInteger();
+    Thread helperThread1 = new Thread(() -> {
+      for (int i = 0; i < 4; i++) {
+        try {
+          cpuThread[i] = new CpuThread(i, fileChannel, number);
+          cpuThread[i].setName("stable-thread-" + i);
+          cpuThread[i].start();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    });
+    helperThread1.start();
+
+    Thread helperThread2 = new Thread(() -> {
+      for (int i = 4; i < 8; i++) {
+        try {
+          cpuThread[i] = new CpuThread(i, fileChannel, number);
+          cpuThread[i].setName("stable-thread-" + i);
+          cpuThread[i].start();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    });
+    helperThread2.start();
+
+    Thread helperThread3 = new Thread(() -> {
+      for (int i = 8; i < 12; i++) {
+        try {
+          cpuThread[i] = new CpuThread(i, fileChannel, number);
+          cpuThread[i].setName("stable-thread-" + i);
+          cpuThread[i].start();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    });
+    helperThread3.start();
+
+    Thread helperThread4 = new Thread(() -> {
+      for (int i = 12; i < 16; i++) {
+        try {
+          cpuThread[i] = new CpuThread(i, fileChannel, number);
+          cpuThread[i].setName("stable-thread-" + i);
+          cpuThread[i].start();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    });
+    helperThread4.start();
+
+    for (int i = 16; i < cpuThreadNum; i++) {
+      cpuThread[i] = new CpuThread(i, fileChannel, number);
+      cpuThread[i].setName("stable-thread-" + i);
+      cpuThread[i].start();
+    }
+    helperThread1.join();
+    helperThread2.join();
+    helperThread3.join();
+    helperThread4.join();
+    System.out.println("create threads cost time is : " + (System.currentTimeMillis() - beginThreadTime));
   }
 
   private void storeFinalDataToDisk() throws Exception {
