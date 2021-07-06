@@ -654,9 +654,9 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
 
-    private byte[] batchWriteArr = new byte[secondCacheLength * 7];
+//    private byte[] batchWriteArr = new byte[secondCacheLength * 7];
 
-    private ByteBuffer batchWriteBuffer = ByteBuffer.wrap(batchWriteArr);
+//    private ByteBuffer batchWriteBuffer = ByteBuffer.wrap(batchWriteArr);
 
 
     private void batchSaveFirstCol(int blockIndex) throws Exception {
@@ -679,23 +679,23 @@ public class MyAnalyticDB implements AnalyticDB {
       diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr[blockIndex], length);
     }
 
-    private void putToByteBuffer(long[] data, int length) {
-      int index = 0;
-      for (int i = 0; i < length; i++) {
-        long element = data[i];
-        batchWriteArr[index++] = (byte)(element >> 48);
-        batchWriteArr[index++] = (byte)(element >> 40);
-        batchWriteArr[index++] = (byte)(element >> 32);
-        batchWriteArr[index++] = (byte)(element >> 24);
-        batchWriteArr[index++] = (byte)(element >> 16);
-        batchWriteArr[index++] = (byte)(element >> 8);
-        batchWriteArr[index++] = (byte)(element);
-      }
-
-      batchWriteBuffer.clear();
-      batchWriteBuffer.position(index);
-      batchWriteBuffer.flip();
-    }
+//    private void putToByteBuffer(long[] data, int length) {
+//      int index = 0;
+//      for (int i = 0; i < length; i++) {
+//        long element = data[i];
+//        batchWriteArr[index++] = (byte)(element >> 48);
+//        batchWriteArr[index++] = (byte)(element >> 40);
+//        batchWriteArr[index++] = (byte)(element >> 32);
+//        batchWriteArr[index++] = (byte)(element >> 24);
+//        batchWriteArr[index++] = (byte)(element >> 16);
+//        batchWriteArr[index++] = (byte)(element >> 8);
+//        batchWriteArr[index++] = (byte)(element);
+//      }
+//
+//      batchWriteBuffer.clear();
+//      batchWriteBuffer.position(index);
+//      batchWriteBuffer.flip();
+//    }
   }
 
 

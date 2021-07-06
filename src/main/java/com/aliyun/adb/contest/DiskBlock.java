@@ -36,7 +36,7 @@ public class DiskBlock {
 
   private final String tableName;
 
-  private static final int perReadSize = 7 * 1024 * 128;
+  private static final int perReadSize = 1024 * 1024;
 
 //  private static final int concurrentQueryThreadNum = 2;
 
@@ -58,7 +58,7 @@ public class DiskBlock {
 
   private int[] dataCacheLen2 = null;
 
-  private byte[] batchWriteArr = null;
+//  private byte[] batchWriteArr = null;
 
   private ByteBuffer batchWriteBuffer = null;
 
@@ -73,8 +73,8 @@ public class DiskBlock {
       dataCacheLen1 = new int[splitNum];
       dataCache2 = new long[splitNum][secondCacheLength];
       dataCacheLen2 = new int[splitNum];
-      batchWriteArr = new byte[secondCacheLength * 7];
-      batchWriteBuffer = ByteBuffer.wrap(batchWriteArr);
+//      batchWriteArr = new byte[secondCacheLength * 7];
+      batchWriteBuffer = ByteBuffer.allocateDirect(secondCacheLength * 8);
     }
     this.initFileChannel();
   }
@@ -139,20 +139,10 @@ public class DiskBlock {
 
 
   private void putToByteBuffer(long[] data, int length) {
-    int index = 0;
-    for (int i = 0; i < length; i++) {
-      long element = data[i];
-      batchWriteArr[index++] = (byte)(element >> 48);
-      batchWriteArr[index++] = (byte)(element >> 40);
-      batchWriteArr[index++] = (byte)(element >> 32);
-      batchWriteArr[index++] = (byte)(element >> 24);
-      batchWriteArr[index++] = (byte)(element >> 16);
-      batchWriteArr[index++] = (byte)(element >> 8);
-      batchWriteArr[index++] = (byte)(element);
-    }
-
     batchWriteBuffer.clear();
-    batchWriteBuffer.position(index);
+    for (int i = 0; i < length; i++) {
+      batchWriteBuffer.putLong(data[i]);
+    }
     batchWriteBuffer.flip();
   }
 
@@ -247,9 +237,9 @@ public class DiskBlock {
     long tmpSize = 0;
     for (int i = 0; i < splitNum; i++) {
       tmpSize += partFileChannels[i].size();
-      if (tmpSize > index * 7) {
+      if (tmpSize > index * 8L) {
         partFileChannel = partFileChannels[i];
-        index = (int) (index - (lastTmpSize / 7));
+        index = (int) (index - (lastTmpSize / 8));
         break;
       }
       lastTmpSize = tmpSize;
@@ -257,7 +247,7 @@ public class DiskBlock {
 
     long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
-    byte[] array = byteBuffer.array();
+//    byte[] array = byteBuffer.array();
     int idx = 0;
     long pos = 0;
     while (true) {
@@ -270,11 +260,17 @@ public class DiskBlock {
       if (flag == -1) {
         break;
       }
-      int length = byteBuffer.position();
-      for (int i = 0; i < length; i += 7) {
-        data[idx++] = makeLong(bytePrev, array[i], array[i + 1], array[i + 2],
-                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
+
+      byteBuffer.flip();
+      while (byteBuffer.hasRemaining()) {
+        data[idx++] = byteBuffer.getLong();
       }
+
+//      int length = byteBuffer.position();
+//      for (int i = 0; i < length; i += 7) {
+//        data[idx++] = makeLong(bytePrev, array[i], array[i + 1], array[i + 2],
+//                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
+//      }
     }
 
     return PubTools.solve(data, 0, idx - 1, index);
