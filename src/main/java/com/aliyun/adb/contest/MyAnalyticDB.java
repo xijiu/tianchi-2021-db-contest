@@ -126,86 +126,67 @@ public class MyAnalyticDB implements AnalyticDB {
   }
 
   private void firstInit() throws InterruptedException {
-    isFirstInvoke = false;
-    for (int i = 0; i < blockNum; i++) {
-      diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
-    }
+    Thread thread1 = new Thread(() -> {
+      for (int i = 0; i < blockNum / 2; i++) {
+        diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
+      }
+    });
+    Thread thread1_1 = new Thread(() -> {
+      for (int i = blockNum / 2; i < blockNum; i++) {
+        diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
+      }
+    });
+    thread1.start();
+    thread1_1.start();
 
-    for (int i = 0; i < blockNum; i++) {
-      diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
-    }
 
-    for (int i = 0; i < blockNum; i++) {
-      diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
-    }
 
-    for (int i = 0; i < blockNum; i++) {
+    Thread thread2 = new Thread(() -> {
+      for (int i = 0; i < blockNum / 2; i++) {
+        diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
+      }
+    });
+    Thread thread2_1 = new Thread(() -> {
+      for (int i = blockNum / 2; i < blockNum; i++) {
+        diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
+      }
+    });
+    thread2.start();
+    thread2_1.start();
+
+
+    Thread thread3 = new Thread(() -> {
+      for (int i = 0; i < blockNum / 2; i++) {
+        diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
+      }
+    });
+    Thread thread3_1 = new Thread(() -> {
+      for (int i = blockNum / 2; i < blockNum; i++) {
+        diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
+      }
+    });
+    thread3.start();
+    thread3_1.start();
+
+
+    Thread thread4_1 = new Thread(() -> {
+      for (int i = 0; i < blockNum / 2; i++) {
+        diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
+      }
+    });
+    thread4_1.start();
+
+    for (int i = blockNum / 2; i < blockNum; i++) {
       diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
     }
+    thread1.join();
+    thread1_1.join();
+    thread2.join();
+    thread2_1.join();
+    thread3.join();
+    thread3_1.join();
+    thread4_1.join();
   }
-
-//  private void firstInit() throws InterruptedException {
-//    Thread thread1 = new Thread(() -> {
-//      for (int i = 0; i < blockNum / 2; i++) {
-//        diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
-//      }
-//    });
-//    Thread thread1_1 = new Thread(() -> {
-//      for (int i = blockNum / 2; i < blockNum; i++) {
-//        diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
-//      }
-//    });
-//    thread1.start();
-//    thread1_1.start();
-//
-//
-//
-//    Thread thread2 = new Thread(() -> {
-//      for (int i = 0; i < blockNum / 2; i++) {
-//        diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
-//      }
-//    });
-//    Thread thread2_1 = new Thread(() -> {
-//      for (int i = blockNum / 2; i < blockNum; i++) {
-//        diskBlockData_1_2[i] = new DiskBlock("1", 2, i);
-//      }
-//    });
-//    thread2.start();
-//    thread2_1.start();
-//
-//
-//    Thread thread3 = new Thread(() -> {
-//      for (int i = 0; i < blockNum / 2; i++) {
-//        diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
-//      }
-//    });
-//    Thread thread3_1 = new Thread(() -> {
-//      for (int i = blockNum / 2; i < blockNum; i++) {
-//        diskBlockData_2_1[i] = new DiskBlock("2", 1, i);
-//      }
-//    });
-//    thread3.start();
-//    thread3_1.start();
-//
-//
-//    Thread thread4_1 = new Thread(() -> {
-//      for (int i = 0; i < blockNum / 2; i++) {
-//        diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
-//      }
-//    });
-//    thread4_1.start();
-//
-//    for (int i = blockNum / 2; i < blockNum; i++) {
-//      diskBlockData_2_2[i] = new DiskBlock("2", 2, i);
-//    }
-//    thread1.join();
-//    thread1_1.join();
-//    thread2.join();
-//    thread2_1.join();
-//    thread3.join();
-//    thread3_1.join();
-//    thread4_1.join();
-//  }
 
 
   @Override
@@ -213,9 +194,6 @@ public class MyAnalyticDB implements AnalyticDB {
     long begin = System.currentTimeMillis();
     setInvokeFlag(workspaceDir);
     init(workspaceDir);
-    if (1 == 1) {
-      return;
-    }
     if (!isFirstInvoke) {
       reloadBlockNumberFile();
       return ;
@@ -734,33 +712,18 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private AtomicInteger invokeTimes = new AtomicInteger();
 
-  public static AtomicLong cpuSloveTime = new AtomicLong();
-
-  public static AtomicLong diskReadFileTime = new AtomicLong();
-
-  private volatile boolean loadFinish = false;
-
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-    if (1 == 1) {
-      return "0";
-    }
     int num = invokeTimes.incrementAndGet();
     if (num >= 4000) {
       long time = System.currentTimeMillis();
       long totalCost = time - totalBeginTime;
       System.out.println("finish time is : " + time);
-      System.out.println("=================> cpuSloveTime cost : " + (cpuSloveTime.get() / 8));
-      System.out.println("=================> diskReadFileTime cost : " + (diskReadFileTime.get() / 8));
       System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
       System.out.println("=======================> actual total cost : " + totalCost);
 
-//      if (1 == 1) {
-//        return "0";
-//      }
-
       if (isTest) {
-        if (totalCost > 50000) {
+        if (totalCost > 49000) {
           return "0";
         }
       }
