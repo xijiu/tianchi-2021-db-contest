@@ -33,7 +33,7 @@ public class MyAnalyticDB implements AnalyticDB {
   /** 每一列数据分多少块 */
   private static final int blockNum = (int) Math.pow(2, power);
 
-  private static final int cpuThreadNum = 20;
+  private static final int cpuThreadNum = 24;
 
   /** 单次读取文件的大小，单位字节 */
   private final int readFileLen = 1 * 1024 * 1024;
@@ -818,8 +818,6 @@ public class MyAnalyticDB implements AnalyticDB {
     }
     return null;
   }
-
-  public static long[] sortArr = new long[2600000];
 
   private String secondQuantile(int number) throws Exception {
     int total = 0;
