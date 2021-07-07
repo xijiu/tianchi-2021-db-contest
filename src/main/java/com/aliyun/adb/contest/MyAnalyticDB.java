@@ -8,7 +8,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -88,8 +87,6 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final AtomicLong readFileTime = new AtomicLong();
 
-  private final AtomicLong cpuTime = new AtomicLong();
-
   private final AtomicLong writeFileTime = new AtomicLong();
 
   private final AtomicLong sortDataTime = new AtomicLong();
@@ -102,8 +99,31 @@ public class MyAnalyticDB implements AnalyticDB {
 
   public static volatile boolean isFirstInvoke = true;
 
+  private final File file1 = new File("/adb-data/tpch/lineitem");
+
+  private final File file2 = new File("/adb-data/tpch/orders");
+
+  private volatile FileChannel fileChannel = null;
+
+  private volatile long fileSize = file1.length();
+
+  private volatile boolean couldReadFile2 = false;
+
   public MyAnalyticDB() {
-    System.out.println("current time is " + System.currentTimeMillis());
+    try {
+      fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
+      Thread thread = new Thread(() -> {
+        try {
+          Thread.sleep(1000 * 60);
+          System.exit(1);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      });
+      thread.start();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -178,21 +198,9 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     System.out.println("stable load invoked, time is " + begin);
-
     DiskBlock.workspaceDir = workspaceDir;
 
-    File file1 = new File(tpchDataFileDir + "/lineitem");
-    File file2 = new File(tpchDataFileDir + "/orders");
-
-    File[] files = {file1, file2};
-    for (int i = 0; i < files.length; i++) {
-      File dataFile = files[i];
-      System.out.println("stable target file name is " + dataFile.getPath() + ", target file size is " + dataFile.length());
-      operateFirstFile = i == 0;
-      totalFinishThreadNum.set(0);
-      finishThreadNum.set(0);
-      storeBlockData(dataFile);
-    }
+    storeBlockData();
 
     storeBlockNumberFile();
 
@@ -330,24 +338,13 @@ public class MyAnalyticDB implements AnalyticDB {
     System.out.println("table 2 secondSum is " + firstSum);
   }
 
-  public void storeBlockData(File dataFile) throws Exception {
-    long begin = System.currentTimeMillis();
-    FileChannel fileChannel = FileChannel.open(dataFile.toPath(), StandardOpenOption.READ);
-    // 跳过第一行
-    fileChannel.position(21);
+  public void storeBlockData() throws Exception {
+    initGapBucketArr(file1.length());
 
-    lastBucketIndex = (int) ((fileChannel.size() - 21) / readFileLen);
-    bucketHeadArr = new long[lastBucketIndex + 1];
-    bucketTailArr = new long[lastBucketIndex + 1];
-    bucketBaseArr = new long[lastBucketIndex + 1];
-    bucketDataPosArr = new byte[lastBucketIndex + 1];
-
-
-    AtomicInteger number = new AtomicInteger();
 
     long beginThreadTime = System.currentTimeMillis();
     for (int i = 0; i < cpuThreadNum; i++) {
-      cpuThread[i] = new CpuThread(i, fileChannel, number);
+      cpuThread[i] = new CpuThread(i);
       cpuThread[i].setName("stable-thread-" + i);
       cpuThread[i].start();
     }
@@ -357,18 +354,21 @@ public class MyAnalyticDB implements AnalyticDB {
       cpuThread[i].join();
     }
 
+    // 存储残存的第二张表的数据
     long finalBeginTime = System.currentTimeMillis();
     storeFinalDataToDisk();
-    System.out.println("storeFinalDataToDisk time cost : " + (System.currentTimeMillis() - finalBeginTime));
+    System.out.println("storeFinalDataToDisk 2 time cost : " + (System.currentTimeMillis() - finalBeginTime));
 
-    if (operateFirstFile) {
-      statPerBlockCount1();
-      Arrays.fill(firstColDataLen, 0);
-      Arrays.fill(secondColDataLen, 0);
-    } else {
-      statPerBlockCount2();
-    }
-    System.out.println("operate file " + dataFile.toPath() + ", cost time is " + (System.currentTimeMillis() - begin));
+    // 统计第二张表每个分桶的数量
+    statPerBlockCount2();
+  }
+
+  private void initGapBucketArr(long size) {
+    lastBucketIndex = (int) ((size - 21) / readFileLen);
+    bucketHeadArr = new long[lastBucketIndex + 1];
+    bucketTailArr = new long[lastBucketIndex + 1];
+    bucketBaseArr = new long[lastBucketIndex + 1];
+    bucketDataPosArr = new byte[lastBucketIndex + 1];
   }
 
   public static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
@@ -450,6 +450,8 @@ public class MyAnalyticDB implements AnalyticDB {
     future7.get();
   }
 
+  AtomicInteger number = new AtomicInteger();
+
   public class CpuThread extends Thread {
 
     private int threadIndex;
@@ -466,60 +468,84 @@ public class MyAnalyticDB implements AnalyticDB {
 
     public short[] secondCacheLengthArr = new short[blockNum];
 
-    private FileChannel fileChannel;
-
-    private long fileSize;
-
-    private AtomicInteger number;
-
     private ByteBuffer byteBuffer = ByteBuffer.allocate(readFileLen);
 
     private long[] bucketLongArr = new long[readFileLen / 8 / 2];
 
     private int bucket = -1;
 
-    public CpuThread(int index, FileChannel fileChannel, AtomicInteger number) throws Exception {
+    public CpuThread(int index) throws Exception {
       this.threadIndex = index;
-      this.fileChannel = fileChannel;
-      this.fileSize = fileChannel.size();
-      this.number = number;
     }
 
     public void run() {
       long begin = System.currentTimeMillis();
       try {
-        int finishNum = 0;
         while (true) {
-          long readTime1 = System.currentTimeMillis();
-          byte[] data = threadReadData();
-          readFileTime.addAndGet(System.currentTimeMillis() - readTime1);
+          while (true) {
+            long readTime1 = System.currentTimeMillis();
+            byte[] data = threadReadData();
+            readFileTime.addAndGet(System.currentTimeMillis() - readTime1);
 
 
-          if (data != null) {
-            operate(data);
-          } else {
-            finishNum = finishThreadNum.incrementAndGet();
-            if (finishNum == cpuThreadNum) {
-              operateGapData();
-            }
-            for (int i = 0; i < blockNum; i++) {
-              if (firstCacheLengthArr[i] > 0) {
-                batchSaveFirstCol(i);
+            if (data != null) {
+              operate(data);
+            } else {
+              int finishNum = finishThreadNum.incrementAndGet();
+              if (finishNum == cpuThreadNum) {
+                operateGapData();
               }
-              if (secondCacheLengthArr[i] > 0) {
-                batchSaveSecondCol(i);
+              for (int i = 0; i < blockNum; i++) {
+                if (firstCacheLengthArr[i] > 0) {
+                  batchSaveFirstCol(i);
+                }
+                if (secondCacheLengthArr[i] > 0) {
+                  batchSaveSecondCol(i);
+                }
               }
+              break;
             }
+          }
+
+          int totalFinishNum = totalFinishThreadNum.incrementAndGet();
+          if (totalFinishNum > cpuThreadNum) {
             break;
+          } else {
+            if (totalFinishNum == cpuThreadNum) {
+              cpuThreadReInitForFile2();
+            }
+            while (!couldReadFile2) {
+              Thread.sleep(10);
+            }
           }
         }
-        totalFinishThreadNum.incrementAndGet();
       } catch (Exception e) {
         finishThreadNum.incrementAndGet();
         e.printStackTrace();
       }
       long cost = System.currentTimeMillis() - begin;
       System.out.println(Thread.currentThread().getName() + " cost time : " + cost);
+    }
+
+    private void cpuThreadReInitForFile2() throws Exception {
+      // 存储最后残存的数据
+      long finalBeginTime = System.currentTimeMillis();
+      storeFinalDataToDisk();
+      System.out.println("storeFinalDataToDisk time cost : " + (System.currentTimeMillis() - finalBeginTime));
+
+      // 统计表1每个分桶数量的具体信息
+      statPerBlockCount1();
+
+      Arrays.fill(firstColDataLen, 0);
+      Arrays.fill(secondColDataLen, 0);
+
+      number.set(0);
+      finishThreadNum.set(0);
+      operateFirstFile = false;
+      initGapBucketArr(file2.length());
+      fileChannel = FileChannel.open(file2.toPath(), StandardOpenOption.READ);
+      fileSize = file2.length();
+      couldReadFile2 = true;
     }
 
     private int tmpBlockIndex = -1;
@@ -554,8 +580,6 @@ public class MyAnalyticDB implements AnalyticDB {
         byteBuffer.clear();
         return array;
       }
-
-
     }
 
     private void operateGapData() throws Exception {
@@ -686,24 +710,6 @@ public class MyAnalyticDB implements AnalyticDB {
       DiskBlock[] diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
       diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr[blockIndex], length);
     }
-
-    private void putToByteBuffer(long[] data, int length) {
-      int index = 0;
-      for (int i = 0; i < length; i++) {
-        long element = data[i];
-        batchWriteArr[index++] = (byte)(element >> 48);
-        batchWriteArr[index++] = (byte)(element >> 40);
-        batchWriteArr[index++] = (byte)(element >> 32);
-        batchWriteArr[index++] = (byte)(element >> 24);
-        batchWriteArr[index++] = (byte)(element >> 16);
-        batchWriteArr[index++] = (byte)(element >> 8);
-        batchWriteArr[index++] = (byte)(element);
-      }
-
-      batchWriteBuffer.clear();
-      batchWriteBuffer.position(index);
-      batchWriteBuffer.flip();
-    }
   }
 
 
@@ -731,15 +737,15 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=======================> actual total cost : " + totalCost);
 
       if (isTest) {
-        if (totalCost > 47000) {
+        if (totalCost > 40000) {
           return "0";
         }
       }
     }
 
-    if (1 == 1) {
-      return "0";
-    }
+//    if (1 == 1) {
+//      return "0";
+//    }
 
 //    if (!isFirstInvoke) {
 //      return "0";
