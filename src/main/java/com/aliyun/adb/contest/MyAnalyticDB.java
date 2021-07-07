@@ -456,21 +456,21 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private int threadIndex;
 
-    public short cacheLength = DiskBlock.cacheLength;
+    public final short cacheLength = DiskBlock.cacheLength;
 
-    public short secondCacheLength = DiskBlock.secondCacheLength;
+    public final short secondCacheLength = DiskBlock.secondCacheLength;
 
-    public long[][] firstThreadCacheArr = new long[blockNum][cacheLength];
+    public final long[][] firstThreadCacheArr = new long[blockNum][cacheLength];
 
-    public short[] firstCacheLengthArr = new short[blockNum];
+    public final short[] firstCacheLengthArr = new short[blockNum];
 
-    public long[][] secondThreadCacheArr = new long[blockNum][secondCacheLength];
+    public final long[][] secondThreadCacheArr = new long[blockNum][secondCacheLength];
 
-    public short[] secondCacheLengthArr = new short[blockNum];
+    public final short[] secondCacheLengthArr = new short[blockNum];
 
-    private ByteBuffer byteBuffer = ByteBuffer.allocate(readFileLen);
+    private final ByteBuffer byteBuffer = ByteBuffer.allocate(readFileLen);
 
-    private long[] bucketLongArr = new long[readFileLen / 8 / 2];
+    private final long[] bucketLongArr = new long[readFileLen / 8 / 2];
 
     private int bucket = -1;
 
@@ -517,6 +517,7 @@ public class MyAnalyticDB implements AnalyticDB {
             while (!couldReadFile2) {
               Thread.sleep(10);
             }
+            tmpBlockIndex = -1;
           }
         }
       } catch (Exception e) {
