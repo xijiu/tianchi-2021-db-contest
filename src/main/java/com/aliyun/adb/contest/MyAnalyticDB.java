@@ -517,6 +517,9 @@ public class MyAnalyticDB implements AnalyticDB {
             while (!couldReadFile2) {
               Thread.sleep(10);
             }
+
+            Arrays.fill(firstCacheLengthArr, (short) 0);
+            Arrays.fill(secondCacheLengthArr, (short) 0);
             tmpBlockIndex = -1;
           }
         }
@@ -568,9 +571,11 @@ public class MyAnalyticDB implements AnalyticDB {
       if (position >= fileSize) {
         return null;
       }
-      fileChannel.read(byteBuffer, position + 21);
 
+      byteBuffer.clear();
+      fileChannel.read(byteBuffer, position + 21);
       byteBuffer.flip();
+
       byte[] array = byteBuffer.array();
       if (bucket == lastBucketIndex) {
         lastBucketLength = byteBuffer.limit();
@@ -578,7 +583,6 @@ public class MyAnalyticDB implements AnalyticDB {
         System.arraycopy(array, 0, result, 0, lastBucketLength);
         return result;
       } else {
-        byteBuffer.clear();
         return array;
       }
     }
