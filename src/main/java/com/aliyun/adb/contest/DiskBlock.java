@@ -85,7 +85,7 @@ public class DiskBlock {
       // 8 part  : 63050394783186944L   >> 53
       // 16 part : 67553994410557440L   >> 52
       // 32 part : 69805794224242688L   >> 51
-      int index = (int) ((data & 36028797018963968L) >> 55);
+      int index = (int) ((data & 67553994410557440L) >> 52);
       short pos = dataCacheLen1[index]++;
       dataCache1[index][pos] = data;
       if (pos + 1 == cacheLength) {
@@ -99,7 +99,7 @@ public class DiskBlock {
   public synchronized void storeLongArr2(long[] dataArr, int length) throws Exception {
     for (int i = 0; i < length; i++) {
       long data = dataArr[i];
-      int index = (int) ((data & 36028797018963968L) >> 55);
+      int index = (int) ((data & 67553994410557440L) >> 52);
       short pos = dataCacheLen2[index]++;
       dataCache2[index][pos] = data;
       if (pos + 1 == secondCacheLength) {
