@@ -454,7 +454,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   public class CpuThread extends Thread {
 
-    private int threadIndex;
+    private final int threadIndex;
 
     public final short cacheLength = DiskBlock.cacheLength;
 
@@ -483,10 +483,7 @@ public class MyAnalyticDB implements AnalyticDB {
       try {
         while (true) {
           while (true) {
-            long readTime1 = System.currentTimeMillis();
             byte[] data = threadReadData();
-            readFileTime.addAndGet(System.currentTimeMillis() - readTime1);
-
 
             if (data != null) {
               operate(data);
@@ -588,7 +585,6 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     private void operateGapData() throws Exception {
-      long begin = System.currentTimeMillis();
       for (int bucket = 0; bucket < lastBucketIndex; bucket++) {
         long tailData = bucketTailArr[bucket];
         long headData = bucketHeadArr[bucket + 1];
@@ -607,7 +603,6 @@ public class MyAnalyticDB implements AnalyticDB {
           }
         }
       }
-      System.out.println("gap data operate over!!! cost " + (System.currentTimeMillis() - begin));
     }
 
     private void operate(byte[] dataArr) throws Exception {
@@ -742,7 +737,7 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=======================> actual total cost : " + totalCost);
 
       if (isTest) {
-        if (totalCost > 40000) {
+        if (totalCost > 47000) {
           return "0";
         }
       }
@@ -767,8 +762,6 @@ public class MyAnalyticDB implements AnalyticDB {
   }
 
   public String tmp(String table, String column, double percentile) throws Exception {
-    long begin = System.currentTimeMillis();
-
     int number = (int) Math.ceil(1000000000L * percentile);
     if (number % 2 != 0) {
       if (number % 10 == 9) {
@@ -781,22 +774,19 @@ public class MyAnalyticDB implements AnalyticDB {
 //    System.out.println("table is " + table + ", column is" + column
 //            + ", percentile is " + percentile + ", number is " + number);
 
-    String result;
     if (table.startsWith("lineitem")) {
       if (column.startsWith("L_O")) {
-        result = firstQuantile(number);
+        return firstQuantile(number);
       } else {
-        result = secondQuantile(number);
+        return secondQuantile(number);
       }
     } else {
       if (column.startsWith("O_O")) {
-        result = firstQuantileForTable2(number);
+        return firstQuantileForTable2(number);
       } else {
-        result = secondQuantileForTable2(number);
+        return secondQuantileForTable2(number);
       }
     }
-//    System.out.println("=====> stable quantile cost time is " + (System.currentTimeMillis() - begin) + ", result is " + result);
-    return result;
   }
 
 

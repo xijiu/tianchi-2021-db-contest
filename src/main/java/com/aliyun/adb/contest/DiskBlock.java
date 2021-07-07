@@ -4,12 +4,9 @@ package com.aliyun.adb.contest;
 import com.aliyun.adb.contest.utils.PubTools;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 硬盘存储块
