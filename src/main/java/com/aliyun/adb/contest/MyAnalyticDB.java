@@ -488,20 +488,20 @@ public class MyAnalyticDB implements AnalyticDB {
             readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
             if (data != null) {
-//              operate(data);
+              operate(data);
             } else {
-//              int finishNum = finishThreadNum.incrementAndGet();
-//              if (finishNum == cpuThreadNum) {
-//                operateGapData();
-//              }
-//              for (int i = 0; i < blockNum; i++) {
-//                if (firstCacheLengthArr[i] > 0) {
-//                  batchSaveFirstCol(i);
-//                }
-//                if (secondCacheLengthArr[i] > 0) {
-//                  batchSaveSecondCol(i);
-//                }
-//              }
+              int finishNum = finishThreadNum.incrementAndGet();
+              if (finishNum == cpuThreadNum) {
+                operateGapData();
+              }
+              for (int i = 0; i < blockNum; i++) {
+                if (firstCacheLengthArr[i] > 0) {
+                  batchSaveFirstCol(i);
+                }
+                if (secondCacheLengthArr[i] > 0) {
+                  batchSaveSecondCol(i);
+                }
+              }
               break;
             }
           }
@@ -739,9 +739,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-//    if (1 == 1) {
-//      return "0";
-//    }
+    if (1 == 1) {
+      return "0";
+    }
 
 //    if (!isFirstInvoke) {
 //      return "0";
