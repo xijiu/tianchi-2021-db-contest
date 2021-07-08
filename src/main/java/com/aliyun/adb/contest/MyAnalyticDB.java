@@ -32,7 +32,7 @@ public class MyAnalyticDB implements AnalyticDB {
   /** 每一列数据分多少块 */
   private static final int blockNum = (int) Math.pow(2, power);
 
-  private static final int cpuThreadNum = 22;
+  private static final int cpuThreadNum = 8;
 
   /** 单次读取文件的大小，单位字节 */
   private final int readFileLen = 1 * 1024 * 1024;
@@ -488,20 +488,20 @@ public class MyAnalyticDB implements AnalyticDB {
             readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
             if (data != null) {
-              operate(data);
+//              operate(data);
             } else {
-              int finishNum = finishThreadNum.incrementAndGet();
-              if (finishNum == cpuThreadNum) {
-                operateGapData();
-              }
-              for (int i = 0; i < blockNum; i++) {
-                if (firstCacheLengthArr[i] > 0) {
-                  batchSaveFirstCol(i);
-                }
-                if (secondCacheLengthArr[i] > 0) {
-                  batchSaveSecondCol(i);
-                }
-              }
+//              int finishNum = finishThreadNum.incrementAndGet();
+//              if (finishNum == cpuThreadNum) {
+//                operateGapData();
+//              }
+//              for (int i = 0; i < blockNum; i++) {
+//                if (firstCacheLengthArr[i] > 0) {
+//                  batchSaveFirstCol(i);
+//                }
+//                if (secondCacheLengthArr[i] > 0) {
+//                  batchSaveSecondCol(i);
+//                }
+//              }
               break;
             }
           }
