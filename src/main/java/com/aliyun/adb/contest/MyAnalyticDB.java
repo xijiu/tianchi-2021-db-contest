@@ -112,15 +112,15 @@ public class MyAnalyticDB implements AnalyticDB {
   public MyAnalyticDB() {
     try {
       fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
-//      Thread thread = new Thread(() -> {
-//        try {
-//          Thread.sleep(1000 * 60);
-//          System.exit(1);
-//        } catch (InterruptedException e) {
-//          e.printStackTrace();
-//        }
-//      });
-//      thread.start();
+      Thread thread = new Thread(() -> {
+        try {
+          Thread.sleep(1000 * 60);
+          System.exit(1);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      });
+      thread.start();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -488,20 +488,20 @@ public class MyAnalyticDB implements AnalyticDB {
             readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
             if (data != null) {
-              operate(data);
+//              operate(data);
             } else {
-              int finishNum = finishThreadNum.incrementAndGet();
-              if (finishNum == cpuThreadNum) {
-                operateGapData();
-              }
-              for (int i = 0; i < blockNum; i++) {
-                if (firstCacheLengthArr[i] > 0) {
-                  batchSaveFirstCol(i);
-                }
-                if (secondCacheLengthArr[i] > 0) {
-                  batchSaveSecondCol(i);
-                }
-              }
+//              int finishNum = finishThreadNum.incrementAndGet();
+//              if (finishNum == cpuThreadNum) {
+//                operateGapData();
+//              }
+//              for (int i = 0; i < blockNum; i++) {
+//                if (firstCacheLengthArr[i] > 0) {
+//                  batchSaveFirstCol(i);
+//                }
+//                if (secondCacheLengthArr[i] > 0) {
+//                  batchSaveSecondCol(i);
+//                }
+//              }
               break;
             }
           }
