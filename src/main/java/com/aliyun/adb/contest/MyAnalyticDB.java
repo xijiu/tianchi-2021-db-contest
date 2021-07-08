@@ -718,24 +718,26 @@ public class MyAnalyticDB implements AnalyticDB {
 
 
 
-//  private AtomicInteger invokeTimes = new AtomicInteger();
+
+  private ThreadLocal<Integer> invokeTimes = ThreadLocal.withInitial(() -> 0);
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-//    int num = invokeTimes.incrementAndGet();
-//    if (num >= 4000) {
-//      long time = System.currentTimeMillis();
-//      long totalCost = time - totalBeginTime;
-//      System.out.println("finish time is : " + time);
-//      System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
-//      System.out.println("=======================> actual total cost : " + totalCost);
-//
-//      if (isTest) {
-//        if (totalCost > 46000) {
-//          return "0";
-//        }
-//      }
-//    }
+    int num = this.invokeTimes.get() + 1;
+    invokeTimes.set(num);
+    if (num >= 500) {
+      long time = System.currentTimeMillis();
+      long totalCost = time - totalBeginTime;
+      System.out.println("finish time is : " + time);
+      System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
+      System.out.println("=======================> actual total cost : " + totalCost);
+
+      if (isTest) {
+        if (totalCost > 46000) {
+          return "0";
+        }
+      }
+    }
 
 //    if (1 == 1) {
 //      return "0";
