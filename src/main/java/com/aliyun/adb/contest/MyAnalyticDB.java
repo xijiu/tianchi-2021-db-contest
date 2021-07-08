@@ -87,7 +87,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final AtomicLong readFileTime = new AtomicLong();
 
-  private final AtomicLong writeFileTime = new AtomicLong();
+  public static final AtomicLong writeFileTime = new AtomicLong();
 
   private final AtomicLong sortDataTime = new AtomicLong();
 
@@ -483,7 +483,9 @@ public class MyAnalyticDB implements AnalyticDB {
       try {
         while (true) {
           while (true) {
+            long begin1 = System.currentTimeMillis();
             byte[] data = threadReadData();
+            readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
             if (data != null) {
               operate(data);
@@ -722,8 +724,9 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-    int num = invokeTimes.incrementAndGet();
-    if (num >= 4000) {
+    int num = this.invokeTimes.get() + 1;
+    invokeTimes.set(num);
+    if (num >= 500) {
       long time = System.currentTimeMillis();
       long totalCost = time - totalBeginTime;
       System.out.println("finish time is : " + time);
