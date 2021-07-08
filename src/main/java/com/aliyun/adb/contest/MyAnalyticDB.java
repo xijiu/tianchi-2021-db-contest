@@ -488,7 +488,7 @@ public class MyAnalyticDB implements AnalyticDB {
             readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
             if (data != null) {
-              operate(data);
+//              operate(data);
             } else {
 //              int finishNum = finishThreadNum.incrementAndGet();
 //              if (finishNum == cpuThreadNum) {
@@ -647,7 +647,7 @@ public class MyAnalyticDB implements AnalyticDB {
       // 处理尾部数据
       bucketTailArr[bucket] = data;
 
-//      saveToMemoryOrDisk(firstIndex, normal);
+      saveToMemoryOrDisk(firstIndex, normal);
     }
 
     private void saveToMemoryOrDisk(int firstIndex, boolean normal) throws Exception {
