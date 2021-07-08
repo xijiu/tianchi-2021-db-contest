@@ -720,12 +720,11 @@ public class MyAnalyticDB implements AnalyticDB {
 
 
 
-  private AtomicInteger invokeTimes = new AtomicInteger();
+  private final AtomicInteger invokeTimes = new AtomicInteger();
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-    int num = this.invokeTimes.get() + 1;
-    invokeTimes.set(num);
+    int num = invokeTimes.incrementAndGet();
     if (num >= 4000) {
       long time = System.currentTimeMillis();
       long totalCost = time - totalBeginTime;
