@@ -571,6 +571,7 @@ public class MyAnalyticDB implements AnalyticDB {
         return null;
       }
 
+      Thread.sleep(10);
       byteBuffer.clear();
       fileChannel.read(byteBuffer, position + 21);
       byteBuffer.flip();
