@@ -112,15 +112,15 @@ public class MyAnalyticDB implements AnalyticDB {
   public MyAnalyticDB() {
     try {
       fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
-      Thread thread = new Thread(() -> {
-        try {
-          Thread.sleep(1000 * 60);
-          System.exit(1);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      });
-      thread.start();
+//      Thread thread = new Thread(() -> {
+//        try {
+//          Thread.sleep(1000 * 60);
+//          System.exit(1);
+//        } catch (InterruptedException e) {
+//          e.printStackTrace();
+//        }
+//      });
+//      thread.start();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -685,12 +685,6 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-
-    private byte[] batchWriteArr = new byte[secondCacheLength * 7];
-
-    private ByteBuffer batchWriteBuffer = ByteBuffer.wrap(batchWriteArr);
-
-
     private void batchSaveFirstCol(int blockIndex) throws Exception {
       int length = firstCacheLengthArr[blockIndex];
       firstCacheLengthArr[blockIndex] = 0;
@@ -724,24 +718,24 @@ public class MyAnalyticDB implements AnalyticDB {
 
 
 
-  private AtomicInteger invokeTimes = new AtomicInteger();
+//  private AtomicInteger invokeTimes = new AtomicInteger();
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-    int num = invokeTimes.incrementAndGet();
-    if (num >= 4000) {
-      long time = System.currentTimeMillis();
-      long totalCost = time - totalBeginTime;
-      System.out.println("finish time is : " + time);
-      System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
-      System.out.println("=======================> actual total cost : " + totalCost);
-
-      if (isTest) {
-        if (totalCost > 46000) {
-          return "0";
-        }
-      }
-    }
+//    int num = invokeTimes.incrementAndGet();
+//    if (num >= 4000) {
+//      long time = System.currentTimeMillis();
+//      long totalCost = time - totalBeginTime;
+//      System.out.println("finish time is : " + time);
+//      System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
+//      System.out.println("=======================> actual total cost : " + totalCost);
+//
+//      if (isTest) {
+//        if (totalCost > 46000) {
+//          return "0";
+//        }
+//      }
+//    }
 
 //    if (1 == 1) {
 //      return "0";
