@@ -754,7 +754,9 @@ public class MyAnalyticDB implements AnalyticDB {
 //      statPerBlockCount1();
 //      loadFinish = true;
 //    }
-    return tmp(table, column, percentile);
+    String result = tmp(table, column, percentile);
+    System.out.println("result is " + result);
+    return result;
   }
 
   public String tmp(String table, String column, double percentile) throws Exception {
@@ -767,8 +769,8 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-//    System.out.println("table is " + table + ", column is" + column
-//            + ", percentile is " + percentile + ", number is " + number);
+    System.out.println("table is " + table + ", column is" + column
+            + ", percentile is " + percentile + ", number is " + number);
 
     if (table.startsWith("lineitem")) {
       if (column.startsWith("L_O")) {
