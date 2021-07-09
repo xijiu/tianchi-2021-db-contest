@@ -20,13 +20,8 @@ public class ReadCharTest {
     // lineitem L_ORDERKEY,L_PARTKEY
     // orders   O_ORDERKEY,O_CUSTKEY
 
-    String str = "L_ORDERKEY,L_PARTKEY";
-    System.out.println(str.getBytes().length);
-
-    File file = new File("/Users/likangning/test/charFile.data");
-    BufferedReader br = new BufferedReader(new FileReader(file));
-    System.out.println(br.readLine());
-    br.close();
+    System.out.println(4096 * 3 * 7);
+    System.out.println(4096 * 3 * 6.5);
   }
 
   @Test
@@ -162,13 +157,26 @@ public class ReadCharTest {
     System.out.println(standard);
     System.out.println((224 & 224) >> 5);
 
+    for (int i = 0; i < 64; i++) {
+      System.out.print("0");
+    }
+    System.out.println();
 
-    System.out.println(Long.parseLong("0000000010000000000000000000000000000000000000000000000000000000", 2));
+
+    System.out.println(Long.parseLong("0000000011110000000000000000000000000000000000000000000000000000", 2));
+    System.out.println(Long.parseLong("0000000000001111000000000000000000000000000000000000000000000000", 2));
 //    System.out.println(Long.parseLong("0101000010100000000000000000000000000000000000001100000000000000", 2));
 //
 //    long data = 5809643519307988992L;
 //
 //    System.out.println(((data & 63050394783186944L) >> 53));
+
+
+    System.out.println(4222124650659840L << 12 >>> 60);
+
+    System.out.println(Long.toBinaryString((67553994410557440L >> 52 << 4)));
+
+    System.out.println(Long.toBinaryString((67553994410557440L >> 52 << 4) | (4222124650659840L << 12 >>> 60)));
   }
 
 
