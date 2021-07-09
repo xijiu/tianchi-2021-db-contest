@@ -294,7 +294,8 @@ public class DiskBlock {
       }
     }
 
-    return PubTools.solve(data, 0, idx - 1, index);
+//    return PubTools.solve(data, 0, idx - 1, index);
+    return PubTools.quickSelect(data, 0, idx - 1, index);
   }
 
 

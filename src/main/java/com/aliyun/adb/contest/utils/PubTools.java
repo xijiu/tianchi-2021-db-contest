@@ -589,4 +589,35 @@ public class PubTools {
 //  public static long solve(long[] nums, int k) {
 //    return solve(nums, 0, nums.length - 1, k);
 //  }
+
+  public static long quickSelect(long[] nums, int start, int end, int k) {
+    if (start == end) {
+      return nums[start];
+    }
+    int left = start;
+    int right = end;
+    long pivot = nums[(start + end) / 2];
+    while (left <= right) {
+      while (left <= right && nums[left] > pivot) {
+        left++;
+      }
+      while (left <= right && nums[right] < pivot) {
+        right--;
+      }
+      if (left <= right) {
+        long temp = nums[left];
+        nums[left] = nums[right];
+        nums[right] = temp;
+        left++;
+        right--;
+      }
+    }
+    if (start + k - 1 <= right) {
+      return quickSelect(nums, start, right, k);
+    }
+    if (start + k - 1 >= left) {
+      return quickSelect(nums, left, end, k - (left - start));
+    }
+    return nums[right + 1];
+  }
 }
