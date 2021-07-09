@@ -343,8 +343,9 @@ public class DiskBlock {
     int lastTmpSize = 0;
     int tmpSize = 0;
     byte partNum = 0;
+    int fileLen = 0;
     for (byte i = 0; i < splitNum; i++) {
-      int fileLen = (int) partFileChannels[i].size();
+      fileLen = (int) partFileChannels[i].size();
       System.out.println("current file data num is " + (fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1));
       tmpSize += fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1;
       if (tmpSize > index) {
@@ -390,8 +391,8 @@ public class DiskBlock {
     }
 
     if (length % 13 != 0) {
-      data[idx++] = makeLong(bytePrev, array[length - 7], array[length - 6], array[length - 5],
-              array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
+      data[idx++] = makeLong(bytePrev, array[fileLen - 7], array[fileLen - 6], array[fileLen - 5],
+              array[fileLen - 4], array[fileLen - 3], array[fileLen - 2], array[fileLen - 1]);
     }
 
     return PubTools.solve(data, 0, idx - 1, index);

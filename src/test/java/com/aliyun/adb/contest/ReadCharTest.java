@@ -23,8 +23,13 @@ public class ReadCharTest {
     System.out.println(4096 * 3 * 7);
     System.out.println(4096 * 3 * 6.5);
     System.out.println((byte)(15 << 4));
-
     System.out.println((byte)(15 << 4));
+
+
+    int partNum = 15;
+    partNum = (byte) (partNum << 4);
+    byte first = (byte) ((32 >> 4) | partNum);
+    System.out.println(Integer.toBinaryString(first));
   }
 
   @Test
