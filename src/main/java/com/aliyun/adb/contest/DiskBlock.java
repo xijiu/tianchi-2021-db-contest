@@ -382,7 +382,7 @@ public class DiskBlock {
 
       for (int i = 0; i < length; i += 13) {
         byte first = (byte) ((array[i] >> 4) | partNum);
-        byte second = (byte) ((array[i] << 4 >> 4) | partNum);
+        byte second = (byte) ((array[i] & 15) | partNum);
         data[idx++] = makeLong(bytePrev, first, array[i + 1], array[i + 2],
                 array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
         data[idx++] = makeLong(bytePrev, second, array[i + 7], array[i + 8],

@@ -182,8 +182,17 @@ public class ReadCharTest {
     long data1 = 281474976710656L;
     long data2 = 562949953421312L;
     byte b = (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60));
+    System.out.println(b);
+    System.out.println("er jin zhi is " + Integer.toBinaryString(b));
 
-    System.out.println((data1 >> 48 << 4));
+    byte partNum = 0;
+    byte first = (byte) ((b >> 4) | partNum);
+    byte second = (byte) ((b & 15) | partNum);
+
+    System.out.println(" a is " + ((b & 15)));
+
+    System.out.println(first);
+    System.out.println(second);
   }
 
 
