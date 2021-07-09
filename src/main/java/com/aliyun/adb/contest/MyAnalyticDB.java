@@ -795,7 +795,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " stable first number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_1_1[i].get2(index));
+        return String.valueOf(diskBlockData_1_1[i].get2(index, count));
       }
     }
     return null;
@@ -810,7 +810,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " stable first number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_2_1[i].get2(index));
+        return String.valueOf(diskBlockData_2_1[i].get2(index, count));
       }
     }
     return null;
@@ -825,7 +825,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " stable second number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_1_2[i].get2(index));
+        return String.valueOf(diskBlockData_1_2[i].get2(index, count));
       }
     }
     return null;
@@ -840,7 +840,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " second number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_2_2[i].get2(index));
+        return String.valueOf(diskBlockData_2_2[i].get2(index, count));
       }
     }
     return null;
