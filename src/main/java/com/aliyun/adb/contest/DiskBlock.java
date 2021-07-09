@@ -338,12 +338,14 @@ public class DiskBlock {
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index, int count) throws Exception {
+    System.out.println("target index is " + index);
     FileChannel partFileChannel = null;
     int lastTmpSize = 0;
     int tmpSize = 0;
     byte partNum = 0;
     for (byte i = 0; i < splitNum; i++) {
       int fileLen = (int) partFileChannels[i].size();
+      System.out.println("current file data num is " + (fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1));
       tmpSize += fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1;
       if (tmpSize > index) {
         partNum = i;
@@ -353,6 +355,8 @@ public class DiskBlock {
       }
       lastTmpSize = tmpSize;
     }
+
+    System.out.println("finally index is " + index);
     partNum = (byte) (partNum << 4);
 
     long[] data = MyAnalyticDB.helper.get();
