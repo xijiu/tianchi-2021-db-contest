@@ -596,7 +596,8 @@ public class PubTools {
     }
     int left = start;
     int right = end;
-    long pivot = nums[(start + end) / 2];
+//    long pivot = nums[(start + end) / 2];
+    long pivot = nums[start];
     while (left <= right) {
       while (left <= right && nums[left] > pivot) {
         left++;
