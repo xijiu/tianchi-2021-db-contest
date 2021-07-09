@@ -488,7 +488,7 @@ public class MyAnalyticDB implements AnalyticDB {
             readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
             if (data != null) {
-              operate(data);
+//              operate(data);
             } else {
 //              int finishNum = finishThreadNum.incrementAndGet();
 //              if (finishNum == cpuThreadNum) {
