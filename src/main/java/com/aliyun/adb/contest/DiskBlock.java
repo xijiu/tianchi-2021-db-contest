@@ -53,7 +53,7 @@ public class DiskBlock {
 
   private ByteBuffer batchWriteBuffer = null;
 
-  private long temporary = 0;
+  private long[] temporaryArr = new long[splitNum];
 
 
   public DiskBlock(String tableName, int col, int blockIndex) {
@@ -62,7 +62,7 @@ public class DiskBlock {
     this.blockIndex = blockIndex;
     this.bytePrev = (byte) (blockIndex >> (MyAnalyticDB.power - 8 + 1));
     if (MyAnalyticDB.isFirstInvoke) {
-      batchWriteArr = new byte[(int) (secondCacheLength * 6.5 + 1)];
+      batchWriteArr = new byte[(int) (secondCacheLength * 6.5 + 7)];
       batchWriteBuffer = ByteBuffer.wrap(batchWriteArr);
 
       if (col == 1) {
@@ -88,7 +88,7 @@ public class DiskBlock {
       short pos = dataCacheLen1[index]++;
       dataCache1[index][pos] = data;
       if (pos + 1 == cacheLength) {
-        putToByteBuffer(dataCache1[index], cacheLength);
+        putToByteBuffer(index, dataCache1[index], cacheLength);
 
         long begin = System.currentTimeMillis();
         partFileChannels[index].write(batchWriteBuffer);
@@ -105,8 +105,7 @@ public class DiskBlock {
       short pos = dataCacheLen2[index]++;
       dataCache2[index][pos] = data;
       if (pos + 1 == secondCacheLength) {
-        putToByteBuffer(dataCache2[index], secondCacheLength);
-
+        putToByteBuffer(index, dataCache2[index], secondCacheLength);
         long begin = System.currentTimeMillis();
         partFileChannels[index].write(batchWriteBuffer);
         MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
@@ -117,10 +116,11 @@ public class DiskBlock {
 
 
   public synchronized void forceStoreLongArr1() throws Exception {
-    for (int i = 0; i < dataCacheLen1.length; i++) {
+    for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen1[i];
       if (len > 0) {
-        putToByteBuffer(dataCache1[i], len);
+        putToByteBuffer(i, dataCache1[i], len);
+        storeLastData(i);
         long begin = System.currentTimeMillis();
         partFileChannels[i].write(batchWriteBuffer);
         MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
@@ -130,15 +130,34 @@ public class DiskBlock {
   }
 
   public synchronized void forceStoreLongArr2() throws Exception {
-    for (int i = 0; i < dataCacheLen2.length; i++) {
+    for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen2[i];
       if (len > 0) {
-        putToByteBuffer(dataCache2[i], len);
+        putToByteBuffer(i, dataCache2[i], len);
+        storeLastData(i);
         long begin = System.currentTimeMillis();
         partFileChannels[i].write(batchWriteBuffer);
         MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         dataCacheLen2[i] = 0;
       }
+    }
+  }
+
+  private void storeLastData(int idx) {
+    long data = temporaryArr[idx];
+    if (data != 0) {
+      int index = batchWriteBuffer.position();
+      batchWriteArr[index++] = (byte)(data >> 48);
+      batchWriteArr[index++] = (byte)(data >> 40);
+      batchWriteArr[index++] = (byte)(data >> 32);
+      batchWriteArr[index++] = (byte)(data >> 24);
+      batchWriteArr[index++] = (byte)(data >> 16);
+      batchWriteArr[index++] = (byte)(data >> 8);
+      batchWriteArr[index++] = (byte)(data);
+
+      batchWriteBuffer.clear();
+      batchWriteBuffer.position(index);
+      batchWriteBuffer.flip();
     }
   }
 
@@ -163,7 +182,7 @@ public class DiskBlock {
 //  }
 
 
-  private void putToByteBuffer(long[] dataArr, int length) {
+  private void putToByteBuffer(int idx, long[] dataArr, int length) {
     int actualLen = length % 2 == 0 ? length : length - 1;
     int index = 0;
     for (int i = 0; i < actualLen; i += 2) {
@@ -188,10 +207,10 @@ public class DiskBlock {
 
     // 奇数
     if (actualLen != length) {
-      if (temporary == 0) {
-        temporary = dataArr[length - 1];
+      if (temporaryArr[idx] == 0) {
+        temporaryArr[idx] = dataArr[length - 1];
       } else {
-        long data1 = temporary;
+        long data1 = temporaryArr[idx];
         long data2 = dataArr[length - 1];
 
         batchWriteArr[index++] = (byte) ((data1 >> 52 << 4) | (data2 << 12 >>> 60));
@@ -209,7 +228,7 @@ public class DiskBlock {
         batchWriteArr[index++] = (byte)(data2 >> 8);
         batchWriteArr[index++] = (byte)(data2);
 
-        temporary = 0;
+        temporaryArr[idx] = 0;
       }
     }
 
@@ -217,11 +236,6 @@ public class DiskBlock {
     batchWriteBuffer.position(index);
     batchWriteBuffer.flip();
   }
-
-  private void writeToByteBuffer(long data1, long data2) {
-
-  }
-
 
 //  public long get2(int index, int count) throws Exception {
 //    long[] data = MyAnalyticDB.helper.get();
@@ -356,8 +370,8 @@ public class DiskBlock {
       }
     }
 
-//    return PubTools.solve(data, 0, idx - 1, index);
-    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
+    return PubTools.solve(data, 0, idx - 1, index);
+//    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }
 
 
