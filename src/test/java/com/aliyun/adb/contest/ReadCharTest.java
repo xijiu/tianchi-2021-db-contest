@@ -22,6 +22,9 @@ public class ReadCharTest {
 
     System.out.println(4096 * 3 * 7);
     System.out.println(4096 * 3 * 6.5);
+    System.out.println((byte)(15 << 4));
+
+    System.out.println((byte)(15 << 4));
   }
 
   @Test

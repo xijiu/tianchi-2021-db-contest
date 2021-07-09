@@ -27,7 +27,7 @@ public class DiskBlock {
 
   private final String tableName;
 
-  private static final int perReadSize = 7 * 1024 * 128;
+  private static final int perReadSize = 13 * 1024 * 64;
 
 //  private static final int concurrentQueryThreadNum = 2;
 //
@@ -339,23 +339,28 @@ public class DiskBlock {
 
   public long get2(int index, int count) throws Exception {
     FileChannel partFileChannel = null;
-    long lastTmpSize = 0;
-    long tmpSize = 0;
-    for (int i = 0; i < splitNum; i++) {
-      tmpSize += partFileChannels[i].size();
-      if (tmpSize > index * 7) {
+    int lastTmpSize = 0;
+    int tmpSize = 0;
+    byte partNum = 0;
+    for (byte i = 0; i < splitNum; i++) {
+      int fileLen = (int) partFileChannels[i].size();
+      tmpSize += fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1;
+      if (tmpSize > index) {
+        partNum = i;
         partFileChannel = partFileChannels[i];
-        index = (int) (index - (lastTmpSize / 7));
+        index = index - lastTmpSize;
         break;
       }
       lastTmpSize = tmpSize;
     }
+    partNum = (byte) (partNum << 4);
 
     long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
     byte[] array = byteBuffer.array();
     int idx = 0;
     long pos = 0;
+    int length = 0;
     while (true) {
       byteBuffer.clear();
       int flag = partFileChannel.read(byteBuffer, pos);
@@ -363,11 +368,26 @@ public class DiskBlock {
       if (flag == -1) {
         break;
       }
-      int length = byteBuffer.position();
-      for (int i = 0; i < length; i += 7) {
-        data[idx++] = makeLong(bytePrev, array[i], array[i + 1], array[i + 2],
+      length = byteBuffer.position();
+
+//      for (int i = 0; i < length; i += 7) {
+//        data[idx++] = makeLong(bytePrev, array[i], array[i + 1], array[i + 2],
+//                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
+//      }
+
+      for (int i = 0; i < length; i += 13) {
+        byte first = (byte) ((array[i] >> 4) | partNum);
+        byte second = (byte) ((array[i] << 4 >> 4) | partNum);
+        data[idx++] = makeLong(bytePrev, first, array[i + 1], array[i + 2],
                 array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
+        data[idx++] = makeLong(bytePrev, second, array[i + 7], array[i + 8],
+                array[i + 9], array[i + 10], array[i + 11], array[i + 12]);
       }
+    }
+
+    if (length % 13 != 0) {
+      data[idx++] = makeLong(bytePrev, array[length - 7], array[length - 6], array[length - 5],
+              array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
     }
 
     return PubTools.solve(data, 0, idx - 1, index);
