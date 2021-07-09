@@ -32,7 +32,7 @@ public class MyAnalyticDB implements AnalyticDB {
   /** 每一列数据分多少块 */
   private static final int blockNum = (int) Math.pow(2, power);
 
-  private static final int cpuThreadNum = 4;
+  private static final int cpuThreadNum = 22;
 
   /** 单次读取文件的大小，单位字节 */
   private final int readFileLen = 1 * 1024 * 1024;
@@ -114,7 +114,7 @@ public class MyAnalyticDB implements AnalyticDB {
       fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
       Thread thread = new Thread(() -> {
         try {
-          Thread.sleep(1000 * 60);
+          Thread.sleep(2 * 1000 * 60);
           System.exit(1);
         } catch (InterruptedException e) {
           e.printStackTrace();
@@ -490,18 +490,18 @@ public class MyAnalyticDB implements AnalyticDB {
             if (data != null) {
               operate(data);
             } else {
-//              int finishNum = finishThreadNum.incrementAndGet();
-//              if (finishNum == cpuThreadNum) {
-//                operateGapData();
-//              }
-//              for (int i = 0; i < blockNum; i++) {
-//                if (firstCacheLengthArr[i] > 0) {
-//                  batchSaveFirstCol(i);
-//                }
-//                if (secondCacheLengthArr[i] > 0) {
-//                  batchSaveSecondCol(i);
-//                }
-//              }
+              int finishNum = finishThreadNum.incrementAndGet();
+              if (finishNum == cpuThreadNum) {
+                operateGapData();
+              }
+              for (int i = 0; i < blockNum; i++) {
+                if (firstCacheLengthArr[i] > 0) {
+                  batchSaveFirstCol(i);
+                }
+                if (secondCacheLengthArr[i] > 0) {
+                  batchSaveSecondCol(i);
+                }
+              }
               break;
             }
           }
@@ -647,7 +647,7 @@ public class MyAnalyticDB implements AnalyticDB {
       // 处理尾部数据
       bucketTailArr[bucket] = data;
 
-//      saveToMemoryOrDisk(firstIndex, normal);
+      saveToMemoryOrDisk(firstIndex, normal);
     }
 
     private void saveToMemoryOrDisk(int firstIndex, boolean normal) throws Exception {
@@ -739,9 +739,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-    if (1 == 1) {
-      return "0";
-    }
+//    if (1 == 1) {
+//      return "0";
+//    }
 
 //    if (!isFirstInvoke) {
 //      return "0";
@@ -795,7 +795,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " stable first number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_1_1[i].get2(index));
+        return String.valueOf(diskBlockData_1_1[i].get2(index, count));
       }
     }
     return null;
@@ -810,7 +810,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " stable first number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_2_1[i].get2(index));
+        return String.valueOf(diskBlockData_2_1[i].get2(index, count));
       }
     }
     return null;
@@ -825,7 +825,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " stable second number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_1_2[i].get2(index));
+        return String.valueOf(diskBlockData_1_2[i].get2(index, count));
       }
     }
     return null;
@@ -840,7 +840,7 @@ public class MyAnalyticDB implements AnalyticDB {
       if (total >= number) {
         int index = number - beforeTotal - 1;
 //        System.out.println(Thread.currentThread().getName() + " second number read disk, block index is " + i);
-        return String.valueOf(diskBlockData_2_2[i].get2(index));
+        return String.valueOf(diskBlockData_2_2[i].get2(index, count));
       }
     }
     return null;

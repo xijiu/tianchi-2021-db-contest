@@ -261,7 +261,7 @@ public class DiskBlock {
 
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
-  public long get2(int index) throws Exception {
+  public long get2(int index, int count) throws Exception {
     FileChannel partFileChannel = null;
     long lastTmpSize = 0;
     long tmpSize = 0;
@@ -294,7 +294,8 @@ public class DiskBlock {
       }
     }
 
-    return PubTools.solve(data, 0, idx - 1, index);
+//    return PubTools.solve(data, 0, idx - 1, index);
+    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }
 
 
