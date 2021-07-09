@@ -189,7 +189,7 @@ public class DiskBlock {
       long data1 = dataArr[i];
       long data2 = dataArr[i + 1];
 
-      batchWriteArr[index++] = (byte) ((data1 >> 52 << 4) | (data2 << 12 >>> 60));
+      batchWriteArr[index++] = (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60));
       batchWriteArr[index++] = (byte)(data1 >> 40);
       batchWriteArr[index++] = (byte)(data1 >> 32);
       batchWriteArr[index++] = (byte)(data1 >> 24);
@@ -213,7 +213,7 @@ public class DiskBlock {
         long data1 = temporaryArr[idx];
         long data2 = dataArr[length - 1];
 
-        batchWriteArr[index++] = (byte) ((data1 >> 52 << 4) | (data2 << 12 >>> 60));
+        batchWriteArr[index++] = (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60));
         batchWriteArr[index++] = (byte)(data1 >> 40);
         batchWriteArr[index++] = (byte)(data1 >> 32);
         batchWriteArr[index++] = (byte)(data1 >> 24);

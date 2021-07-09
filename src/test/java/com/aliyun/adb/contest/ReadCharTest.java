@@ -170,21 +170,20 @@ public class ReadCharTest {
     }
     System.out.println();
 
+    System.out.println("len is " +  "000000000000000000000000000000000000000000000000".length());
+
 
     System.out.println(Long.parseLong("0000000011110000000000000000000000000000000000000000000000000000", 2));
     System.out.println(Long.parseLong("0000000000001111000000000000000000000000000000000000000000000000", 2));
-//    System.out.println(Long.parseLong("0101000010100000000000000000000000000000000000001100000000000000", 2));
-//
-//    long data = 5809643519307988992L;
-//
-//    System.out.println(((data & 63050394783186944L) >> 53));
+    System.out.println(Long.parseLong("0000000000000001000000000000000000000000000000000000000000000000", 2));
+    System.out.println(Long.parseLong("0000000000000010000000000000000000000000000000000000000000000000", 2));
 
 
-    System.out.println(4222124650659840L << 12 >>> 60);
+    long data1 = 281474976710656L;
+    long data2 = 562949953421312L;
+    byte b = (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60));
 
-    System.out.println(Long.toBinaryString((67553994410557440L >> 52 << 4)));
-
-    System.out.println(Long.toBinaryString((67553994410557440L >> 52 << 4) | (4222124650659840L << 12 >>> 60)));
+    System.out.println((data1 >> 48 << 4));
   }
 
 
