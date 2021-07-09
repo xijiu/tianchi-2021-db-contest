@@ -114,7 +114,7 @@ public class MyAnalyticDB implements AnalyticDB {
       fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
       Thread thread = new Thread(() -> {
         try {
-          Thread.sleep(1000 * 60);
+          Thread.sleep(2 * 1000 * 60);
           System.exit(1);
         } catch (InterruptedException e) {
           e.printStackTrace();
