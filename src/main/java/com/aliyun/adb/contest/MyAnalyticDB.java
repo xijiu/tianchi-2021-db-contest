@@ -32,7 +32,7 @@ public class MyAnalyticDB implements AnalyticDB {
   /** 每一列数据分多少块 */
   private static final int blockNum = (int) Math.pow(2, power);
 
-  private static final int cpuThreadNum = 1;
+  private static final int cpuThreadNum = 20;
 
   /** 单次读取文件的大小，单位字节 */
   private final int readFileLen = 1 * 1024 * 1024;
@@ -474,6 +474,8 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private int bucket = -1;
 
+    private FileChannel fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
+
     public CpuThread(int index) throws Exception {
       this.threadIndex = index;
     }
@@ -521,6 +523,7 @@ public class MyAnalyticDB implements AnalyticDB {
             Arrays.fill(secondCacheLengthArr, (short) 0);
             tmpBlockIndex = -1;
           }
+          fileChannel = FileChannel.open(file2.toPath(), StandardOpenOption.READ);
         }
       } catch (Exception e) {
         finishThreadNum.incrementAndGet();
