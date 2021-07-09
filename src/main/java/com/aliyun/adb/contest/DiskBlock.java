@@ -37,7 +37,7 @@ public class DiskBlock {
 //
 //  private static final ThreadPoolExecutor executor = MyAnalyticDB.executor;
 
-  private static final int splitNum = 32;
+  private static final int splitNum = 16;
 
   private volatile FileChannel[] partFileChannels = null;
 
