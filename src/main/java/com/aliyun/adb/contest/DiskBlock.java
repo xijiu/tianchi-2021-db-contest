@@ -369,10 +369,10 @@ public class DiskBlock {
     while (true) {
       byteBuffer.clear();
       int flag = partFileChannel.read(byteBuffer, pos);
-      pos += perReadSize;
       if (flag == -1) {
         break;
       }
+      pos += perReadSize;
       length = byteBuffer.position();
 
 //      for (int i = 0; i < length; i += 7) {
@@ -388,12 +388,14 @@ public class DiskBlock {
         data[idx++] = makeLong(bytePrev, second, array[i + 7], array[i + 8],
                 array[i + 9], array[i + 10], array[i + 11], array[i + 12]);
       }
+
+      if (length % 13 != 0) {
+        data[idx++] = makeLong(bytePrev, array[length - 7], array[length - 6], array[length - 5],
+                array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
+      }
     }
 
-    if (length % 13 != 0) {
-      data[idx++] = makeLong(bytePrev, array[fileLen - 7], array[fileLen - 6], array[fileLen - 5],
-              array[fileLen - 4], array[fileLen - 3], array[fileLen - 2], array[fileLen - 1]);
-    }
+
 
     return PubTools.solve(data, 0, idx - 1, index);
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
