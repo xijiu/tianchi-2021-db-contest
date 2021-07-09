@@ -89,7 +89,7 @@ public class DiskBlock {
         putToByteBuffer(dataCache1[index], cacheLength);
 
         long begin = System.currentTimeMillis();
-//        partFileChannels[index].write(batchWriteBuffer);
+        partFileChannels[index].write(batchWriteBuffer);
         MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         dataCacheLen1[index] = 0;
       }
@@ -106,7 +106,7 @@ public class DiskBlock {
         putToByteBuffer(dataCache2[index], secondCacheLength);
 
         long begin = System.currentTimeMillis();
-//        partFileChannels[index].write(batchWriteBuffer);
+        partFileChannels[index].write(batchWriteBuffer);
         MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         dataCacheLen2[index] = 0;
       }
@@ -120,7 +120,7 @@ public class DiskBlock {
       if (len > 0) {
         putToByteBuffer(dataCache1[i], len);
         long begin = System.currentTimeMillis();
-//        partFileChannels[i].write(batchWriteBuffer);
+        partFileChannels[i].write(batchWriteBuffer);
         MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         dataCacheLen1[i] = 0;
       }
@@ -133,7 +133,7 @@ public class DiskBlock {
       if (len > 0) {
         putToByteBuffer(dataCache2[i], len);
         long begin = System.currentTimeMillis();
-//        partFileChannels[i].write(batchWriteBuffer);
+        partFileChannels[i].write(batchWriteBuffer);
         MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         dataCacheLen2[i] = 0;
       }
