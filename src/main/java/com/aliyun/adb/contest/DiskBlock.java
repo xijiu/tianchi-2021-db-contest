@@ -348,8 +348,8 @@ public class DiskBlock {
     printDataCount(count);
     for (byte i = 0; i < splitNum; i++) {
       fileLen = (int) partFileChannels[i].size();
-      System.out.println("current file data num is " + (fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1));
-      tmpSize += fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1;
+      System.out.println("current file data num is " + (fileLen % 13 == 0 ? (fileLen / 13 * 2) : (fileLen / 13 * 2 + 1)));
+      tmpSize += fileLen % 13 == 0 ? (fileLen / 13 * 2) : (fileLen / 13 * 2 + 1);
       if (tmpSize > index) {
         partNum = i;
         partFileChannel = partFileChannels[i];
