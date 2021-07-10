@@ -395,6 +395,9 @@ public class DiskBlock {
       }
     }
 
+    System.out.println("idx is " + idx);
+    System.out.println("fileLen is " + fileLen);
+
 
 
     return PubTools.solve(data, 0, idx - 1, index);
