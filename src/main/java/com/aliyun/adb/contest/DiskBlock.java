@@ -396,6 +396,8 @@ public class DiskBlock {
     long leftSolve = solve - 50000;
     long rightSolve = solve + 50000;
 
+    System.out.println("min is " + min + ", max is " + max + ", solve is " + solve + ", index is " + index);
+
     int left = 0, middle = 0, right = 0;
 
     for (int i = 0; i < length; i++) {
