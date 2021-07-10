@@ -376,28 +376,32 @@ public class DiskBlock {
       }
       pos += perReadSize;
       length = byteBuffer.position();
+      int cycleTime = length / 13;
+      for (int i = 0; i < cycleTime; i++) {
+        int tmpIdx = i * 13;
+        byte first = (byte) (((array[tmpIdx] >> 4) & 15) | partNum);
+        byte second = (byte) ((array[tmpIdx] & 15) | partNum);
+        data[idx++] = makeLong(bytePrev, first, array[tmpIdx + 1], array[tmpIdx + 2],
+                array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
+        data[idx++] = makeLong(bytePrev, second, array[tmpIdx + 7], array[tmpIdx + 8],
+                array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
+      }
 
-//      for (int i = 0; i < length; i += 7) {
-//        data[idx++] = makeLong(bytePrev, array[i], array[i + 1], array[i + 2],
+//      int i = 0;
+//      for (i = 0; i < length; i += 13) {
+//        byte first = (byte) (((array[i] >> 4) & 15) | partNum);
+//        byte second = (byte) ((array[i] & 15) | partNum);
+//        data[idx++] = makeLong(bytePrev, first, array[i + 1], array[i + 2],
 //                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
+//        data[idx++] = makeLong(bytePrev, second, array[i + 7], array[i + 8],
+//                array[i + 9], array[i + 10], array[i + 11], array[i + 12]);
 //      }
+    }
 
-      int i = 0;
-      for (i = 0; i + 13 <= length; i += 13) {
-        byte first = (byte) (((array[i] >> 4) & 15) | partNum);
-        byte second = (byte) ((array[i] & 15) | partNum);
-        data[idx++] = makeLong(bytePrev, first, array[i + 1], array[i + 2],
-                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
-        data[idx++] = makeLong(bytePrev, second, array[i + 7], array[i + 8],
-                array[i + 9], array[i + 10], array[i + 11], array[i + 12]);
-      }
-
-      if (length % 13 != 0) {
-        i -= 13;
-        data[idx++] = makeLong(bytePrev, array[i++], array[i++], array[i++],
-                array[i++], array[i++], array[i++], array[i++]);
-        System.out.println("wolegeca I is " + i + ", and length is " + length);
-      }
+    if (length % 13 != 0) {
+      data[idx++] = makeLong(bytePrev, array[length - 7], array[length - 6], array[length - 5],
+              array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
+//      System.out.println("wolegeca I is " + i + ", and length is " + length);
     }
 
     System.out.println("idx is " + idx);
