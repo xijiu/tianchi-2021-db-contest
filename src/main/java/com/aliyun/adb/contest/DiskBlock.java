@@ -348,8 +348,6 @@ public class DiskBlock {
       lastTmpSize = tmpSize;
     }
 
-    System.out.println("part --- long number is " + (fileLen / 13 * 2));
-
     partNum = (byte) (partNum << 4);
 
     long[] data = MyAnalyticDB.helper.get();
@@ -414,7 +412,7 @@ public class DiskBlock {
     if (index > left && index < (left + middle)) {
       System.out.println("hit");
     } else {
-      System.out.println("miss");
+      System.out.println("miss, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
     }
   }
 
