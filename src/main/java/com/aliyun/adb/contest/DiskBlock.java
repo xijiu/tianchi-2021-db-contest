@@ -393,6 +393,7 @@ public class DiskBlock {
       }
 
       if (length % 13 != 0) {
+        i -= 13;
         data[idx++] = makeLong(bytePrev, array[i++], array[i++], array[i++],
                 array[i++], array[i++], array[i++], array[i++]);
         System.out.println("wolegeca I is " + i + ", and length is " + length);
