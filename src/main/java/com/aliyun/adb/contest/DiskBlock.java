@@ -369,22 +369,33 @@ public class DiskBlock {
         int tmpIdx = i * 13;
         byte first = (byte) (((array[tmpIdx] >> 4) & 15) | partNum);
         byte second = (byte) ((array[tmpIdx] & 15) | partNum);
-        data[idx++] = makeLong(bytePrev, first, array[tmpIdx + 1], array[tmpIdx + 2],
+        data[idx++] = makeLong2(first, array[tmpIdx + 1], array[tmpIdx + 2],
                 array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
-        data[idx++] = makeLong(bytePrev, second, array[tmpIdx + 7], array[tmpIdx + 8],
+        data[idx++] = makeLong2(second, array[tmpIdx + 7], array[tmpIdx + 8],
                 array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
       }
     }
 
     if (length % 13 != 0) {
-      data[idx++] = makeLong(bytePrev, array[length - 7], array[length - 6], array[length - 5],
+      data[idx++] = makeLong2(array[length - 7], array[length - 6], array[length - 5],
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
     }
 
-    return PubTools.solve(data, 0, idx - 1, index);
+    long solve = PubTools.solve(data, 0, idx - 1, index);
+    return (((long) bytePrev & 0xff) << 56) | solve;
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }
 
+  public static long makeLong2(byte b6, byte b5, byte b4,
+                               byte b3, byte b2, byte b1, byte b0){
+    return ((((long)b6 & 0xff) << 48) |
+            (((long)b5 & 0xff) << 40) |
+            (((long)b4 & 0xff) << 32) |
+            (((long)b3 & 0xff) << 24) |
+            (((long)b2 & 0xff) << 16) |
+            (((long)b1 & 0xff) <<  8) |
+            (((long)b0 & 0xff)      ));
+  }
 
   public static long makeLong(byte b7, byte b6, byte b5, byte b4,
                               byte b3, byte b2, byte b1, byte b0){

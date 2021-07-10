@@ -177,33 +177,15 @@ public class ReadCharTest {
     System.out.println(Long.parseLong("0000000000001111000000000000000000000000000000000000000000000000", 2));
     System.out.println(Long.parseLong("0000000011111101000000000000000000000000000000000000000000000000", 2));
     System.out.println(Long.parseLong("0000000011111110000000000000000000000000000000000000000000000000", 2));
-    System.out.println(Long.parseLong("0000000000000000000000000000000000000000000000000000000000000000", 2));
+    // 36028797018963970
+    System.out.println(Long.parseLong("0000000010000000000000000000000000000000000000000000000000000010", 2));
 
-//
-//    long data1 = 2533274790395904L;
-//    long data2 = 2814749767106560L;
-//    byte b = (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60));
-//    System.out.println(b);
-//    System.out.println("er jin zhi is " + Integer.toBinaryString(b));
-//    System.out.println("er jin zhi is aaaa " + Integer.toBinaryString((b >> 4)));
-//
-//    byte partNum = 32;
-//    byte first = (byte) (((b >> 4) & 15) | partNum);
-//    byte second = (byte) ((b & 15) | partNum);
-//
-//
-//    System.out.println(first);
-//    System.out.println(Integer.toBinaryString(first));
-//    System.out.println(second);
-//    System.out.println(Integer.toBinaryString(second));
 
-    // 0010101011010000000000000000000001101000101100100000011110000011
-    // 0010101011011111111111111111110000011000100000000110111100000011
+    byte num = 64;
 
-//    int index1 = (int) ((3084965746505287555L & 67553994410557440L) >> 52);
-//
-//    System.out.println(index1);
+    long l = (((long) num & 0xff) << 56) | 36028797018963970L;
 
+    System.out.println(Long.toBinaryString(l));
 
   }
 

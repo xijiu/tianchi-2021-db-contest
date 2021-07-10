@@ -26,13 +26,13 @@ public class MyTest {
     byte second = (byte) ((array[0] & 15) | partNum);
     System.out.println("first byte is " + Integer.toBinaryString(first));
     System.out.println("second byte is " + Integer.toBinaryString(second));
-    long a = DiskBlock.makeLong(bytePrev, first, array[1], array[2],
-            array[3], array[4], array[5], array[6]);
-    long b = DiskBlock.makeLong(bytePrev, second, array[7], array[8],
-            array[9], array[10], array[11], array[12]);
-
-    System.out.println(a);
-    System.out.println(b);
+//    long a = DiskBlock.makeLong(bytePrev, first, array[1], array[2],
+//            array[3], array[4], array[5], array[6]);
+//    long b = DiskBlock.makeLong(bytePrev, second, array[7], array[8],
+//            array[9], array[10], array[11], array[12]);
+//
+//    System.out.println(a);
+//    System.out.println(b);
   }
 
   byte[] array = new byte[13];
