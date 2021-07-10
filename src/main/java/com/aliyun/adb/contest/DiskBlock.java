@@ -367,8 +367,8 @@ public class DiskBlock {
       int cycleTime = length / 13;
       for (int i = 0; i < cycleTime; i++) {
         int tmpIdx = i * 13;
-        byte first = (byte) (((array[tmpIdx] >> 4) & 15));
-        byte second = (byte) ((array[tmpIdx] & 15));
+        byte first = (byte) (((array[tmpIdx] >> 4) & 15) | partNum);
+        byte second = (byte) ((array[tmpIdx] & 15) | partNum);
         data[idx++] = makeLong2(first, array[tmpIdx + 1], array[tmpIdx + 2],
                 array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
         data[idx++] = makeLong2(second, array[tmpIdx + 7], array[tmpIdx + 8],
@@ -382,7 +382,7 @@ public class DiskBlock {
     }
 
     long solve = PubTools.solve(data, 0, idx - 1, index);
-    return ((((long) bytePrev & 0xff) << 56) | solve) | (((long)partNum & 0xff) << 48);
+    return (((long) bytePrev & 0xff) << 56) | solve;
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }
 

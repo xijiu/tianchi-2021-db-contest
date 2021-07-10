@@ -9,7 +9,15 @@ public class MyTest {
   @Test
   public void test() throws Exception {
     int i = 0xff;
-    System.out.println(Integer.toBinaryString(i));
+    byte a = 68;
+    byte second = (byte) ((a & 15));
+    System.out.println(second);
+    System.out.println(Integer.toBinaryString(second));
+
+    byte partNum = 4;
+    partNum = (byte) (partNum << 4);
+    long result = ((long) partNum & 0xff) << 48;
+    System.out.println(Long.toBinaryString(result));
   }
 
 
