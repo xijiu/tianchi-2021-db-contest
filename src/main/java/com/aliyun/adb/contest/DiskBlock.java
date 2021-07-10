@@ -382,7 +382,8 @@ public class DiskBlock {
 //                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
 //      }
 
-      for (int i = 0; i < length; i += 13) {
+      int i = 0;
+      for (i = 0; i < length; i += 13) {
         byte first = (byte) (((array[i] >> 4) & 15) | partNum);
         byte second = (byte) ((array[i] & 15) | partNum);
         data[idx++] = makeLong(bytePrev, first, array[i + 1], array[i + 2],
@@ -392,8 +393,9 @@ public class DiskBlock {
       }
 
       if (length % 13 != 0) {
-        data[idx++] = makeLong(bytePrev, array[length - 7], array[length - 6], array[length - 5],
-                array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
+        data[idx++] = makeLong(bytePrev, array[i++], array[i++], array[i++],
+                array[i++], array[i++], array[i++], array[i++]);
+        System.out.println("wolegeca I is " + i + ", and length is " + length);
       }
     }
 

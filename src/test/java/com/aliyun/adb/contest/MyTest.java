@@ -2,11 +2,16 @@ package com.aliyun.adb.contest;
 
 import org.junit.Test;
 
+import java.nio.ByteBuffer;
+
 public class MyTest {
 
   @Test
   public void test() throws Exception {
-    new MyTest().storeLongArr2();
+//    new MyTest().storeLongArr2();
+    ByteBuffer byteBuffer = ByteBuffer.allocate(8);
+    byteBuffer.putLong(8);
+    System.out.println(byteBuffer.position());
   }
 
 
