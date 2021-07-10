@@ -330,7 +330,7 @@ public class DiskBlock {
 
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
-  public long get2(int index, int count) throws Exception {
+  public long get2(int index) throws Exception {
     FileChannel partFileChannel = null;
     int lastTmpSize = 0;
     int tmpSize = 0;
@@ -369,19 +369,20 @@ public class DiskBlock {
         int tmpIdx = i * 13;
         byte first = (byte) (((array[tmpIdx] >> 4) & 15) | partNum);
         byte second = (byte) ((array[tmpIdx] & 15) | partNum);
-        data[idx++] = makeLong(bytePrev, first, array[tmpIdx + 1], array[tmpIdx + 2],
+        data[idx++] = makeLong((byte) 0, first, array[tmpIdx + 1], array[tmpIdx + 2],
                 array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
-        data[idx++] = makeLong(bytePrev, second, array[tmpIdx + 7], array[tmpIdx + 8],
+        data[idx++] = makeLong((byte) 0, second, array[tmpIdx + 7], array[tmpIdx + 8],
                 array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
       }
     }
 
     if (length % 13 != 0) {
-      data[idx++] = makeLong(bytePrev, array[length - 7], array[length - 6], array[length - 5],
+      data[idx++] = makeLong((byte) 0, array[length - 7], array[length - 6], array[length - 5],
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
     }
 
-    return PubTools.solve(data, 0, idx - 1, index);
+    long solve = PubTools.solve(data, 0, idx - 1, index);
+    return ((long) bytePrev << 56) & solve;
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }
 

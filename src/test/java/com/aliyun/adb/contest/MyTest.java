@@ -8,10 +8,6 @@ public class MyTest {
 
   @Test
   public void test() throws Exception {
-//    new MyTest().storeLongArr2();
-    ByteBuffer byteBuffer = ByteBuffer.allocate(8);
-    byteBuffer.putLong(8);
-    System.out.println(byteBuffer.position());
   }
 
 
