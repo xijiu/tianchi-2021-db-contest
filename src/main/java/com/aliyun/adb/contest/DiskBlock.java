@@ -384,12 +384,16 @@ public class DiskBlock {
 
       int i = 0;
       for (i = 0; i < length; i += 13) {
-        byte first = (byte) (((array[i] >> 4) & 15) | partNum);
-        byte second = (byte) ((array[i] & 15) | partNum);
-        data[idx++] = makeLong(bytePrev, first, array[i + 1], array[i + 2],
-                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
-        data[idx++] = makeLong(bytePrev, second, array[i + 7], array[i + 8],
-                array[i + 9], array[i + 10], array[i + 11], array[i + 12]);
+        if (i + 13 < length) {
+          byte first = (byte) (((array[i] >> 4) & 15) | partNum);
+          byte second = (byte) ((array[i] & 15) | partNum);
+          data[idx++] = makeLong(bytePrev, first, array[i + 1], array[i + 2],
+                  array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
+          data[idx++] = makeLong(bytePrev, second, array[i + 7], array[i + 8],
+                  array[i + 9], array[i + 10], array[i + 11], array[i + 12]);
+        } else {
+          break;
+        }
       }
 
       if (length % 13 != 0) {
