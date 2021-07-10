@@ -401,7 +401,8 @@ public class DiskBlock {
     long minData = Long.MAX_VALUE;
     long maxData = 0;
 
-    for (long datum : data) {
+    for (int i = 0; i < idx; i++) {
+      long datum = data[i];
       minData = Math.min(datum, minData);
       maxData = Math.max(datum, maxData);
     }
