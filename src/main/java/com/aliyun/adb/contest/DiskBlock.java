@@ -396,7 +396,7 @@ public class DiskBlock {
     long leftSolve = (long) (solve - solve * 0.1);
     long rightSolve = (long) (solve + solve * 0.1);
 
-    System.out.println("min is " + min + ", max is " + max + ", solve is " + solve + ", index is " + index);
+//    System.out.println("min is " + min + ", max is " + max + ", solve is " + solve + ", index is " + index);
 
     int left = 0, middle = 0, right = 0;
 
@@ -412,7 +412,7 @@ public class DiskBlock {
     }
 
     if (index > left && index < (left + middle)) {
-      System.out.println("hit");
+      System.out.println("hit, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
     } else {
       System.out.println("miss, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
     }
