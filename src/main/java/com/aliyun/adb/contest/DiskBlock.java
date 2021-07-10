@@ -147,7 +147,7 @@ public class DiskBlock {
   private void storeLastData(int idx) {
     long data = temporaryArr[idx];
     if (data != 0) {
-      int index = batchWriteBuffer.position();
+      int index = batchWriteBuffer.limit();
       batchWriteArr[index++] = (byte)(data >> 48);
       batchWriteArr[index++] = (byte)(data >> 40);
       batchWriteArr[index++] = (byte)(data >> 32);
