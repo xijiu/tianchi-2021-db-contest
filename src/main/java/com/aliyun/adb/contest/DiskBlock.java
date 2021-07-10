@@ -91,9 +91,7 @@ public class DiskBlock {
       if (pos + 1 == cacheLength) {
         putToByteBuffer(index, dataCache1[index], cacheLength);
 
-        long begin = System.currentTimeMillis();
         partFileChannels[index].write(batchWriteBuffer);
-        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         dataCacheLen1[index] = 0;
       }
     }
@@ -107,9 +105,7 @@ public class DiskBlock {
       dataCache2[index][pos] = data;
       if (pos + 1 == secondCacheLength) {
         putToByteBuffer(index, dataCache2[index], secondCacheLength);
-        long begin = System.currentTimeMillis();
         partFileChannels[index].write(batchWriteBuffer);
-        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         dataCacheLen2[index] = 0;
       }
     }
@@ -122,9 +118,7 @@ public class DiskBlock {
       if (len > 0) {
         putToByteBuffer(i, dataCache1[i], len);
         storeLastData(i);
-        long begin = System.currentTimeMillis();
         partFileChannels[i].write(batchWriteBuffer);
-        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         dataCacheLen1[i] = 0;
       }
     }
@@ -136,9 +130,7 @@ public class DiskBlock {
       if (len > 0) {
         putToByteBuffer(i, dataCache2[i], len);
         storeLastData(i);
-        long begin = System.currentTimeMillis();
         partFileChannels[i].write(batchWriteBuffer);
-        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         dataCacheLen2[i] = 0;
       }
     }
@@ -387,15 +379,6 @@ public class DiskBlock {
     if (length % 13 != 0) {
       data[idx++] = makeLong(bytePrev, array[length - 7], array[length - 6], array[length - 5],
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
-    }
-
-    long minData = Long.MAX_VALUE;
-    long maxData = 0;
-
-    for (int i = 0; i < idx; i++) {
-      long datum = data[i];
-      minData = Math.min(datum, minData);
-      maxData = Math.max(datum, maxData);
     }
 
     return PubTools.solve(data, 0, idx - 1, index);
