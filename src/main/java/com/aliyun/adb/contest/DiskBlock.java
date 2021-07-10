@@ -383,9 +383,39 @@ public class DiskBlock {
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
     }
 
+    tryToQuickFindK(partNum, data, idx, index);
+
     long solve = PubTools.solve(data, 0, idx - 1, index);
     return (((long) bytePrev & 0xff) << 56) | solve;
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
+  }
+
+  private void tryToQuickFindK(byte partNum, long[] data, int length, int index) {
+    long min = ((long) partNum & 0xff) << 48;
+    long max = min | 4503599627370495L;
+
+    long solve = (long) ((index / (double)length) * max);
+    long leftSolve = solve - 5000;
+    long rightSolve = solve + 5000;
+
+    int left = 0, middle = 0, right = 0;
+
+    for (int i = 0; i < length; i++) {
+      long ele = data[i];
+      if (ele < leftSolve) {
+        left++;
+      } else if (ele > rightSolve) {
+        right++;
+      } else {
+        middle++;
+      }
+    }
+
+    if (index > left && index < (left + middle)) {
+      System.out.println("hit");
+    } else {
+      System.out.println("miss");
+    }
   }
 
   public static long makeLong2(byte b6, byte b5, byte b4,
