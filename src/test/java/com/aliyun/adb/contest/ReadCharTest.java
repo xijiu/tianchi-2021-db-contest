@@ -170,7 +170,7 @@ public class ReadCharTest {
     }
     System.out.println();
 
-    System.out.println("len is " +  "000000000000000000000000000000000000000000000000".length());
+    System.out.println("len is " +  "0010101011010000000000000000000001101000101100100000011110000011".length());
 
 
     System.out.println(Long.parseLong("0000000011110000000000000000000000000000000000000000000000000000", 2));
@@ -195,6 +195,15 @@ public class ReadCharTest {
 //    System.out.println(Integer.toBinaryString(first));
 //    System.out.println(second);
 //    System.out.println(Integer.toBinaryString(second));
+
+    // 0010101011010000000000000000000001101000101100100000011110000011
+    // 0010101011011111111111111111110000011000100000000110111100000011
+    System.out.println(Long.toBinaryString(3084965746505287555L));
+    System.out.println(Long.toBinaryString(3089469327607361283L));
+
+//    int index1 = (int) ((3084965746505287555L & 67553994410557440L) >> 52);
+//
+//    System.out.println(index1);
 
 
   }

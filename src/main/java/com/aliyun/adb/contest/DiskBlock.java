@@ -4,6 +4,7 @@ package com.aliyun.adb.contest;
 import com.aliyun.adb.contest.utils.PubTools;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -344,6 +345,7 @@ public class DiskBlock {
     int tmpSize = 0;
     byte partNum = 0;
     int fileLen = 0;
+    printDataCount(count);
     for (byte i = 0; i < splitNum; i++) {
       fileLen = (int) partFileChannels[i].size();
       System.out.println("current file data num is " + (fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1));
@@ -412,6 +414,16 @@ public class DiskBlock {
 
     return PubTools.solve(data, 0, idx - 1, index);
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
+  }
+
+  private void printDataCount(int count) throws IOException {
+    int tmpSize = 0;
+    for (int i = 0; i < splitNum; i++) {
+      int fileLen = (int) partFileChannels[i].size();
+      tmpSize += fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1;
+    }
+    System.out.println("------tmpSize is " + tmpSize);
+    System.out.println("------count is " + count);
   }
 
 
