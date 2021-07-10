@@ -310,23 +310,6 @@ public class MyAnalyticDB implements AnalyticDB {
       firstSum += tmp;
     }
     System.out.println("table 1 secondSum is " + firstSum);
-
-    long tmpSize = 0L;
-    for (DiskBlock diskBlock : diskBlockData_1_1) {
-      for (FileChannel partFileChannel : diskBlock.partFileChannels) {
-        long fileLen = partFileChannel.size();
-        tmpSize += fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1;
-      }
-    }
-    System.out.println("likangning file 1111 length test total data num is " + tmpSize);
-    tmpSize = 0L;
-    for (DiskBlock diskBlock : diskBlockData_1_2) {
-      for (FileChannel partFileChannel : diskBlock.partFileChannels) {
-        long fileLen = partFileChannel.size();
-        tmpSize += fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1;
-      }
-    }
-    System.out.println("likangning file 2222 length test total data num is " + tmpSize);
   }
 
   private void statPerBlockCount2() {

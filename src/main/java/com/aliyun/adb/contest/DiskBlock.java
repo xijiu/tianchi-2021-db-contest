@@ -339,16 +339,13 @@ public class DiskBlock {
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index, int count) throws Exception {
-    System.out.println("target index is " + index);
     FileChannel partFileChannel = null;
     int lastTmpSize = 0;
     int tmpSize = 0;
     byte partNum = 0;
     int fileLen = 0;
-    printDataCount(count);
     for (byte i = 0; i < splitNum; i++) {
       fileLen = (int) partFileChannels[i].size();
-      System.out.println("current file data num is " + (fileLen % 13 == 0 ? (fileLen / 13 * 2) : (fileLen / 13 * 2 + 1)));
       tmpSize += fileLen % 13 == 0 ? (fileLen / 13 * 2) : (fileLen / 13 * 2 + 1);
       if (tmpSize > index) {
         partNum = i;
@@ -359,7 +356,6 @@ public class DiskBlock {
       lastTmpSize = tmpSize;
     }
 
-    System.out.println("finally index is " + index);
     partNum = (byte) (partNum << 4);
 
     long[] data = MyAnalyticDB.helper.get();
@@ -386,26 +382,12 @@ public class DiskBlock {
         data[idx++] = makeLong(bytePrev, second, array[tmpIdx + 7], array[tmpIdx + 8],
                 array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
       }
-
-//      int i = 0;
-//      for (i = 0; i < length; i += 13) {
-//        byte first = (byte) (((array[i] >> 4) & 15) | partNum);
-//        byte second = (byte) ((array[i] & 15) | partNum);
-//        data[idx++] = makeLong(bytePrev, first, array[i + 1], array[i + 2],
-//                array[i + 3], array[i + 4], array[i + 5], array[i + 6]);
-//        data[idx++] = makeLong(bytePrev, second, array[i + 7], array[i + 8],
-//                array[i + 9], array[i + 10], array[i + 11], array[i + 12]);
-//      }
     }
 
     if (length % 13 != 0) {
       data[idx++] = makeLong(bytePrev, array[length - 7], array[length - 6], array[length - 5],
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
-//      System.out.println("wolegeca I is " + i + ", and length is " + length);
     }
-
-    System.out.println("idx is " + idx);
-    System.out.println("fileLen is " + fileLen);
 
     long minData = Long.MAX_VALUE;
     long maxData = 0;
@@ -416,21 +398,8 @@ public class DiskBlock {
       maxData = Math.max(datum, maxData);
     }
 
-    System.out.println("minData is " + minData);
-    System.out.println("maxData is " + maxData);
-
     return PubTools.solve(data, 0, idx - 1, index);
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
-  }
-
-  private void printDataCount(int count) throws IOException {
-    int tmpSize = 0;
-    for (int i = 0; i < splitNum; i++) {
-      int fileLen = (int) partFileChannels[i].size();
-      tmpSize += fileLen % 13 == 0 ? fileLen / 13 * 2 : fileLen / 13 * 2 + 1;
-    }
-    System.out.println("------tmpSize is " + tmpSize);
-    System.out.println("------count is " + count);
   }
 
 
