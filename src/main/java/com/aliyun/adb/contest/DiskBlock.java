@@ -40,7 +40,7 @@ public class DiskBlock {
 
   private static final int splitNum = 16;
 
-  private volatile FileChannel[] partFileChannels = null;
+  public volatile FileChannel[] partFileChannels = null;
 
   private long[][] dataCache1 = null;
 
