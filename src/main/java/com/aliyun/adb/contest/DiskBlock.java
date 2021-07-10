@@ -76,12 +76,9 @@ public class DiskBlock {
     this.initFileChannel();
   }
 
-  long minData = Long.MAX_VALUE;
-
   public synchronized void storeLongArr1(long[] dataArr, int length) throws Exception {
     for (int i = 0; i < length; i++) {
       long data = dataArr[i];
-      minData = Math.min(data, minData);
       // 2 part  : 36028797018963968L   >> 55
       // 4 part  : 54043195528445952L   >> 54
       // 8 part  : 63050394783186944L   >> 53
@@ -104,7 +101,6 @@ public class DiskBlock {
   public synchronized void storeLongArr2(long[] dataArr, int length) throws Exception {
     for (int i = 0; i < length; i++) {
       long data = dataArr[i];
-      minData = Math.min(data, minData);
       int index = (int) ((data & 67553994410557440L) >> 52);
       short pos = dataCacheLen2[index]++;
       dataCache2[index][pos] = data;
@@ -131,7 +127,6 @@ public class DiskBlock {
         dataCacheLen1[i] = 0;
       }
     }
-    System.out.println("min data 1111 is " + minData);
   }
 
   public synchronized void forceStoreLongArr2() throws Exception {
@@ -146,7 +141,6 @@ public class DiskBlock {
         dataCacheLen2[i] = 0;
       }
     }
-    System.out.println("min data 2222 is " + minData);
   }
 
   private void storeLastData(int idx) {
@@ -194,8 +188,6 @@ public class DiskBlock {
     for (int i = 0; i < actualLen; i += 2) {
       long data1 = dataArr[i];
       long data2 = dataArr[i + 1];
-      minData = Math.min(data1, minData);
-      minData = Math.min(data2, minData);
 
       batchWriteArr[index++] = (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60));
       batchWriteArr[index++] = (byte)(data1 >> 40);
@@ -406,7 +398,16 @@ public class DiskBlock {
     System.out.println("idx is " + idx);
     System.out.println("fileLen is " + fileLen);
 
+    long minData = Long.MAX_VALUE;
+    long maxData = 0;
 
+    for (long datum : data) {
+      minData = Math.min(datum, minData);
+      maxData = Math.max(datum, maxData);
+    }
+
+    System.out.println("minData is " + minData);
+    System.out.println("maxData is " + maxData);
 
     return PubTools.solve(data, 0, idx - 1, index);
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
