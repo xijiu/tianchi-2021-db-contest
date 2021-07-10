@@ -348,6 +348,8 @@ public class DiskBlock {
       lastTmpSize = tmpSize;
     }
 
+    System.out.println("part --- long number is " + (fileLen / 13 * 2));
+
     partNum = (byte) (partNum << 4);
 
     long[] data = MyAnalyticDB.helper.get();
