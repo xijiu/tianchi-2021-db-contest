@@ -393,8 +393,8 @@ public class DiskBlock {
     long max = min | 4503599627370495L;
 
     long solve = (long) ((index / (double)length) * max);
-    long leftSolve = solve - 5000;
-    long rightSolve = solve + 5000;
+    long leftSolve = solve - 50000;
+    long rightSolve = solve + 50000;
 
     int left = 0, middle = 0, right = 0;
 
