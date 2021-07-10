@@ -8,6 +8,8 @@ public class MyTest {
 
   @Test
   public void test() throws Exception {
+    int i = 0xff;
+    System.out.println(Integer.toBinaryString(i));
   }
 
 
