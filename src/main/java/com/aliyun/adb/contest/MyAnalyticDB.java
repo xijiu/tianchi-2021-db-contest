@@ -26,6 +26,7 @@ public class MyAnalyticDB implements AnalyticDB {
    * 1024-1000000
    */
   public static ThreadLocal<long[]> helper = ThreadLocal.withInitial(() -> new long[8000000]);
+  public static ThreadLocal<long[]> helper2 = ThreadLocal.withInitial(() -> new long[8000000]);
 
   private final int drift = 64 - (power + 1);
 
@@ -733,7 +734,7 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=======================> actual total cost : " + totalCost);
 
       if (isTest) {
-        if (totalCost > 46300) {
+        if (totalCost > 40000) {
           return "0";
         }
       }

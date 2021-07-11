@@ -381,14 +381,17 @@ public class DiskBlock {
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
     }
 
-    tryToQuickFindK(partNum, data, idx, index);
-
-    long solve = PubTools.solve(data, 0, idx - 1, index);
+    long solve = tryToQuickFindK(partNum, data, idx, index);
+    if (solve == -1) {
+      solve = PubTools.solve(data, 0, idx - 1, index);
+    }
     return (((long) bytePrev & 0xff) << 56) | solve;
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }
 
-  private void tryToQuickFindK(byte partNum, long[] data, int length, int index) {
+  private long tryToQuickFindK(byte partNum, long[] data, int length, int index) {
+    long[] helperArr = MyAnalyticDB.helper2.get();
+    int helperIndex = 0;
     long min = ((long) partNum & 0xff) << 48;
     long max = min | 4503599627370495L;
 
@@ -408,13 +411,17 @@ public class DiskBlock {
         right++;
       } else {
         middle++;
+        helperArr[helperIndex++] = ele;
       }
     }
 
     if (index > left && index < (left + middle)) {
-      System.out.println("hit, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
+//      System.out.println("hit, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
+      index = index - left;
+      return PubTools.solve(helperArr, 0, helperIndex - 1, index);
     } else {
       System.out.println("miss, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
+      return -1;
     }
   }
 
