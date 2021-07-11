@@ -405,13 +405,14 @@ public class DiskBlock {
 
     for (int i = 0; i < length; i++) {
       long ele = data[i];
-      if (ele < leftSolve) {
-        left++;
-      } else if (ele <= rightSolve) {
-        middle++;
-        data[i] = data[validIndex];
-        data[validIndex] = ele;
-        validIndex++;
+      if (ele <= rightSolve) {
+        if (ele < leftSolve) {
+          left++;
+        } else {
+          middle++;
+          data[i] = data[validIndex];
+          data[validIndex++] = ele;
+        }
       }
     }
 
