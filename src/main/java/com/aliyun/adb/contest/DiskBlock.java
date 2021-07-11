@@ -390,8 +390,6 @@ public class DiskBlock {
   }
 
   private long tryToQuickFindK(byte partNum, long[] data, int length, int index) {
-    long[] helperArr = MyAnalyticDB.helper2.get();
-    int helperIndex = 0;
     long min = ((long) partNum & 0xff) << 48;
     long max = min | 4503599627370495L;
 
@@ -403,6 +401,8 @@ public class DiskBlock {
 
     int left = 0, middle = 0, right = 0;
 
+    int validIndex = 0;
+
     for (int i = 0; i < length; i++) {
       long ele = data[i];
       if (ele < leftSolve) {
@@ -411,14 +411,16 @@ public class DiskBlock {
         right++;
       } else {
         middle++;
-        helperArr[helperIndex++] = ele;
+        data[i] = data[validIndex];
+        data[validIndex] = ele;
+        validIndex++;
       }
     }
 
     if (index > left && index < (left + middle)) {
 //      System.out.println("hit, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
       index = index - left;
-      return PubTools.solve(helperArr, 0, helperIndex - 1, index);
+      return PubTools.solve(data, 0, validIndex - 1, index);
     } else {
       System.out.println("miss, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
       return -1;
