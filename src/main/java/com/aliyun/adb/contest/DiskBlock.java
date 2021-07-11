@@ -396,8 +396,8 @@ public class DiskBlock {
     long max = min | 4503599627370495L;
 
     long solve = (long) ((index / (double)length) * (max - min)) + min;
-    long leftSolve = (long) (solve - solve * 0.01);
-    long rightSolve = (long) (solve + solve * 0.01);
+    long leftSolve = (long) (solve - solve * 0.005);
+    long rightSolve = (long) (solve + solve * 0.005);
 
 //    System.out.println("min is " + min + ", max is " + max + ", solve is " + solve + ", index is " + index);
 
