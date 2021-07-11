@@ -399,7 +399,7 @@ public class DiskBlock {
 
 //    System.out.println("min is " + min + ", max is " + max + ", solve is " + solve + ", index is " + index);
 
-    int left = 0, middle = 0, right = 0;
+    int left = 0, middle = 0;
 
     int validIndex = 0;
 
@@ -407,9 +407,7 @@ public class DiskBlock {
       long ele = data[i];
       if (ele < leftSolve) {
         left++;
-      } else if (ele > rightSolve) {
-        right++;
-      } else {
+      } else if (ele <= rightSolve) {
         middle++;
         data[i] = data[validIndex];
         data[validIndex] = ele;
