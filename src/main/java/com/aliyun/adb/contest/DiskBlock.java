@@ -422,7 +422,7 @@ public class DiskBlock {
       index = index - left;
       return PubTools.solve(data, 0, validIndex - 1, index);
     } else {
-      System.out.println("miss, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
+//      System.out.println("miss, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
       return -1;
     }
   }
