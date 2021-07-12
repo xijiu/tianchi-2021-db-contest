@@ -22,7 +22,7 @@ public class DiskBlock {
 
   private byte bytePrev;
 
-  public static final short cacheLength = 4096;
+  public static final short cacheLength = 4096 * 6;
 
   public static final short secondCacheLength = (int) (cacheLength);
 
