@@ -457,9 +457,9 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private final int threadIndex;
 
-    public final short cacheLength = DiskBlock.cacheLength;
+    public final short cacheLength = 4096 * 3;
 
-    public final short secondCacheLength = DiskBlock.secondCacheLength;
+    public final short secondCacheLength = cacheLength;
 
     public final long[][] firstThreadCacheArr = new long[blockNum][cacheLength];
 

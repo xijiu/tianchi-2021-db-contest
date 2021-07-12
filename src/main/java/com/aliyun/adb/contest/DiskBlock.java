@@ -22,13 +22,13 @@ public class DiskBlock {
 
   private byte bytePrev;
 
-  public static final short cacheLength = 4096 * 3;
+  public static final short cacheLength = 4096;
 
   public static final short secondCacheLength = (int) (cacheLength);
 
   private final String tableName;
 
-  private static final int perReadSize = 4 * 1024 * 1024;
+  private static final int perReadSize = 13 * 1024 * 64;
 
 //  private static final int concurrentQueryThreadNum = 2;
 //
