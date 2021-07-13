@@ -344,33 +344,10 @@ public class MyAnalyticDB implements AnalyticDB {
 
 
     long beginThreadTime = System.currentTimeMillis();
-    int startThreadHelperNum = 4;
-    int perThreadNum = cpuThreadNum / startThreadHelperNum;
-    Future<?>[] futures = new Future[startThreadHelperNum - 1];
-    for (int i = 0; i < startThreadHelperNum - 1; i++) {
-      int finalI = i;
-      futures[i] = executor.submit(() -> {
-        try {
-          int start = finalI * perThreadNum;
-          int end = start + perThreadNum;
-          for (int j = start; j < end; j++) {
-            cpuThread[j] = new CpuThread(j);
-            cpuThread[j].setName("stable-thread-" + j);
-            cpuThread[j].start();
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      });
-    }
-
-    for (int i = cpuThreadNum - perThreadNum; i < cpuThreadNum; i++) {
+    for (int i = 0; i < cpuThreadNum; i++) {
       cpuThread[i] = new CpuThread(i);
       cpuThread[i].setName("stable-thread-" + i);
       cpuThread[i].start();
-    }
-    for (Future<?> future : futures) {
-      future.get();
     }
     System.out.println("create threads cost time is : " + (System.currentTimeMillis() - beginThreadTime));
 
@@ -499,7 +476,6 @@ public class MyAnalyticDB implements AnalyticDB {
     private int bucket = -1;
 
     public CpuThread(int index) throws Exception {
-//      super(null, null, "thread-" + index, 8 * 1024 * 1024);
       this.threadIndex = index;
     }
 
@@ -758,7 +734,7 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=======================> actual total cost : " + totalCost);
 
       if (isTest) {
-        if (totalCost > 43300) {
+        if (totalCost > 44000) {
           return "0";
         }
       }
