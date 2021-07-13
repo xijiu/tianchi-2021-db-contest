@@ -110,18 +110,20 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private volatile boolean couldReadFile2 = false;
 
+  public ThreadPoolExecutor executor = null;
+
   public MyAnalyticDB() {
     try {
       fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
-      Thread thread = new Thread(() -> {
-        try {
-          Thread.sleep(2 * 1000 * 60);
-          System.exit(1);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      });
-      thread.start();
+//      Thread thread = new Thread(() -> {
+//        try {
+//          Thread.sleep(2 * 1000 * 60);
+//          System.exit(1);
+//        } catch (InterruptedException e) {
+//          e.printStackTrace();
+//        }
+//      });
+//      thread.start();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -138,6 +140,9 @@ public class MyAnalyticDB implements AnalyticDB {
   }
 
   private void firstInit() throws Exception {
+    if (isFirstInvoke) {
+      executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+    }
     Future<?> future1 = executor.submit(() -> {
       for (int i = 0; i < blockNum / 2; i++) {
         diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
@@ -371,8 +376,6 @@ public class MyAnalyticDB implements AnalyticDB {
     bucketBaseArr = new long[lastBucketIndex + 1];
     bucketDataPosArr = new byte[lastBucketIndex + 1];
   }
-
-  public static final ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
 
   private void storeFinalDataToDisk() throws Exception {
     Future<?> future1 = executor.submit(() -> {
