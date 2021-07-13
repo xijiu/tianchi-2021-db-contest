@@ -418,7 +418,7 @@ public class DiskBlock {
 
     if (index > left && index < (left + middle)) {
 //      System.out.println("hit, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
-      MyAnalyticDB.findKStat.incrementAndGet();
+//      MyAnalyticDB.findKStat.incrementAndGet();
       index = index - left;
       return PubTools.solve(data, 0, validIndex - 1, index);
     } else {
