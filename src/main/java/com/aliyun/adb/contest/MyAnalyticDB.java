@@ -476,7 +476,7 @@ public class MyAnalyticDB implements AnalyticDB {
     private int bucket = -1;
 
     public CpuThread(int index) throws Exception {
-      super(null, null, "thread-" + index, 8 * 1024 * 1024);
+//      super(null, null, "thread-" + index, 8 * 1024 * 1024);
       this.threadIndex = index;
     }
 
