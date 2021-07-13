@@ -344,11 +344,23 @@ public class MyAnalyticDB implements AnalyticDB {
 
 
     long beginThreadTime = System.currentTimeMillis();
-    for (int i = 0; i < cpuThreadNum; i++) {
+    Future<?> future = executor.submit(() -> {
+      try {
+        for (int i = 0; i < cpuThreadNum / 2; i++) {
+          cpuThread[i] = new CpuThread(i);
+          cpuThread[i].setName("stable-thread-" + i);
+          cpuThread[i].start();
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    });
+    for (int i = cpuThreadNum / 2; i < cpuThreadNum; i++) {
       cpuThread[i] = new CpuThread(i);
       cpuThread[i].setName("stable-thread-" + i);
       cpuThread[i].start();
     }
+    future.get();
     System.out.println("create threads cost time is : " + (System.currentTimeMillis() - beginThreadTime));
 
     for (int i = 0; i < cpuThreadNum; i++) {
