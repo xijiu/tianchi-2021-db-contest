@@ -110,7 +110,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private volatile boolean couldReadFile2 = false;
 
-  public ThreadPoolExecutor executor = null;
+  public ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
 
   public MyAnalyticDB() {
     try {
@@ -140,9 +140,6 @@ public class MyAnalyticDB implements AnalyticDB {
   }
 
   private void firstInit() throws Exception {
-    if (isFirstInvoke) {
-      executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
-    }
     Future<?> future1 = executor.submit(() -> {
       for (int i = 0; i < blockNum / 2; i++) {
         diskBlockData_1_1[i] = new DiskBlock("1", 1, i);
@@ -190,6 +187,10 @@ public class MyAnalyticDB implements AnalyticDB {
     future5.get();
     future6.get();
     future7.get();
+
+    if (!isFirstInvoke) {
+      executor.shutdown();
+    }
   }
 
 
