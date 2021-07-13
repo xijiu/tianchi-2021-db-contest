@@ -727,12 +727,17 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final AtomicInteger invokeTimes = new AtomicInteger();
 
+  public static final AtomicInteger findKStat = new AtomicInteger();
+
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
+    System.out.println(System.currentTimeMillis() + " : " + Thread.currentThread().getId());
     int num = invokeTimes.incrementAndGet();
     if (num >= 4000) {
       long time = System.currentTimeMillis();
       long totalCost = time - totalBeginTime;
+      System.out.println("hit cache count is : " + findKStat.get());
+      System.out.println("miss cache count is : " + (4000 - findKStat.get()));
       System.out.println("finish time is : " + time);
       System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
       System.out.println("=======================> actual total cost : " + totalCost);
