@@ -731,7 +731,6 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
-    System.out.println(System.currentTimeMillis() + " : " + Thread.currentThread().getId());
     int num = invokeTimes.incrementAndGet();
     if (num >= 4000) {
       long time = System.currentTimeMillis();
