@@ -346,7 +346,7 @@ public class MyAnalyticDB implements AnalyticDB {
     long beginThreadTime = System.currentTimeMillis();
     int startThreadHelperNum = 4;
     int perThreadNum = cpuThreadNum / startThreadHelperNum;
-    Future<?>[] futures = new Future[startThreadHelperNum];
+    Future<?>[] futures = new Future[startThreadHelperNum - 1];
     for (int i = 0; i < startThreadHelperNum - 1; i++) {
       int finalI = i;
       futures[i] = executor.submit(() -> {
