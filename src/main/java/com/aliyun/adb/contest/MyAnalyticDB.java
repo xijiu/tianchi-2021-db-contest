@@ -344,23 +344,34 @@ public class MyAnalyticDB implements AnalyticDB {
 
 
     long beginThreadTime = System.currentTimeMillis();
-    Future<?> future = executor.submit(() -> {
-      try {
-        for (int i = 0; i < cpuThreadNum / 2; i++) {
-          cpuThread[i] = new CpuThread(i);
-          cpuThread[i].setName("stable-thread-" + i);
-          cpuThread[i].start();
+    int startThreadHelperNum = 4;
+    int perThreadNum = cpuThreadNum / startThreadHelperNum;
+    Future<?>[] futures = new Future[startThreadHelperNum];
+    for (int i = 0; i < startThreadHelperNum - 1; i++) {
+      int finalI = i;
+      futures[i] = executor.submit(() -> {
+        try {
+          int start = finalI * perThreadNum;
+          int end = start + perThreadNum;
+          for (int j = start; j < end; j++) {
+            cpuThread[j] = new CpuThread(j);
+            cpuThread[j].setName("stable-thread-" + j);
+            cpuThread[j].start();
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
         }
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    });
-    for (int i = cpuThreadNum / 2; i < cpuThreadNum; i++) {
+      });
+    }
+
+    for (int i = cpuThreadNum - perThreadNum; i < cpuThreadNum; i++) {
       cpuThread[i] = new CpuThread(i);
       cpuThread[i].setName("stable-thread-" + i);
       cpuThread[i].start();
     }
-    future.get();
+    for (Future<?> future : futures) {
+      future.get();
+    }
     System.out.println("create threads cost time is : " + (System.currentTimeMillis() - beginThreadTime));
 
     for (int i = 0; i < cpuThreadNum; i++) {
