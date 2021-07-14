@@ -729,6 +729,8 @@ public class MyAnalyticDB implements AnalyticDB {
 
 //  public static final AtomicInteger findKStat = new AtomicInteger();
 
+  public static final AtomicLong writeTimeStat = new AtomicLong();
+
   @Override
   public String quantile(String table, String column, double percentile) throws Exception {
     int num = invokeTimes.incrementAndGet();
@@ -738,6 +740,7 @@ public class MyAnalyticDB implements AnalyticDB {
 //      System.out.println("hit cache count is : " + findKStat.get());
 //      System.out.println("miss cache count is : " + (4000 - findKStat.get()));
       System.out.println("finish time is : " + time);
+      System.out.println("writeTimeStat time is : " + writeTimeStat.get() / 8);
       System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
       System.out.println("=======================> actual total cost : " + totalCost);
 
