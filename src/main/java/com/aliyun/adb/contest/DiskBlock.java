@@ -358,11 +358,7 @@ public class DiskBlock {
     int length = 0;
     while (true) {
       byteBuffer.clear();
-
-      long writeBegin = System.currentTimeMillis();
       int flag = partFileChannel.read(byteBuffer, pos);
-      MyAnalyticDB.writeTimeStat.addAndGet(System.currentTimeMillis() - writeBegin);
-
       if (flag == -1) {
         break;
       }
