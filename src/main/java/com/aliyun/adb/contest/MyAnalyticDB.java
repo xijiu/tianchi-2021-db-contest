@@ -115,15 +115,15 @@ public class MyAnalyticDB implements AnalyticDB {
   public MyAnalyticDB() {
     try {
       fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
-//      Thread thread = new Thread(() -> {
-//        try {
-//          Thread.sleep(2 * 1000 * 60);
-//          System.exit(1);
-//        } catch (InterruptedException e) {
-//          e.printStackTrace();
-//        }
-//      });
-//      thread.start();
+      Thread thread = new Thread(() -> {
+        try {
+          Thread.sleep(2 * 1000 * 60);
+          System.exit(1);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      });
+      thread.start();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -750,9 +750,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-//    if (1 == 1) {
-//      return "0";
-//    }
+    if (1 == 1) {
+      return "0";
+    }
 
 //    if (!isFirstInvoke) {
 //      return "0";

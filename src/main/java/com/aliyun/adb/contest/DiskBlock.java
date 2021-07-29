@@ -4,7 +4,6 @@ package com.aliyun.adb.contest;
 import com.aliyun.adb.contest.utils.PubTools;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -30,6 +29,8 @@ public class DiskBlock {
 
   private static final int perReadSize = 13 * 1024 * 64;
 
+  private static final int partFileSize = 4000000;
+
 //  private static final int concurrentQueryThreadNum = 2;
 //
 //  private final long[] beginReadPosArr = new long[concurrentQueryThreadNum];
@@ -40,7 +41,9 @@ public class DiskBlock {
 
   private static final int splitNum = 16;
 
-  public volatile FileChannel[] partFileChannels = null;
+  private int[] partFilePosArr = new int[splitNum];
+
+  public volatile FileChannel partFileChannel = null;
 
   private long[][] dataCache1 = null;
 
@@ -91,7 +94,8 @@ public class DiskBlock {
       if (pos + 1 == cacheLength) {
         putToByteBuffer(index, dataCache1[index], cacheLength);
 
-        partFileChannels[index].write(batchWriteBuffer);
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
+        partFilePosArr[index] += batchWriteBuffer.limit();
         dataCacheLen1[index] = 0;
       }
     }
@@ -105,7 +109,8 @@ public class DiskBlock {
       dataCache2[index][pos] = data;
       if (pos + 1 == secondCacheLength) {
         putToByteBuffer(index, dataCache2[index], secondCacheLength);
-        partFileChannels[index].write(batchWriteBuffer);
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
+        partFilePosArr[index] += batchWriteBuffer.limit();
         dataCacheLen2[index] = 0;
       }
     }
@@ -118,7 +123,8 @@ public class DiskBlock {
       if (len > 0) {
         putToByteBuffer(i, dataCache1[i], len);
         storeLastData(i);
-        partFileChannels[i].write(batchWriteBuffer);
+        partFileChannel.write(batchWriteBuffer);
+        partFilePosArr[i] += batchWriteBuffer.limit();
         dataCacheLen1[i] = 0;
       }
     }
@@ -130,7 +136,8 @@ public class DiskBlock {
       if (len > 0) {
         putToByteBuffer(i, dataCache2[i], len);
         storeLastData(i);
-        partFileChannels[i].write(batchWriteBuffer);
+        partFileChannel.write(batchWriteBuffer);
+        partFilePosArr[i] += batchWriteBuffer.limit();
         dataCacheLen2[i] = 0;
       }
     }
@@ -331,24 +338,25 @@ public class DiskBlock {
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index) throws Exception {
-    FileChannel partFileChannel = null;
-    int lastTmpSize = 0;
-    int tmpSize = 0;
-    byte partNum = 0;
-    int fileLen = 0;
-    for (byte i = 0; i < splitNum; i++) {
-      fileLen = (int) partFileChannels[i].size();
-      tmpSize += fileLen % 13 == 0 ? (fileLen / 13 * 2) : (fileLen / 13 * 2 + 1);
-      if (tmpSize > index) {
-        partNum = i;
-        partFileChannel = partFileChannels[i];
-        index = index - lastTmpSize;
-        break;
-      }
-      lastTmpSize = tmpSize;
-    }
+//    FileChannel partFileChannel = null;
+//    int lastTmpSize = 0;
+//    int tmpSize = 0;
+//    byte partNum = 0;
+//    int fileLen = 0;
+//    for (byte i = 0; i < splitNum; i++) {
+//      fileLen = (int) this.partFileChannel[i].size();
+//      tmpSize += fileLen % 13 == 0 ? (fileLen / 13 * 2) : (fileLen / 13 * 2 + 1);
+//      if (tmpSize > index) {
+//        partNum = i;
+//        partFileChannel = this.partFileChannel[i];
+//        index = index - lastTmpSize;
+//        break;
+//      }
+//      lastTmpSize = tmpSize;
+//    }
+//    partNum = (byte) (partNum << 4);
 
-    partNum = (byte) (partNum << 4);
+    byte partNum = 0;
 
     long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
@@ -452,18 +460,18 @@ public class DiskBlock {
 
   private void initFileChannel() {
     try {
-      partFileChannels = new FileChannel[splitNum];
       File path = new File(workspaceDir + "/" + tableName);
       if (!path.exists()) {
         path.mkdirs();
       }
 
+      File file = new File(workspaceDir + "/" + tableName + "/partFile_" + col + "_" + blockIndex + ".data");
+      if (!file.exists()) {
+        file.createNewFile();
+      }
+      partFileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
       for (int i = 0; i < splitNum; i++) {
-        File file = new File(workspaceDir + "/" + tableName + "/partFile_" + i + "_" + col + "_" + blockIndex + ".data");
-        if (!file.exists()) {
-          file.createNewFile();
-        }
-        partFileChannels[i] = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
+        partFilePosArr[i] = i * partFileSize;
       }
     } catch (Exception e) {
       e.printStackTrace();
