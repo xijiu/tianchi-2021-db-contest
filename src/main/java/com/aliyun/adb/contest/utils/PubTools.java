@@ -1,6 +1,25 @@
 package com.aliyun.adb.contest.utils;
 
+import java.io.File;
+
 public class PubTools {
+
+  public static long getDirSize(File file) {
+    if (file.exists()) {
+      if (file.isDirectory()) {
+        File[] children = file.listFiles();
+        long size = 0;
+        for (File f : children)
+          size += getDirSize(f);
+        return size;
+      } else {
+        long size = file.length();
+        return size;
+      }
+    } else {
+      return 0L;
+    }
+  }
 
   public static void myQuickSort(long[] arr, int low, int high) {
     int i, j;

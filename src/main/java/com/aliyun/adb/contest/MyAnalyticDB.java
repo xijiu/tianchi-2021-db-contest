@@ -1,6 +1,7 @@
 package com.aliyun.adb.contest;
 
 import com.aliyun.adb.contest.spi.AnalyticDB;
+import com.aliyun.adb.contest.utils.PubTools;
 
 import java.io.File;
 import java.io.IOException;
@@ -212,6 +213,7 @@ public class MyAnalyticDB implements AnalyticDB {
     storeBlockNumberFile();
 
     loadCostTime = System.currentTimeMillis() - begin;
+    System.out.println("target file size is " + PubTools.getDirSize(new File(workspaceDir)));
     System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
     System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
     System.out.println("============> sort data cost time : " + sortDataTime.get() / cpuThreadNum);
