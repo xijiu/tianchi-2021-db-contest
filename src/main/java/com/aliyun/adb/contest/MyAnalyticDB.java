@@ -213,7 +213,7 @@ public class MyAnalyticDB implements AnalyticDB {
     storeBlockNumberFile();
 
     loadCostTime = System.currentTimeMillis() - begin;
-    System.out.println("target file size is " + PubTools.getDirSize(new File(workspaceDir)));
+//    System.out.println("target file size is " + PubTools.getDirSize(new File(workspaceDir)));
     System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
     System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
     System.out.println("============> sort data cost time : " + sortDataTime.get() / cpuThreadNum);
@@ -821,7 +821,8 @@ public class MyAnalyticDB implements AnalyticDB {
 //      loadFinish = true;
 //    }
     String result = tmp(table, column, percentile);
-//    System.out.println("result is " + result);
+    System.out.println("table is " + table + ", column is" + column
+            + ", percentile is " + percentile + ", result is " + result);
     return result;
   }
 
