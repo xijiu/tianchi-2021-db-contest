@@ -417,7 +417,7 @@ public class DiskBlock {
     System.out.println("arr length is " + idx);
 
     if (1 == 1) {
-      Arrays.sort(data);
+      Arrays.sort(data, 0, idx);
       System.out.println("data begin !!!!!!");
       for (int i = 0; i < 100; i++) {
         System.out.println(data[i]);
