@@ -404,6 +404,8 @@ public class DiskBlock {
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
     }
 
+    System.out.println("arr length is " + idx);
+
 //    long solve = tryToQuickFindK(partNum, data, idx, index);
     long solve = -1;
     if (solve == -1) {
