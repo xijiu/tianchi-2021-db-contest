@@ -850,7 +850,7 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-    for (int i = 1; i < 10; i++) {
+    for (int i = 10001; i < 10011; i++) {
       String result = tmp("lineitem", "L_O", i);
       System.out.println("table is " + table + ", column is" + column
               + ", percentile is " + percentile + ", result is " + result);
