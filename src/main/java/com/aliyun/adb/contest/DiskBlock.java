@@ -358,6 +358,7 @@ public class DiskBlock {
       lastTmpSize = tmpSize;
     }
     partNum = (byte) (partNum << 4);
+    System.out.println("partIndex is " + partIndex);
 
     long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
