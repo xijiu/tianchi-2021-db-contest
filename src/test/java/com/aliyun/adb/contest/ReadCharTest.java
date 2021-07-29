@@ -20,16 +20,8 @@ public class ReadCharTest {
     // lineitem L_ORDERKEY,L_PARTKEY
     // orders   O_ORDERKEY,O_CUSTKEY
 
-    System.out.println(4096 * 3 * 7);
-    System.out.println(4096 * 3 * 6.5);
-    System.out.println((byte)(15 << 4));
-    System.out.println((byte)(15 << 4));
-
-
-    int partNum = 15;
-    partNum = (byte) (partNum << 4);
-    byte first = (byte) ((32 >> 4) | partNum);
-    System.out.println(Integer.toBinaryString(first));
+    System.out.println((long) (1000000000L * 0.00001D));
+    System.out.println((long) (1000000000L * 0.00002D));
   }
 
   @Test
