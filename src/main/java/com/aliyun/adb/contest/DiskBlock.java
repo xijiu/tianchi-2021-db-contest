@@ -375,7 +375,7 @@ public class DiskBlock {
       }
       pos += perReadSize;
       length = byteBuffer.position();
-      if (pos >= endPos) {
+      if (pos > endPos) {
         length = (int) (perReadSize - (pos - endPos));
         over = true;
       }
