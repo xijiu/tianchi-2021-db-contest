@@ -312,30 +312,43 @@ public class MyAnalyticDB implements AnalyticDB {
     }
     byteBuffer.putLong(totalBeginTime);
 
+    int total1 = 0;
+    int total2 = 0;
+    int total3 = 0;
+    int total4 = 0;
     for (DiskBlock diskBlock : diskBlockData_1_1) {
       int[] partFilePosArr = diskBlock.partFilePosArr;
       for (int num : partFilePosArr) {
         byteBuffer.putInt(num);
+        total1 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
       }
     }
     for (DiskBlock diskBlock : diskBlockData_1_2) {
       int[] partFilePosArr = diskBlock.partFilePosArr;
       for (int num : partFilePosArr) {
         byteBuffer.putInt(num);
+        total2 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
       }
     }
     for (DiskBlock diskBlock : diskBlockData_2_1) {
       int[] partFilePosArr = diskBlock.partFilePosArr;
       for (int num : partFilePosArr) {
         byteBuffer.putInt(num);
+        total3 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
       }
     }
     for (DiskBlock diskBlock : diskBlockData_2_2) {
       int[] partFilePosArr = diskBlock.partFilePosArr;
       for (int num : partFilePosArr) {
         byteBuffer.putInt(num);
+        total4 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
       }
     }
+
+    System.out.println("total1 is " + total1);
+    System.out.println("total2 is " + total2);
+    System.out.println("total3 is " + total3);
+    System.out.println("total4 is " + total4);
 
     byteBuffer.flip();
     fileChannel.write(byteBuffer);
