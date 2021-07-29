@@ -118,7 +118,7 @@ public class MyAnalyticDB implements AnalyticDB {
       fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
       Thread thread = new Thread(() -> {
         try {
-          Thread.sleep(2 * 1000 * 60);
+          Thread.sleep(1 * 1000 * 60);
           System.exit(1);
         } catch (InterruptedException e) {
           e.printStackTrace();
@@ -850,10 +850,13 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-    String result = tmp(table, column, number);
-    System.out.println("table is " + table + ", column is" + column
-            + ", percentile is " + percentile + ", result is " + result);
-    return result;
+    for (int i = 1; i < 10; i++) {
+      String result = tmp("lineitem", "L_O", i);
+      System.out.println("table is " + table + ", column is" + column
+              + ", percentile is " + percentile + ", result is " + result);
+    }
+
+    return "0";
   }
 
   public String tmp(String table, String column, int number) throws Exception {
