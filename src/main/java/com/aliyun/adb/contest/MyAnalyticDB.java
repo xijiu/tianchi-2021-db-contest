@@ -318,29 +318,37 @@ public class MyAnalyticDB implements AnalyticDB {
     int total4 = 0;
     for (DiskBlock diskBlock : diskBlockData_1_1) {
       int[] partFilePosArr = diskBlock.partFilePosArr;
-      for (int num : partFilePosArr) {
+      for (int i = 0; i < DiskBlock.splitNum; i++) {
+        int num = partFilePosArr[i];
         byteBuffer.putInt(num);
+        num = num - DiskBlock.partFileSize * i;
         total1 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
       }
     }
     for (DiskBlock diskBlock : diskBlockData_1_2) {
       int[] partFilePosArr = diskBlock.partFilePosArr;
-      for (int num : partFilePosArr) {
+      for (int i = 0; i < DiskBlock.splitNum; i++) {
+        int num = partFilePosArr[i];
         byteBuffer.putInt(num);
+        num = num - DiskBlock.partFileSize * i;
         total2 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
       }
     }
     for (DiskBlock diskBlock : diskBlockData_2_1) {
       int[] partFilePosArr = diskBlock.partFilePosArr;
-      for (int num : partFilePosArr) {
+      for (int i = 0; i < DiskBlock.splitNum; i++) {
+        int num = partFilePosArr[i];
         byteBuffer.putInt(num);
+        num = num - DiskBlock.partFileSize * i;
         total3 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
       }
     }
     for (DiskBlock diskBlock : diskBlockData_2_2) {
       int[] partFilePosArr = diskBlock.partFilePosArr;
-      for (int num : partFilePosArr) {
+      for (int i = 0; i < DiskBlock.splitNum; i++) {
+        int num = partFilePosArr[i];
         byteBuffer.putInt(num);
+        num = num - DiskBlock.partFileSize * i;
         total4 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
       }
     }

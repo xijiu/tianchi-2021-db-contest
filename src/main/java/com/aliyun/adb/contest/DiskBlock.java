@@ -29,7 +29,7 @@ public class DiskBlock {
 
   private static final int perReadSize = 13 * 1024 * 64;
 
-  private static final int partFileSize = 4000000;
+  public static final int partFileSize = 4000000;
 
 //  private static final int concurrentQueryThreadNum = 2;
 //
