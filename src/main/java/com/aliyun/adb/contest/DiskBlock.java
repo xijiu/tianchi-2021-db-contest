@@ -406,8 +406,8 @@ public class DiskBlock {
 
     System.out.println("arr length is " + idx);
 
-//    long solve = tryToQuickFindK(partNum, data, idx, index);
-    long solve = -1;
+    long solve = tryToQuickFindK(partNum, data, idx, index);
+//    long solve = -1;
     if (solve == -1) {
       solve = PubTools.solve(data, 0, idx - 1, index);
     }
@@ -488,9 +488,6 @@ public class DiskBlock {
         file.createNewFile();
       }
       partFileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
-      for (int i = 0; i < splitNum; i++) {
-        partFilePosArr[i] = i * partFileSize;
-      }
     } catch (Exception e) {
       e.printStackTrace();
       throw new RuntimeException(e);
