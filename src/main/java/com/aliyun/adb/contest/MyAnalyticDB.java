@@ -841,13 +841,6 @@ public class MyAnalyticDB implements AnalyticDB {
 //      statPerBlockCount1();
 //      loadFinish = true;
 //    }
-    String result = tmp(table, column, percentile);
-    System.out.println("table is " + table + ", column is" + column
-            + ", percentile is " + percentile + ", result is " + result);
-    return result;
-  }
-
-  public String tmp(String table, String column, double percentile) throws Exception {
     int number = (int) Math.ceil(1000000000L * percentile);
     if (number % 2 != 0) {
       if (number % 10 == 9) {
@@ -856,10 +849,16 @@ public class MyAnalyticDB implements AnalyticDB {
         number--;
       }
     }
+    for (int i = 0; i < 10; i++) {
+      String result = tmp(table, column, number++);
+      System.out.println("table is " + table + ", column is" + column
+              + ", percentile is " + percentile + ", result is " + result);
+    }
 
-//    System.out.println("table is " + table + ", column is" + column
-//            + ", percentile is " + percentile + ", number is " + number);
+    return "0";
+  }
 
+  public String tmp(String table, String column, int number) throws Exception {
     if (table.startsWith("lineitem")) {
       if (column.startsWith("L_O")) {
         return firstQuantile(number);
