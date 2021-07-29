@@ -60,6 +60,9 @@ public class DiskBlock {
 
   private long[] temporaryArr = new long[splitNum];
 
+  private static long[] testFirstBucketArr = new long[500000];
+  private static int testFirstBucketArrIndex = 0;
+
 
   public DiskBlock(String tableName, int col, int blockIndex) {
     this.tableName = tableName;
@@ -93,6 +96,9 @@ public class DiskBlock {
       // 16 part : 67553994410557440L   >> 52
       // 32 part : 69805794224242688L   >> 51
       int index = (int) ((data & 67553994410557440L) >> 52);
+      if (blockIndex == 0 && index == 0 && tableName.equals("1")) {
+        testFirstBucketArr[testFirstBucketArrIndex++] = data;
+      }
       short pos = dataCacheLen1[index]++;
       dataCache1[index][pos] = data;
       if (pos + 1 == cacheLength) {
@@ -342,6 +348,8 @@ public class DiskBlock {
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index) throws Exception {
+    Arrays.sort(testFirstBucketArr, 0, testFirstBucketArrIndex);
+
     int lastTmpSize = 0;
     int tmpSize = 0;
     byte partNum = 0;
@@ -360,6 +368,7 @@ public class DiskBlock {
     }
     partNum = (byte) (partNum << 4);
     System.out.println("partIndex is " + partIndex);
+    System.out.println("correct answer is " + testFirstBucketArr[index]);
 
     long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
