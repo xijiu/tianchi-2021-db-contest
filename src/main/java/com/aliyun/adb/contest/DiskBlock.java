@@ -367,9 +367,12 @@ public class DiskBlock {
     long pos = partIndex * partFileSize;
     int length = 0;
     int endPos = partFilePosArr[partIndex];
+    System.out.println("target file size is a " + ((endPos - pos)));
+    System.out.println("target file size is b " + ((endPos - pos) / 1024 / 1024));
     boolean over = false;
     while (true) {
       byteBuffer.clear();
+      System.out.println("read pos is " + pos);
       int flag = partFileChannel.read(byteBuffer, pos);
       if (flag == -1) {
         break;
