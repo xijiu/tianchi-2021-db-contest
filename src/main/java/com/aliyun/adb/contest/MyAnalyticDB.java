@@ -850,7 +850,7 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-    number--;
+    number++;
 
     String result = tmp(table, column, number);
     System.out.println("table is " + table + ", column is" + column
