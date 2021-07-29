@@ -849,13 +849,11 @@ public class MyAnalyticDB implements AnalyticDB {
         number--;
       }
     }
-    for (int i = 0; i < 10; i++) {
-      String result = tmp(table, column, number + i);
-      System.out.println("table is " + table + ", column is" + column
-              + ", percentile is " + percentile + ", result is " + result);
-    }
 
-    return "0";
+    String result = tmp(table, column, number);
+    System.out.println("table is " + table + ", column is" + column
+            + ", percentile is " + percentile + ", result is " + result);
+    return result;
   }
 
   public String tmp(String table, String column, int number) throws Exception {
