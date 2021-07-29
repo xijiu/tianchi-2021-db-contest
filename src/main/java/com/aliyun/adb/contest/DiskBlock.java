@@ -407,14 +407,20 @@ public class DiskBlock {
 
     System.out.println("arr length is " + idx);
 
+    if (1 == 1) {
+      Arrays.sort(data);
+      long result = (((long) bytePrev & 0xff) << 56) | data[index];
+      System.out.println("target value is a " + result);
+      return result;
+    }
+
     long solve = tryToQuickFindK(partNum, data, idx, index);
 //    long solve = -1;
     if (solve == -1) {
       solve = PubTools.solve(data, 0, idx - 1, index);
     }
 
-    Arrays.sort(data);
-    System.out.println("target value is a " + ((((long) bytePrev & 0xff) << 56) | data[index]));
+
 
     return (((long) bytePrev & 0xff) << 56) | solve;
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
