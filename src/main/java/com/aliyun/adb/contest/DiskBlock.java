@@ -76,6 +76,9 @@ public class DiskBlock {
         dataCache2 = new long[splitNum][secondCacheLength];
         dataCacheLen2 = new short[splitNum];
       }
+      for (int i = 0; i < splitNum; i++) {
+        partFilePosArr[i] = i * partFileSize;
+      }
     }
     this.initFileChannel();
   }
