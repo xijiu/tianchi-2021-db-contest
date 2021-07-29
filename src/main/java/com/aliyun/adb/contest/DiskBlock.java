@@ -418,6 +418,11 @@ public class DiskBlock {
 
     if (1 == 1) {
       Arrays.sort(data);
+      System.out.println("data begin !!!!!!");
+      for (int i = 0; i < 100; i++) {
+        System.out.println(data[i]);
+      }
+      System.out.println("data end !!!!!!");
       long result = (((long) bytePrev & 0xff) << 56) | data[index];
       System.out.println("target value is a " + result);
       return result;
