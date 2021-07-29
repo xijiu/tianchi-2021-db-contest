@@ -39,9 +39,9 @@ public class DiskBlock {
 //
 //  private static final ThreadPoolExecutor executor = MyAnalyticDB.executor;
 
-  private static final int splitNum = 16;
+  public static final int splitNum = 16;
 
-  private int[] partFilePosArr = new int[splitNum];
+  public int[] partFilePosArr = new int[splitNum];
 
   public volatile FileChannel partFileChannel = null;
 
@@ -338,32 +338,32 @@ public class DiskBlock {
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index) throws Exception {
-//    FileChannel partFileChannel = null;
-//    int lastTmpSize = 0;
-//    int tmpSize = 0;
-//    byte partNum = 0;
-//    int fileLen = 0;
-//    for (byte i = 0; i < splitNum; i++) {
-//      fileLen = (int) this.partFileChannel[i].size();
-//      tmpSize += fileLen % 13 == 0 ? (fileLen / 13 * 2) : (fileLen / 13 * 2 + 1);
-//      if (tmpSize > index) {
-//        partNum = i;
-//        partFileChannel = this.partFileChannel[i];
-//        index = index - lastTmpSize;
-//        break;
-//      }
-//      lastTmpSize = tmpSize;
-//    }
-//    partNum = (byte) (partNum << 4);
-
+    int lastTmpSize = 0;
+    int tmpSize = 0;
     byte partNum = 0;
+    byte partIndex = 0;
+    int fileLen = 0;
+    for (byte i = 0; i < splitNum; i++) {
+      fileLen = (int) partFilePosArr[i] - (i * partFileSize);
+      tmpSize += fileLen % 13 == 0 ? (fileLen / 13 * 2) : (fileLen / 13 * 2 + 1);
+      if (tmpSize > index) {
+        partNum = i;
+        partIndex = i;
+        index = index - lastTmpSize;
+        break;
+      }
+      lastTmpSize = tmpSize;
+    }
+    partNum = (byte) (partNum << 4);
 
     long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
     byte[] array = byteBuffer.array();
     int idx = 0;
-    long pos = 0;
+    long pos = partIndex * partFileSize;
     int length = 0;
+    int endPos = partFilePosArr[partIndex];
+    boolean over = false;
     while (true) {
       byteBuffer.clear();
       int flag = partFileChannel.read(byteBuffer, pos);
@@ -372,6 +372,10 @@ public class DiskBlock {
       }
       pos += perReadSize;
       length = byteBuffer.position();
+      if (pos >= endPos) {
+        length = (int) (perReadSize - (pos - endPos));
+        over = true;
+      }
       int cycleTime = length / 13;
       for (int i = 0; i < cycleTime; i++) {
         int tmpIdx = i * 13;
@@ -381,6 +385,9 @@ public class DiskBlock {
                 array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
         data[idx++] = makeLong2(second, array[tmpIdx + 7], array[tmpIdx + 8],
                 array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
+      }
+      if (over) {
+        break;
       }
     }
 

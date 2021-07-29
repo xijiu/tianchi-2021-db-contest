@@ -244,7 +244,8 @@ public class MyAnalyticDB implements AnalyticDB {
   private void reloadBlockNumberFile() throws IOException {
     storeBlockNumberFile = new File(DiskBlock.workspaceDir + "/blockNumberInfo.data");
     FileChannel fileChannel = FileChannel.open(storeBlockNumberFile.toPath(), StandardOpenOption.READ);
-    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4 * 4 + 8);
+    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4 * 4 + 8 + (DiskBlock.splitNum * 4 * 4));
+
     fileChannel.read(byteBuffer);
     byteBuffer.flip();
     for (int i = 0; i < blockNum; i++) {
@@ -261,13 +262,40 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     totalBeginTime = byteBuffer.getLong();
+
+    for (DiskBlock diskBlock : diskBlockData_1_1) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int i = 0; i < partFilePosArr.length; i++) {
+        partFilePosArr[i] = byteBuffer.getInt();
+      }
+    }
+    for (DiskBlock diskBlock : diskBlockData_1_2) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int i = 0; i < partFilePosArr.length; i++) {
+        partFilePosArr[i] = byteBuffer.getInt();
+      }
+    }
+    for (DiskBlock diskBlock : diskBlockData_2_1) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int i = 0; i < partFilePosArr.length; i++) {
+        partFilePosArr[i] = byteBuffer.getInt();
+      }
+    }
+    for (DiskBlock diskBlock : diskBlockData_2_2) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int i = 0; i < partFilePosArr.length; i++) {
+        partFilePosArr[i] = byteBuffer.getInt();
+      }
+    }
+
+    fileChannel.close();
   }
 
   private void storeBlockNumberFile() throws Exception {
     storeBlockNumberFile = new File(DiskBlock.workspaceDir + "/blockNumberInfo.data");
     storeBlockNumberFile.createNewFile();
     FileChannel fileChannel = FileChannel.open(storeBlockNumberFile.toPath(), StandardOpenOption.READ, StandardOpenOption.WRITE);
-    ByteBuffer byteBuffer = ByteBuffer.allocate(blockNum * 4 * 4 + 8);
+    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(blockNum * 4 * 4 + 8 + (DiskBlock.splitNum * 4 * 4));
     for (int num : table_1_BlockDataNumArr1) {
       byteBuffer.putInt(num);
     }
@@ -281,6 +309,31 @@ public class MyAnalyticDB implements AnalyticDB {
       byteBuffer.putInt(num);
     }
     byteBuffer.putLong(totalBeginTime);
+
+    for (DiskBlock diskBlock : diskBlockData_1_1) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int num : partFilePosArr) {
+        byteBuffer.putInt(num);
+      }
+    }
+    for (DiskBlock diskBlock : diskBlockData_1_2) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int num : partFilePosArr) {
+        byteBuffer.putInt(num);
+      }
+    }
+    for (DiskBlock diskBlock : diskBlockData_2_1) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int num : partFilePosArr) {
+        byteBuffer.putInt(num);
+      }
+    }
+    for (DiskBlock diskBlock : diskBlockData_2_2) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int num : partFilePosArr) {
+        byteBuffer.putInt(num);
+      }
+    }
 
     byteBuffer.flip();
     fileChannel.write(byteBuffer);
@@ -750,9 +803,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-    if (1 == 1) {
-      return "0";
-    }
+//    if (1 == 1) {
+//      return "0";
+//    }
 
 //    if (!isFirstInvoke) {
 //      return "0";

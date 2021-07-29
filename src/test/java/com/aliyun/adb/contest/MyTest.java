@@ -2,22 +2,23 @@ package com.aliyun.adb.contest;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
 
 public class MyTest {
 
   @Test
   public void test() throws Exception {
-    int i = 0xff;
-    byte a = 68;
-    byte second = (byte) ((a & 15));
-    System.out.println(second);
-    System.out.println(Integer.toBinaryString(second));
-
-    byte partNum = 4;
-    partNum = (byte) (partNum << 4);
-    long result = ((long) partNum & 0xff) << 48;
-    System.out.println(Long.toBinaryString(result));
+    File file = new File("/Users/likangning/test/abc.data");
+    file.createNewFile();
+    FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
+    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * 1024);
+    byteBuffer.putLong(100);
+    byteBuffer.flip();
+    fileChannel.write(byteBuffer, 4096);
+    System.out.println(fileChannel.size());
   }
 
 
