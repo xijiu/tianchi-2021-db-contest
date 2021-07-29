@@ -7,6 +7,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 
 /**
  * 硬盘存储块
@@ -411,6 +412,10 @@ public class DiskBlock {
     if (solve == -1) {
       solve = PubTools.solve(data, 0, idx - 1, index);
     }
+
+    Arrays.sort(data);
+    System.out.println("target value is a " + ((((long) bytePrev & 0xff) << 56) | data[index]));
+
     return (((long) bytePrev & 0xff) << 56) | solve;
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }

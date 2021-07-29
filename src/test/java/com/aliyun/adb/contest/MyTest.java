@@ -12,13 +12,22 @@ public class MyTest {
   @Test
   public void test() throws Exception {
     File file = new File("/Users/likangning/test/abc.data");
+    if (file.exists()) {
+      file.delete();
+    }
     file.createNewFile();
     FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
-    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * 1024);
+    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(16);
     byteBuffer.putLong(100);
     byteBuffer.flip();
-    fileChannel.write(byteBuffer, 4096);
+    fileChannel.write(byteBuffer, 8);
     System.out.println(fileChannel.size());
+
+    byteBuffer.clear();
+    fileChannel.read(byteBuffer);
+    byteBuffer.flip();
+    System.out.println(byteBuffer.getLong());
+    System.out.println(byteBuffer.getLong());
   }
 
 
