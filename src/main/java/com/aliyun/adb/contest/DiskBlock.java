@@ -418,9 +418,6 @@ public class DiskBlock {
 
     if (1 == 1) {
       Arrays.sort(data);
-      System.out.println(Long.toBinaryString(data[index - 1]));
-      System.out.println(Long.toBinaryString(data[index]));
-      System.out.println(Long.toBinaryString(data[index + 1]));
       long result = (((long) bytePrev & 0xff) << 56) | data[index];
       System.out.println("target value is a " + result);
       return result;
