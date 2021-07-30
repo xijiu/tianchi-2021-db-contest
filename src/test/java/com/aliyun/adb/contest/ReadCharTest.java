@@ -22,6 +22,7 @@ public class ReadCharTest {
 
     System.out.println((long) (1000000000L * 0.00001D));
     System.out.println((long) (1000000000L * 0.00002D));
+    System.out.println(Long.toBinaryString(38052863319L));
   }
 
   @Test

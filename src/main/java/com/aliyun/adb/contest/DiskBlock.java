@@ -407,6 +407,14 @@ public class DiskBlock {
                 array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
         data[idx++] = makeLong2(second, array[tmpIdx + 7], array[tmpIdx + 8],
                 array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
+        if (data[idx - 1] == 0) {
+          System.out.println("ext 1 : " + tmpIdx);
+          System.exit(1);
+        }
+        if (data[idx - 2] == 0) {
+          System.out.println("ext 2 : " + tmpIdx);
+          System.exit(2);
+        }
       }
       if (over) {
         break;
