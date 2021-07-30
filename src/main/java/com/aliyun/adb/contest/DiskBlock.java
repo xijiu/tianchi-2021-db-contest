@@ -453,6 +453,13 @@ public class DiskBlock {
 
     System.out.println("arr length is " + idx);
 
+    if (1 == 1) {
+      Arrays.sort(data, 0, idx);
+      long result = (((long) bytePrev & 0xff) << 56) | data[index];
+      System.out.println("target value is a " + result);
+      return result;
+    }
+
     long solve = tryToQuickFindK(partNum, data, idx, index);
 //    long solve = -1;
     if (solve == -1) {
