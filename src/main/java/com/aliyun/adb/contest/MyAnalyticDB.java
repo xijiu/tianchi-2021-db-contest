@@ -312,6 +312,32 @@ public class MyAnalyticDB implements AnalyticDB {
     }
     byteBuffer.putLong(totalBeginTime);
 
+
+    for (DiskBlock diskBlock : diskBlockData_1_1) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int num : partFilePosArr) {
+        byteBuffer.putInt(num);
+      }
+    }
+    for (DiskBlock diskBlock : diskBlockData_1_2) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int num : partFilePosArr) {
+        byteBuffer.putInt(num);
+      }
+    }
+    for (DiskBlock diskBlock : diskBlockData_2_1) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int num : partFilePosArr) {
+        byteBuffer.putInt(num);
+      }
+    }
+    for (DiskBlock diskBlock : diskBlockData_2_2) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      for (int num : partFilePosArr) {
+        byteBuffer.putInt(num);
+      }
+    }
+
     byteBuffer.flip();
     fileChannel.write(byteBuffer);
     fileChannel.close();
@@ -774,7 +800,7 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=======================> actual total cost : " + totalCost);
 
       if (isTest) {
-        if (totalCost > 42500) {
+        if (totalCost > 43500) {
           return "0";
         }
       }
