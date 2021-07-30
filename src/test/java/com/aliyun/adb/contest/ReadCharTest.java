@@ -20,9 +20,8 @@ public class ReadCharTest {
     // lineitem L_ORDERKEY,L_PARTKEY
     // orders   O_ORDERKEY,O_CUSTKEY
 
-    System.out.println((long) (1000000000L * 0.00001D));
-    System.out.println((long) (1000000000L * 0.00002D));
-    System.out.println(Long.toBinaryString(38052863319L));
+    System.out.println(Long.toBinaryString(2207551456187336L));
+    System.out.println(Integer.toBinaryString(-63));
   }
 
   @Test

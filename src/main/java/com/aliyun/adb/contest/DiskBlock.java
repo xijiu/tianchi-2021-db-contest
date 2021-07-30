@@ -422,7 +422,7 @@ public class DiskBlock {
                 array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
         System.out.println("read file byte ---- begin");
         for (int j = 0; j < 13; j++) {
-          System.out.println(Long.toBinaryString(array[j]));
+          System.out.println(array[j]);
         }
         System.out.println("read file byte ---- end");
         if (1 == 1) {
