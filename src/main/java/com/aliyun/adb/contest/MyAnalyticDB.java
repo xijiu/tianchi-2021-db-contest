@@ -544,9 +544,9 @@ public class MyAnalyticDB implements AnalyticDB {
       try {
         while (true) {
           while (true) {
-            long begin1 = System.currentTimeMillis();
+//            long begin1 = System.currentTimeMillis();
             byte[] data = threadReadData();
-            readFileTime.addAndGet(System.currentTimeMillis() - begin1);
+//            readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
             if (data != null) {
               operate(data);
