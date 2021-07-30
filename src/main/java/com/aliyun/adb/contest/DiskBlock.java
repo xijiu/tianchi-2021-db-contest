@@ -374,6 +374,12 @@ public class DiskBlock {
     System.out.println("correct ---- begin");
     System.out.println(testFirstBucketArr[0] + " : " + Long.toBinaryString(testFirstBucketArr[0]));
     System.out.println(testFirstBucketArr[1] + " : " + Long.toBinaryString(testFirstBucketArr[1]));
+
+    ByteBuffer byteBuffer222 = ByteBuffer.allocate(13);
+    partFileChannel.read(byteBuffer222, 0);
+    for (int i = 0; i < 13; i++) {
+      System.out.println(byteBuffer222.array()[i]);
+    }
     System.out.println("correct ---- end");
 
     int lastTmpSize = 0;
