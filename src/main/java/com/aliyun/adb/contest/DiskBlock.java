@@ -370,22 +370,17 @@ public class DiskBlock {
 //    System.out.println("min number 1 is " + testFirstBucketArr[0]);
 //    System.out.println("min number 2 is " + testFirstBucketArr[1]);
 //    System.out.println("min number 3 is " + testFirstBucketArr[2]);
-    System.out.println("correct ---- begin");
-    System.out.println(testFirstBucketArr[0] + " : " + Long.toBinaryString(testFirstBucketArr[0]));
-    System.out.println(testFirstBucketArr[1] + " : " + Long.toBinaryString(testFirstBucketArr[1]));
-
-
-    ByteBuffer byteBufferTest = ByteBuffer.allocate(13);
-    partFileChannel.read(byteBufferTest, 0);
-    byteBufferTest.flip();
-    for (int j = 0; j < 13; j++) {
-      System.out.println(byteBufferTest.array()[j]);
-    }
-
-    if (1 == 1) {
-      System.exit(1);
-    }
-    System.out.println("correct ---- end");
+//    System.out.println("correct ---- begin");
+//
+//
+//    ByteBuffer byteBufferTest = ByteBuffer.allocate(13);
+//    partFileChannel.read(byteBufferTest, 0);
+//    byteBufferTest.flip();
+//    for (int j = 0; j < 13; j++) {
+//      System.out.println(byteBufferTest.array()[j]);
+//    }
+//
+//    System.out.println("correct ---- end");
 
     int lastTmpSize = 0;
     int tmpSize = 0;
@@ -419,7 +414,6 @@ public class DiskBlock {
     boolean over = false;
     while (true) {
       byteBuffer.clear();
-      System.out.println("read pos is " + pos);
       int flag = partFileChannel.read(byteBuffer, pos);
       if (flag == -1) {
         break;
@@ -427,7 +421,6 @@ public class DiskBlock {
       pos += perReadSize;
       length = byteBuffer.position();
       if (pos > endPos) {
-        System.out.println("pos is " + pos + ", endPos is " + endPos + ", length is " + length);
         length = (int) (perReadSize - (pos - endPos));
         over = true;
       }
@@ -440,14 +433,6 @@ public class DiskBlock {
                 array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
         data[idx++] = makeLong2(second, array[tmpIdx + 7], array[tmpIdx + 8],
                 array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
-        System.out.println("read file byte ---- begin");
-        for (int j = 0; j < 13; j++) {
-          System.out.println(array[j]);
-        }
-        System.out.println("read file byte ---- end");
-        if (1 == 1) {
-          System.exit(1);
-        }
       }
       if (over) {
         break;
@@ -467,18 +452,6 @@ public class DiskBlock {
     System.out.println("read file content ---- end");
 
     System.out.println("arr length is " + idx);
-
-    if (1 == 1) {
-      Arrays.sort(data, 0, idx);
-      System.out.println("data begin !!!!!!");
-      for (int i = 0; i < 100; i++) {
-        System.out.println(data[i]);
-      }
-      System.out.println("data end !!!!!!");
-      long result = (((long) bytePrev & 0xff) << 56) | data[index];
-      System.out.println("target value is a " + result);
-      return result;
-    }
 
     long solve = tryToQuickFindK(partNum, data, idx, index);
 //    long solve = -1;
