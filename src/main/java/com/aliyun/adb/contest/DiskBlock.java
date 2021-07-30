@@ -105,6 +105,15 @@ public class DiskBlock {
         putToByteBuffer(index, dataCache1[index], cacheLength);
 
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
+        if (blockIndex == 0 && index == 0 && tableName.equals("1")) {
+          System.out.println("load batchWriteArr record begin -----");
+          System.out.println(dataCache1[index][0]);
+          System.out.println(dataCache1[index][1]);
+          for (int j = 0; j < 13; j++) {
+            System.out.println(batchWriteArr[j]);
+          }
+          System.out.println("load batchWriteArr record end -----");
+        }
         partFilePosArr[index] += batchWriteBuffer.limit();
         dataCacheLen1[index] = 0;
       }
