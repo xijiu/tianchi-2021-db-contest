@@ -60,10 +60,6 @@ public class DiskBlock {
 
   private long[] temporaryArr = new long[splitNum];
 
-  private static long[] testFirstBucketArr = new long[500000];
-  private static int testFirstBucketArrIndex = 0;
-
-
   public DiskBlock(String tableName, int col, int blockIndex) {
     this.tableName = tableName;
     this.col = col;
@@ -96,29 +92,12 @@ public class DiskBlock {
       // 16 part : 67553994410557440L   >> 52
       // 32 part : 69805794224242688L   >> 51
       int index = (int) ((data & 67553994410557440L) >> 52);
-      if (blockIndex == 0 && index == 0 && tableName.equals("1") && col == 1) {
-        testFirstBucketArr[testFirstBucketArrIndex++] = data;
-      }
       short pos = dataCacheLen1[index]++;
       dataCache1[index][pos] = data;
       if (pos + 1 == cacheLength) {
         putToByteBuffer(index, dataCache1[index], cacheLength);
 
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
-        if (blockIndex == 0 && index == 0 && tableName.equals("1") && col == 1) {
-          System.out.println("partFileChannel str is " + partFileChannel.toString());
-          System.out.println("load batchWriteArr record begin -----");
-          System.out.println("write file pos is " + partFilePosArr[index]);
-          System.out.println(dataCache1[index][0]);
-          System.out.println(dataCache1[index][1]);
-          ByteBuffer byteBufferTest = ByteBuffer.allocate(13);
-          partFileChannel.read(byteBufferTest, 0);
-          byteBufferTest.flip();
-          for (int j = 0; j < 13; j++) {
-            System.out.println(byteBufferTest.array()[j]);
-          }
-          System.out.println("load batchWriteArr record end -----");
-        }
         partFilePosArr[index] += batchWriteBuffer.limit();
         dataCacheLen1[index] = 0;
       }
@@ -133,6 +112,7 @@ public class DiskBlock {
       dataCache2[index][pos] = data;
       if (pos + 1 == secondCacheLength) {
         putToByteBuffer(index, dataCache2[index], secondCacheLength);
+
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
         dataCacheLen2[index] = 0;
