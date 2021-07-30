@@ -349,6 +349,9 @@ public class DiskBlock {
 
   public long get2(int index) throws Exception {
     Arrays.sort(testFirstBucketArr, 0, testFirstBucketArrIndex);
+    System.out.println("min number 1 is " + testFirstBucketArr[0]);
+    System.out.println("min number 2 is " + testFirstBucketArr[1]);
+    System.out.println("min number 3 is " + testFirstBucketArr[2]);
 
     int lastTmpSize = 0;
     int tmpSize = 0;
