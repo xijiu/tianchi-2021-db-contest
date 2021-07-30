@@ -147,7 +147,7 @@ public class DiskBlock {
       if (len > 0) {
         putToByteBuffer(i, dataCache1[i], len);
         storeLastData(i);
-        partFileChannel.write(batchWriteBuffer);
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
         dataCacheLen1[i] = 0;
       }
@@ -160,7 +160,7 @@ public class DiskBlock {
       if (len > 0) {
         putToByteBuffer(i, dataCache2[i], len);
         storeLastData(i);
-        partFileChannel.write(batchWriteBuffer);
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
         dataCacheLen2[i] = 0;
       }
