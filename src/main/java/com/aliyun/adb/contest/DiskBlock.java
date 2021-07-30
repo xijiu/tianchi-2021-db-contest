@@ -357,6 +357,9 @@ public class DiskBlock {
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index) throws Exception {
+    System.out.println("table is " + tableName);
+    System.out.println("col is " + col);
+    System.out.println("blockIndex is " + blockIndex);
 //    Arrays.sort(testFirstBucketArr, 0, testFirstBucketArrIndex);
 //    System.out.println("testFirstBucketArr len is " + testFirstBucketArrIndex);
 //    System.out.println("min number 1 is " + testFirstBucketArr[0]);
