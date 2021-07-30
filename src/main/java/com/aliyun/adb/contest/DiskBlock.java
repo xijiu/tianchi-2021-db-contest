@@ -425,10 +425,10 @@ public class DiskBlock {
     }
 
     System.out.println("read file content ---- begin");
-    System.out.println(data[0]);
-    System.out.println(data[1]);
-    System.out.println(data[2]);
-    System.out.println(data[3]);
+    System.out.println((((long) bytePrev & 0xff) << 56) | data[0]);
+    System.out.println((((long) bytePrev & 0xff) << 56) | data[1]);
+    System.out.println((((long) bytePrev & 0xff) << 56) | data[2]);
+    System.out.println((((long) bytePrev & 0xff) << 56) | data[3]);
     System.out.println("read file content ---- end");
 
     System.out.println("arr length is " + idx);
