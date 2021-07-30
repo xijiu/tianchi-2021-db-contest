@@ -96,7 +96,7 @@ public class DiskBlock {
       // 16 part : 67553994410557440L   >> 52
       // 32 part : 69805794224242688L   >> 51
       int index = (int) ((data & 67553994410557440L) >> 52);
-      if (blockIndex == 0 && index == 0 && tableName.equals("1")) {
+      if (blockIndex == 0 && index == 0 && tableName.equals("1") && col == 1) {
         testFirstBucketArr[testFirstBucketArrIndex++] = data;
       }
       short pos = dataCacheLen1[index]++;
@@ -105,7 +105,7 @@ public class DiskBlock {
         putToByteBuffer(index, dataCache1[index], cacheLength);
 
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
-        if (blockIndex == 0 && index == 0 && tableName.equals("1")) {
+        if (blockIndex == 0 && index == 0 && tableName.equals("1") && col == 1) {
           System.out.println("load batchWriteArr record begin -----");
           System.out.println("write file pos is " + partFilePosArr[index]);
           System.out.println(dataCache1[index][0]);
