@@ -354,10 +354,8 @@ public class DiskBlock {
 //    System.out.println("min number 2 is " + testFirstBucketArr[1]);
 //    System.out.println("min number 3 is " + testFirstBucketArr[2]);
     System.out.println("correct ---- begin");
-    System.out.println(testFirstBucketArr[0]);
-    System.out.println(testFirstBucketArr[1]);
-    System.out.println(testFirstBucketArr[2]);
-    System.out.println(testFirstBucketArr[3]);
+    System.out.println(testFirstBucketArr[0] + " : " + Long.toBinaryString(testFirstBucketArr[0]));
+    System.out.println(testFirstBucketArr[1] + " : " + Long.toBinaryString(testFirstBucketArr[1]));
     System.out.println("correct ---- end");
 
     int lastTmpSize = 0;
