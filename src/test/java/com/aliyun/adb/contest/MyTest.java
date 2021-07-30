@@ -17,17 +17,26 @@ public class MyTest {
     }
     file.createNewFile();
     FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.WRITE, StandardOpenOption.READ);
-    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(16);
-    byteBuffer.putLong(100);
-    byteBuffer.flip();
-    fileChannel.write(byteBuffer, 8);
-    System.out.println(fileChannel.size());
+    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(8);
+
 
     byteBuffer.clear();
-    fileChannel.read(byteBuffer);
+    byteBuffer.putLong(200);
     byteBuffer.flip();
-    System.out.println(byteBuffer.getLong());
-    System.out.println(byteBuffer.getLong());
+    fileChannel.write(byteBuffer, 8);
+
+    byteBuffer.clear();
+    byteBuffer.putLong(100);
+    byteBuffer.flip();
+    fileChannel.write(byteBuffer, 0);
+
+    System.out.println(fileChannel.size());
+
+    ByteBuffer readByteBuffer = ByteBuffer.allocate(16);
+    fileChannel.read(readByteBuffer, 0);
+    readByteBuffer.flip();
+    System.out.println(readByteBuffer.getLong());
+    System.out.println(readByteBuffer.getLong());
   }
 
 
