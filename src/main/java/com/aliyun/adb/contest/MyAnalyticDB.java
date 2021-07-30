@@ -137,7 +137,7 @@ public class MyAnalyticDB implements AnalyticDB {
     DiskBlock.workspaceDir = workspaceDir;
     long begin = System.currentTimeMillis();
     firstInit();
-    System.out.println("init cost time : " + (System.currentTimeMillis() - begin));
+    System.out.println("\n\n\ninit cost time : " + (System.currentTimeMillis() - begin));
   }
 
   private void firstInit() throws Exception {
