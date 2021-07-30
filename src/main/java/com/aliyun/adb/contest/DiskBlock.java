@@ -106,6 +106,7 @@ public class DiskBlock {
 
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         if (blockIndex == 0 && index == 0 && tableName.equals("1") && col == 1) {
+          System.out.println("partFileChannel str is " + partFileChannel.toString());
           System.out.println("load batchWriteArr record begin -----");
           System.out.println("write file pos is " + partFilePosArr[index]);
           System.out.println(dataCache1[index][0]);
@@ -377,9 +378,13 @@ public class DiskBlock {
     System.out.println(testFirstBucketArr[1] + " : " + Long.toBinaryString(testFirstBucketArr[1]));
 
     ByteBuffer byteBuffer222 = ByteBuffer.allocate(13);
+    System.out.println("partFileChannel str is " + partFileChannel.toString());
     partFileChannel.read(byteBuffer222, 0);
     for (int i = 0; i < 13; i++) {
       System.out.println(byteBuffer222.array()[i]);
+    }
+    if (1 == 1) {
+      System.exit(1);
     }
     System.out.println("correct ---- end");
 
