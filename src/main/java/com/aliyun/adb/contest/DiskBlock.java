@@ -413,6 +413,14 @@ public class DiskBlock {
                 array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
         data[idx++] = makeLong2(second, array[tmpIdx + 7], array[tmpIdx + 8],
                 array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
+        System.out.println("read file byte ---- begin");
+        for (int j = 0; j < 13; j++) {
+          System.out.println(array[j]);
+        }
+        System.out.println("read file byte ---- end");
+        if (1 == 1) {
+          System.exit(1);
+        }
       }
       if (over) {
         break;
