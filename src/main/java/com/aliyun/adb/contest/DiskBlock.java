@@ -111,9 +111,6 @@ public class DiskBlock {
           System.out.println("write file pos is " + partFilePosArr[index]);
           System.out.println(dataCache1[index][0]);
           System.out.println(dataCache1[index][1]);
-          for (int j = 0; j < 13; j++) {
-            System.out.println(batchWriteArr[j]);
-          }
           ByteBuffer byteBufferTest = ByteBuffer.allocate(13);
           partFileChannel.read(byteBufferTest, 0);
           byteBufferTest.flip();
@@ -377,12 +374,14 @@ public class DiskBlock {
     System.out.println(testFirstBucketArr[0] + " : " + Long.toBinaryString(testFirstBucketArr[0]));
     System.out.println(testFirstBucketArr[1] + " : " + Long.toBinaryString(testFirstBucketArr[1]));
 
-    ByteBuffer byteBuffer222 = ByteBuffer.allocate(13);
-    System.out.println("partFileChannel str is " + partFileChannel.toString());
-    partFileChannel.read(byteBuffer222, 0);
-    for (int i = 0; i < 13; i++) {
-      System.out.println(byteBuffer222.array()[i]);
+
+    ByteBuffer byteBufferTest = ByteBuffer.allocate(13);
+    partFileChannel.read(byteBufferTest, 0);
+    byteBufferTest.flip();
+    for (int j = 0; j < 13; j++) {
+      System.out.println(byteBufferTest.array()[j]);
     }
+
     if (1 == 1) {
       System.exit(1);
     }
