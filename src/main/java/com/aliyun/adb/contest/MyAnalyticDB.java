@@ -312,52 +312,6 @@ public class MyAnalyticDB implements AnalyticDB {
     }
     byteBuffer.putLong(totalBeginTime);
 
-    int total1 = 0;
-    int total2 = 0;
-    int total3 = 0;
-    int total4 = 0;
-    for (DiskBlock diskBlock : diskBlockData_1_1) {
-      int[] partFilePosArr = diskBlock.partFilePosArr;
-      for (int i = 0; i < DiskBlock.splitNum; i++) {
-        int num = partFilePosArr[i];
-        byteBuffer.putInt(num);
-        num = num - DiskBlock.partFileSize * i;
-        total1 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
-      }
-    }
-    for (DiskBlock diskBlock : diskBlockData_1_2) {
-      int[] partFilePosArr = diskBlock.partFilePosArr;
-      for (int i = 0; i < DiskBlock.splitNum; i++) {
-        int num = partFilePosArr[i];
-        byteBuffer.putInt(num);
-        num = num - DiskBlock.partFileSize * i;
-        total2 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
-      }
-    }
-    for (DiskBlock diskBlock : diskBlockData_2_1) {
-      int[] partFilePosArr = diskBlock.partFilePosArr;
-      for (int i = 0; i < DiskBlock.splitNum; i++) {
-        int num = partFilePosArr[i];
-        byteBuffer.putInt(num);
-        num = num - DiskBlock.partFileSize * i;
-        total3 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
-      }
-    }
-    for (DiskBlock diskBlock : diskBlockData_2_2) {
-      int[] partFilePosArr = diskBlock.partFilePosArr;
-      for (int i = 0; i < DiskBlock.splitNum; i++) {
-        int num = partFilePosArr[i];
-        byteBuffer.putInt(num);
-        num = num - DiskBlock.partFileSize * i;
-        total4 += num % 13 == 0 ? num / 13 * 2 : num / 13 * 2 + 1;
-      }
-    }
-
-    System.out.println("total1 is " + total1);
-    System.out.println("total2 is " + total2);
-    System.out.println("total3 is " + total3);
-    System.out.println("total4 is " + total4);
-
     byteBuffer.flip();
     fileChannel.write(byteBuffer);
     fileChannel.close();
@@ -820,7 +774,7 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=======================> actual total cost : " + totalCost);
 
       if (isTest) {
-        if (totalCost > 43500) {
+        if (totalCost > 42500) {
           return "0";
         }
       }
