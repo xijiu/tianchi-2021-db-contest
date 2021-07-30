@@ -362,26 +362,6 @@ public class DiskBlock {
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index) throws Exception {
-    System.out.println("table is " + tableName);
-    System.out.println("col is " + col);
-    System.out.println("blockIndex is " + blockIndex);
-//    Arrays.sort(testFirstBucketArr, 0, testFirstBucketArrIndex);
-//    System.out.println("testFirstBucketArr len is " + testFirstBucketArrIndex);
-//    System.out.println("min number 1 is " + testFirstBucketArr[0]);
-//    System.out.println("min number 2 is " + testFirstBucketArr[1]);
-//    System.out.println("min number 3 is " + testFirstBucketArr[2]);
-//    System.out.println("correct ---- begin");
-//
-//
-//    ByteBuffer byteBufferTest = ByteBuffer.allocate(13);
-//    partFileChannel.read(byteBufferTest, 0);
-//    byteBufferTest.flip();
-//    for (int j = 0; j < 13; j++) {
-//      System.out.println(byteBufferTest.array()[j]);
-//    }
-//
-//    System.out.println("correct ---- end");
-
     int lastTmpSize = 0;
     int tmpSize = 0;
     byte partNum = 0;
@@ -399,8 +379,6 @@ public class DiskBlock {
       lastTmpSize = tmpSize;
     }
     partNum = (byte) (partNum << 4);
-    System.out.println("partIndex is " + partIndex);
-    System.out.println("correct answer is " + testFirstBucketArr[index]);
 
     long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
@@ -409,8 +387,6 @@ public class DiskBlock {
     long pos = partIndex * partFileSize;
     int length = 0;
     int endPos = partFilePosArr[partIndex];
-    System.out.println("target file size is a " + ((endPos - pos)));
-    System.out.println("target file size is b " + ((endPos - pos) / 1024 / 1024));
     boolean over = false;
     while (true) {
       byteBuffer.clear();
@@ -444,19 +420,9 @@ public class DiskBlock {
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
     }
 
-    System.out.println("read file content ---- begin");
-    System.out.println((((long) bytePrev & 0xff) << 56) | data[0]);
-    System.out.println((((long) bytePrev & 0xff) << 56) | data[1]);
-    System.out.println((((long) bytePrev & 0xff) << 56) | data[2]);
-    System.out.println((((long) bytePrev & 0xff) << 56) | data[3]);
-    System.out.println("read file content ---- end");
-
-    System.out.println("arr length is " + idx);
-
     if (1 == 1) {
       Arrays.sort(data, 0, idx);
       long result = (((long) bytePrev & 0xff) << 56) | data[index];
-      System.out.println("target value is a " + result);
       return result;
     }
 
