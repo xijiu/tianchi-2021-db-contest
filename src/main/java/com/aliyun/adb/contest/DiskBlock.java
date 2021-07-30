@@ -112,6 +112,12 @@ public class DiskBlock {
           for (int j = 0; j < 13; j++) {
             System.out.println(batchWriteArr[j]);
           }
+          ByteBuffer byteBufferTest = ByteBuffer.allocate(13);
+          partFileChannel.read(byteBufferTest, 0);
+          byteBufferTest.flip();
+          for (int j = 0; j < 13; j++) {
+            System.out.println(byteBufferTest.array()[j]);
+          }
           System.out.println("load batchWriteArr record end -----");
         }
         partFilePosArr[index] += batchWriteBuffer.limit();
