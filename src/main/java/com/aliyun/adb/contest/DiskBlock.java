@@ -400,20 +400,16 @@ public class DiskBlock {
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
     }
 
-    if (1 == 1) {
-      Arrays.sort(data, 0, idx);
-      long result = (((long) bytePrev & 0xff) << 56) | data[index];
-      return result;
-    }
+//    if (1 == 1) {
+//      Arrays.sort(data, 0, idx);
+//      long result = (((long) bytePrev & 0xff) << 56) | data[index];
+//      return result;
+//    }
 
     long solve = tryToQuickFindK(partNum, data, idx, index);
-//    long solve = -1;
     if (solve == -1) {
       solve = PubTools.solve(data, 0, idx - 1, index);
     }
-
-
-
     return (((long) bytePrev & 0xff) << 56) | solve;
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }
