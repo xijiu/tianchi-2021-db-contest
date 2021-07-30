@@ -348,11 +348,17 @@ public class DiskBlock {
   private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
 
   public long get2(int index) throws Exception {
-    Arrays.sort(testFirstBucketArr, 0, testFirstBucketArrIndex);
-    System.out.println("testFirstBucketArr len is " + testFirstBucketArrIndex);
-    System.out.println("min number 1 is " + testFirstBucketArr[0]);
-    System.out.println("min number 2 is " + testFirstBucketArr[1]);
-    System.out.println("min number 3 is " + testFirstBucketArr[2]);
+//    Arrays.sort(testFirstBucketArr, 0, testFirstBucketArrIndex);
+//    System.out.println("testFirstBucketArr len is " + testFirstBucketArrIndex);
+//    System.out.println("min number 1 is " + testFirstBucketArr[0]);
+//    System.out.println("min number 2 is " + testFirstBucketArr[1]);
+//    System.out.println("min number 3 is " + testFirstBucketArr[2]);
+    System.out.println("correct ---- begin");
+    System.out.println(testFirstBucketArr[0]);
+    System.out.println(testFirstBucketArr[1]);
+    System.out.println(testFirstBucketArr[2]);
+    System.out.println(testFirstBucketArr[3]);
+    System.out.println("correct ---- end");
 
     int lastTmpSize = 0;
     int tmpSize = 0;
@@ -407,14 +413,6 @@ public class DiskBlock {
                 array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
         data[idx++] = makeLong2(second, array[tmpIdx + 7], array[tmpIdx + 8],
                 array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
-        if (data[idx - 1] == 0) {
-          System.out.println("ext 1 : " + tmpIdx);
-          System.exit(1);
-        }
-        if (data[idx - 2] == 0) {
-          System.out.println("ext 2 : " + tmpIdx);
-          System.exit(2);
-        }
       }
       if (over) {
         break;
@@ -425,6 +423,13 @@ public class DiskBlock {
       data[idx++] = makeLong2(array[length - 7], array[length - 6], array[length - 5],
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
     }
+
+    System.out.println("read file content ---- begin");
+    System.out.println(data[0]);
+    System.out.println(data[1]);
+    System.out.println(data[2]);
+    System.out.println(data[3]);
+    System.out.println("read file content ---- end");
 
     System.out.println("arr length is " + idx);
 
