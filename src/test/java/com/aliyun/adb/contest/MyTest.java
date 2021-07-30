@@ -23,20 +23,13 @@ public class MyTest {
     byteBuffer.clear();
     byteBuffer.putLong(200);
     byteBuffer.flip();
-    fileChannel.write(byteBuffer, 8);
 
-    byteBuffer.clear();
-    byteBuffer.putLong(100);
-    byteBuffer.flip();
-    fileChannel.write(byteBuffer, 0);
-
+    long begin = System.currentTimeMillis();
+    fileChannel.write(byteBuffer, 1024 * 1024 * 1024 * 10L);
+    long end = System.currentTimeMillis();
+    System.out.println(end - begin);
     System.out.println(fileChannel.size());
 
-    ByteBuffer readByteBuffer = ByteBuffer.allocate(16);
-    fileChannel.read(readByteBuffer, 0);
-    readByteBuffer.flip();
-    System.out.println(readByteBuffer.getLong());
-    System.out.println(readByteBuffer.getLong());
   }
 
 

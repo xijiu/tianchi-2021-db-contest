@@ -406,7 +406,7 @@ public class DiskBlock {
 //      return result;
 //    }
 
-    long solve = tryToQuickFindK(partNum, data, idx, index);
+    long solve = tryToQuickFindK(partNum, data, idx, index, 0.0003);
     if (solve == -1) {
       solve = PubTools.solve(data, 0, idx - 1, index);
     }
@@ -414,13 +414,13 @@ public class DiskBlock {
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }
 
-  private long tryToQuickFindK(byte partNum, long[] data, int length, int index) {
+  private long tryToQuickFindK(byte partNum, long[] data, int length, int index, double floatSize) {
     long min = ((long) partNum & 0xff) << 48;
     long max = min | 4503599627370495L;
 
     long solve = (long) ((index / (double)length) * (max - min)) + min;
-    long leftSolve = (long) (solve - solve * 0.0003);
-    long rightSolve = (long) (solve + solve * 0.0003);
+    long leftSolve = (long) (solve - solve * floatSize);
+    long rightSolve = (long) (solve + solve * floatSize);
 
 //    System.out.println("min is " + min + ", max is " + max + ", solve is " + solve + ", index is " + index);
 
@@ -447,8 +447,11 @@ public class DiskBlock {
       index = index - left;
       return PubTools.solve(data, 0, validIndex - 1, index);
     } else {
-//      System.out.println("miss, left is " + left + ", mid is " + middle + ", right is " + right + ", index is " + index);
-      return -1;
+      if (floatSize == 0.0003) {
+        return tryToQuickFindK(partNum, data, length, index, 0.005);
+      } else {
+        return -1;
+      }
     }
   }
 
