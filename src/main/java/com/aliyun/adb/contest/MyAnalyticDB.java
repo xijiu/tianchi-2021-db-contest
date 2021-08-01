@@ -112,7 +112,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private long step2BeginTime = System.currentTimeMillis();
 
-  private final boolean isTest = step2BeginTime < 1627749928000L;
+  private final boolean isTest = step2BeginTime < 1629424800000L;
 
   public static volatile boolean isFirstInvoke = true;
 
@@ -228,7 +228,7 @@ public class MyAnalyticDB implements AnalyticDB {
     storeBlockNumberFile();
 
     loadCostTime = System.currentTimeMillis() - begin;
-    System.out.println("target file size is " + PubTools.getDirSize(new File(workspaceDir)));
+//    System.out.println("target file size is " + PubTools.getDirSize(new File(workspaceDir)));
     System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
     System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
     System.out.println("============> sort data cost time : " + sortDataTime.get() / cpuThreadNum);
