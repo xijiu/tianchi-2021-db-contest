@@ -120,29 +120,24 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final File file2 = new File("/adb-data/tpch/orders");
 
-//  private volatile FileChannel fileChannel = null;
-
   private volatile long fileSize = file1.length();
-
-  private volatile boolean couldReadFile2 = false;
 
   public static ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
 
   public MyAnalyticDB() {
-    try {
-//      fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
-      Thread thread = new Thread(() -> {
-        try {
-          Thread.sleep(1 * 1000 * 60);
-          System.exit(1);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      });
-      thread.start();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+//    try {
+//      Thread thread = new Thread(() -> {
+//        try {
+//          Thread.sleep(1 * 1000 * 60);
+//          System.exit(1);
+//        } catch (InterruptedException e) {
+//          e.printStackTrace();
+//        }
+//      });
+//      thread.start();
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
   }
 
   /**
@@ -592,61 +587,42 @@ public class MyAnalyticDB implements AnalyticDB {
       long begin = System.currentTimeMillis();
       try {
         while (true) {
-          while (true) {
 //            long begin1 = System.currentTimeMillis();
-            byte[] data = threadReadData();
+          byte[] data = threadReadData();
 //            readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
-            if (data != null) {
-              operate(data);
-            } else {
-              if (firstFile) {
-                int finishNum = finishThreadNum1.incrementAndGet();
-                if (finishNum == cpuThreadNum / 2) {
-                  operateGapData1();
+          if (data != null) {
+            operate(data);
+          } else {
+            if (firstFile) {
+              int finishNum = finishThreadNum1.incrementAndGet();
+              if (finishNum == cpuThreadNum / 2) {
+                operateGapData1();
+              }
+              for (int i = 0; i < blockNum; i++) {
+                if (firstCacheLengthArr[i] > 0) {
+                  batchSaveFirstCol(i);
                 }
-                for (int i = 0; i < blockNum; i++) {
-                  if (firstCacheLengthArr[i] > 0) {
-                    batchSaveFirstCol(i);
-                  }
-                  if (secondCacheLengthArr[i] > 0) {
-                    batchSaveSecondCol(i);
-                  }
-                }
-              } else {
-                int finishNum = finishThreadNum2.incrementAndGet();
-                if (finishNum == cpuThreadNum / 2) {
-                  operateGapData2();
-                }
-                for (int i = 0; i < blockNum; i++) {
-                  if (firstCacheLengthArr[i] > 0) {
-                    batchSaveFirstCol(i);
-                  }
-                  if (secondCacheLengthArr[i] > 0) {
-                    batchSaveSecondCol(i);
-                  }
+                if (secondCacheLengthArr[i] > 0) {
+                  batchSaveSecondCol(i);
                 }
               }
-              break;
+            } else {
+              int finishNum = finishThreadNum2.incrementAndGet();
+              if (finishNum == cpuThreadNum / 2) {
+                operateGapData2();
+              }
+              for (int i = 0; i < blockNum; i++) {
+                if (firstCacheLengthArr[i] > 0) {
+                  batchSaveFirstCol(i);
+                }
+                if (secondCacheLengthArr[i] > 0) {
+                  batchSaveSecondCol(i);
+                }
+              }
             }
+            break;
           }
-
-          break;
-//          int totalFinishNum = totalFinishThreadNum.incrementAndGet();
-//          if (totalFinishNum > cpuThreadNum) {
-//            break;
-//          } else {
-//            if (totalFinishNum == cpuThreadNum) {
-//              cpuThreadReInitForFile2();
-//            }
-//            while (!couldReadFile2) {
-//              Thread.sleep(10);
-//            }
-//
-//            Arrays.fill(firstCacheLengthArr, (short) 0);
-//            Arrays.fill(secondCacheLengthArr, (short) 0);
-//            tmpBlockIndex = -1;
-//          }
         }
       } catch (Exception e) {
         finishThreadNum1.incrementAndGet();
