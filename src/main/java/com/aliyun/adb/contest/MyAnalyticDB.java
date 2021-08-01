@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -533,7 +532,9 @@ public class MyAnalyticDB implements AnalyticDB {
     future7.get();
   }
 
-  AtomicInteger number = new AtomicInteger();
+  private AtomicInteger number1 = new AtomicInteger();
+
+  private AtomicInteger number2 = new AtomicInteger();
 
   public class CpuThread extends Thread {
 
@@ -570,6 +571,7 @@ public class MyAnalyticDB implements AnalyticDB {
     private final int fileFlag;
 
     private final boolean firstFile;
+    private final AtomicInteger number;
 
     public CpuThread(int index, int fileFlag) throws Exception {
       this.threadIndex = index;
@@ -583,6 +585,7 @@ public class MyAnalyticDB implements AnalyticDB {
       bucketTailArr = firstFile ? bucketTailArr_1 : bucketTailArr_2;
       firstColDataLen = firstFile ? colDataLen_1_1 : colDataLen_2_1;
       secondColDataLen = firstFile ? colDataLen_1_2 : colDataLen_2_2;
+      number = firstFile ? number1 : number2;
     }
 
     public void run() {
