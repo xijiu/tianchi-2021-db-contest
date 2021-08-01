@@ -105,7 +105,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private final File file2 = new File("/adb-data/tpch/orders");
 
-  private volatile FileChannel fileChannel = null;
+//  private volatile FileChannel fileChannel = null;
 
   private volatile long fileSize = file1.length();
 
@@ -115,7 +115,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   public MyAnalyticDB() {
     try {
-      fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
+//      fileChannel = FileChannel.open(file1.toPath(), StandardOpenOption.READ);
       Thread thread = new Thread(() -> {
         try {
           Thread.sleep(1 * 1000 * 60);
@@ -125,7 +125,7 @@ public class MyAnalyticDB implements AnalyticDB {
         }
       });
       thread.start();
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -407,7 +407,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
     long beginThreadTime = System.currentTimeMillis();
     for (int i = 0; i < cpuThreadNum; i++) {
-      cpuThread[i] = new CpuThread(i);
+      cpuThread[i] = new CpuThread(i, i < cpuThreadNum / 2 ? 1 : 2);
       cpuThread[i].setName("stable-thread-" + i);
       cpuThread[i].start();
     }
@@ -533,10 +533,17 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private final long[] bucketLongArr = new long[readFileLen / 8 / 2];
 
+    private final FileChannel fileChannel;
+
     private int bucket = -1;
 
-    public CpuThread(int index) throws Exception {
+    private final int fileFlag;
+
+    public CpuThread(int index, int fileFlag) throws Exception {
       this.threadIndex = index;
+      this.fileFlag = fileFlag;
+      fileChannel = fileFlag == 1 ? FileChannel.open(file1.toPath(), StandardOpenOption.READ) :
+              FileChannel.open(file2.toPath(), StandardOpenOption.READ);
     }
 
     public void run() {
@@ -553,35 +560,36 @@ public class MyAnalyticDB implements AnalyticDB {
             } else {
               int finishNum = finishThreadNum.incrementAndGet();
               if (finishNum == cpuThreadNum) {
-                operateGapData();
+//                operateGapData();
               }
-              for (int i = 0; i < blockNum; i++) {
-                if (firstCacheLengthArr[i] > 0) {
-                  batchSaveFirstCol(i);
-                }
-                if (secondCacheLengthArr[i] > 0) {
-                  batchSaveSecondCol(i);
-                }
-              }
+//              for (int i = 0; i < blockNum; i++) {
+//                if (firstCacheLengthArr[i] > 0) {
+//                  batchSaveFirstCol(i);
+//                }
+//                if (secondCacheLengthArr[i] > 0) {
+//                  batchSaveSecondCol(i);
+//                }
+//              }
               break;
             }
           }
 
-          int totalFinishNum = totalFinishThreadNum.incrementAndGet();
-          if (totalFinishNum > cpuThreadNum) {
-            break;
-          } else {
-            if (totalFinishNum == cpuThreadNum) {
-              cpuThreadReInitForFile2();
-            }
-            while (!couldReadFile2) {
-              Thread.sleep(10);
-            }
-
-            Arrays.fill(firstCacheLengthArr, (short) 0);
-            Arrays.fill(secondCacheLengthArr, (short) 0);
-            tmpBlockIndex = -1;
-          }
+          break;
+//          int totalFinishNum = totalFinishThreadNum.incrementAndGet();
+//          if (totalFinishNum > cpuThreadNum) {
+//            break;
+//          } else {
+//            if (totalFinishNum == cpuThreadNum) {
+//              cpuThreadReInitForFile2();
+//            }
+//            while (!couldReadFile2) {
+//              Thread.sleep(10);
+//            }
+//
+//            Arrays.fill(firstCacheLengthArr, (short) 0);
+//            Arrays.fill(secondCacheLengthArr, (short) 0);
+//            tmpBlockIndex = -1;
+//          }
         }
       } catch (Exception e) {
         finishThreadNum.incrementAndGet();
@@ -607,7 +615,6 @@ public class MyAnalyticDB implements AnalyticDB {
       finishThreadNum.set(0);
       operateFirstFile = false;
       initGapBucketArr(file2.length());
-      fileChannel = FileChannel.open(file2.toPath(), StandardOpenOption.READ);
       fileSize = file2.length();
       couldReadFile2 = true;
     }
@@ -674,24 +681,24 @@ public class MyAnalyticDB implements AnalyticDB {
       int length = dataArr.length;
       boolean normal = true;
 
-      if (bucket > 0) {
-        long base = 1;
-        for (int i = 0; i < length; i++) {
-          byte element = dataArr[i];
-          if (element < 45) {
-            beginIndex = i + 1;
-            bucketHeadArr[bucket] = data;
-            bucketBaseArr[bucket] = base;
-            bucketDataPosArr[bucket] = (byte) (element == 10 ? 2 : 1);
-            data = 0L;
-            normal = element == 10;
-            break;
-          } else {
-            data = data * 10 + (element - 48);
-            base *= 10;
-          }
-        }
-      }
+//      if (bucket > 0) {
+//        long base = 1;
+//        for (int i = 0; i < length; i++) {
+//          byte element = dataArr[i];
+//          if (element < 45) {
+//            beginIndex = i + 1;
+//            bucketHeadArr[bucket] = data;
+//            bucketBaseArr[bucket] = base;
+//            bucketDataPosArr[bucket] = (byte) (element == 10 ? 2 : 1);
+//            data = 0L;
+//            normal = element == 10;
+//            break;
+//          } else {
+//            data = data * 10 + (element - 48);
+//            base *= 10;
+//          }
+//        }
+//      }
 
       int firstIndex = 0;
 
@@ -706,7 +713,7 @@ public class MyAnalyticDB implements AnalyticDB {
       }
 
       // 处理尾部数据
-      bucketTailArr[bucket] = data;
+//      bucketTailArr[bucket] = data;
 
       saveToMemoryOrDisk(firstIndex, normal);
     }
@@ -754,7 +761,7 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       firstColDataLen[(threadIndex << power) + blockIndex] += length;
 
-      DiskBlock[] diskBlocks = operateFirstFile ? diskBlockData_1_1 : diskBlockData_2_1;
+      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
       diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr[blockIndex], length);
     }
 
@@ -764,7 +771,7 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       secondColDataLen[(threadIndex << power) + blockIndex] += length;
 
-      DiskBlock[] diskBlocks = operateFirstFile ? diskBlockData_1_2 : diskBlockData_2_2;
+      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
       diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr[blockIndex], length);
     }
   }
@@ -806,9 +813,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-//    if (1 == 1) {
-//      return "0";
-//    }
+    if (1 == 1) {
+      return "0";
+    }
 
 //    if (!isFirstInvoke) {
 //      return "0";
