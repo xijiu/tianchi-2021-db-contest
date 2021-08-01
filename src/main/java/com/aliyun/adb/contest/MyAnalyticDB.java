@@ -396,7 +396,7 @@ public class MyAnalyticDB implements AnalyticDB {
     for (int i = 0; i < table_2_BlockDataNumArr1.length; i++) {
       int tmp = 0;
       for (int j = 0; j < cpuThreadNum; j++) {
-        tmp += colDataLen_1_1[j * blockNum + i];
+        tmp += colDataLen_2_1[j * blockNum + i];
         tmp += cpuThread[j].firstCacheLengthArr[i];
       }
       table_2_BlockDataNumArr1[i] = tmp;
@@ -408,7 +408,7 @@ public class MyAnalyticDB implements AnalyticDB {
     for (int i = 0; i < table_2_BlockDataNumArr2.length; i++) {
       int tmp = 0;
       for (int j = 0; j < cpuThreadNum; j++) {
-        tmp += colDataLen_1_2[j * blockNum + i];
+        tmp += colDataLen_2_2[j * blockNum + i];
         tmp += cpuThread[j].secondCacheLengthArr[i];
       }
       table_2_BlockDataNumArr2[i] = tmp;
