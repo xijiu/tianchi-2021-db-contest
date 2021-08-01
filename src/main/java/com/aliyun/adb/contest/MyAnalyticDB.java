@@ -39,21 +39,33 @@ public class MyAnalyticDB implements AnalyticDB {
   /** 单次读取文件的大小，单位字节 */
   private final int readFileLen = 1 * 1024 * 1024;
 
-  private volatile int lastBucketIndex = -1;
+  private volatile int lastBucketIndex_1 = -1;
 
-  private long[] bucketHeadArr = null;
+  private long[] bucketHeadArr_1 = null;
 
-  private long[] bucketTailArr = null;
+  private long[] bucketTailArr_1 = null;
 
-  private long[] bucketBaseArr = null;
+  private long[] bucketBaseArr_1 = null;
 
-  private byte[] bucketDataPosArr = null;
+  private byte[] bucketDataPosArr_1 = null;
+
+  private volatile int lastBucketIndex_2 = -1;
+
+  private long[] bucketHeadArr_2 = null;
+
+  private long[] bucketTailArr_2 = null;
+
+  private long[] bucketBaseArr_2 = null;
+
+  private byte[] bucketDataPosArr_2 = null;
 
   private volatile int lastBucketLength = -1;
 
   public static final CpuThread[] cpuThread = new CpuThread[cpuThreadNum];
 
-  private AtomicInteger finishThreadNum = new AtomicInteger();
+  private AtomicInteger finishThreadNum1 = new AtomicInteger();
+
+  private AtomicInteger finishThreadNum2 = new AtomicInteger();
 
   private AtomicInteger totalFinishThreadNum = new AtomicInteger();
 
@@ -71,9 +83,13 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private File storeBlockNumberFile = null;
 
-  private final int[] firstColDataLen = new int[cpuThreadNum * blockNum];
+  private final int[] colDataLen_1_1 = new int[cpuThreadNum * blockNum];
 
-  private final int[] secondColDataLen = new int[cpuThreadNum * blockNum];
+  private final int[] colDataLen_1_2 = new int[cpuThreadNum * blockNum];
+
+  private final int[] colDataLen_2_1 = new int[cpuThreadNum * blockNum];
+
+  private final int[] colDataLen_2_2 = new int[cpuThreadNum * blockNum];
 
   private final DiskBlock[] diskBlockData_1_1 = new DiskBlock[blockNum];
 
@@ -354,7 +370,7 @@ public class MyAnalyticDB implements AnalyticDB {
     for (int i = 0; i < table_1_BlockDataNumArr1.length; i++) {
       int tmp = 0;
       for (int j = 0; j < cpuThreadNum; j++) {
-        tmp += firstColDataLen[j * blockNum + i];
+        tmp += colDataLen_1_1[j * blockNum + i];
         tmp += cpuThread[j].firstCacheLengthArr[i];
       }
       table_1_BlockDataNumArr1[i] = tmp;
@@ -366,7 +382,7 @@ public class MyAnalyticDB implements AnalyticDB {
     for (int i = 0; i < table_1_BlockDataNumArr2.length; i++) {
       int tmp = 0;
       for (int j = 0; j < cpuThreadNum; j++) {
-        tmp += secondColDataLen[j * blockNum + i];
+        tmp += colDataLen_1_2[j * blockNum + i];
         tmp += cpuThread[j].secondCacheLengthArr[i];
       }
       table_1_BlockDataNumArr2[i] = tmp;
@@ -380,7 +396,7 @@ public class MyAnalyticDB implements AnalyticDB {
     for (int i = 0; i < table_2_BlockDataNumArr1.length; i++) {
       int tmp = 0;
       for (int j = 0; j < cpuThreadNum; j++) {
-        tmp += firstColDataLen[j * blockNum + i];
+        tmp += colDataLen_1_1[j * blockNum + i];
         tmp += cpuThread[j].firstCacheLengthArr[i];
       }
       table_2_BlockDataNumArr1[i] = tmp;
@@ -392,7 +408,7 @@ public class MyAnalyticDB implements AnalyticDB {
     for (int i = 0; i < table_2_BlockDataNumArr2.length; i++) {
       int tmp = 0;
       for (int j = 0; j < cpuThreadNum; j++) {
-        tmp += secondColDataLen[j * blockNum + i];
+        tmp += colDataLen_1_2[j * blockNum + i];
         tmp += cpuThread[j].secondCacheLengthArr[i];
       }
       table_2_BlockDataNumArr2[i] = tmp;
@@ -402,8 +418,7 @@ public class MyAnalyticDB implements AnalyticDB {
   }
 
   public void storeBlockData() throws Exception {
-    initGapBucketArr(file1.length());
-
+    initGapBucketArr(file1.length(), file2.length());
 
     long beginThreadTime = System.currentTimeMillis();
     for (int i = 0; i < cpuThreadNum; i++) {
@@ -422,16 +437,23 @@ public class MyAnalyticDB implements AnalyticDB {
     storeFinalDataToDisk();
     System.out.println("storeFinalDataToDisk 2 time cost : " + (System.currentTimeMillis() - finalBeginTime));
 
-    // 统计第二张表每个分桶的数量
+    // 统计每个分桶的数量
+    statPerBlockCount1();
     statPerBlockCount2();
   }
 
-  private void initGapBucketArr(long size) {
-    lastBucketIndex = (int) ((size - 21) / readFileLen);
-    bucketHeadArr = new long[lastBucketIndex + 1];
-    bucketTailArr = new long[lastBucketIndex + 1];
-    bucketBaseArr = new long[lastBucketIndex + 1];
-    bucketDataPosArr = new byte[lastBucketIndex + 1];
+  private void initGapBucketArr(long size1, long size2) {
+    lastBucketIndex_1 = (int) ((size1 - 21) / readFileLen);
+    bucketHeadArr_1 = new long[lastBucketIndex_1 + 1];
+    bucketTailArr_1 = new long[lastBucketIndex_1 + 1];
+    bucketBaseArr_1 = new long[lastBucketIndex_1 + 1];
+    bucketDataPosArr_1 = new byte[lastBucketIndex_1 + 1];
+
+    lastBucketIndex_2 = (int) ((size2 - 21) / readFileLen);
+    bucketHeadArr_2 = new long[lastBucketIndex_2 + 1];
+    bucketTailArr_2 = new long[lastBucketIndex_2 + 1];
+    bucketBaseArr_2 = new long[lastBucketIndex_2 + 1];
+    bucketDataPosArr_2 = new byte[lastBucketIndex_2 + 1];
   }
 
   private void storeFinalDataToDisk() throws Exception {
@@ -531,6 +553,14 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(readFileLen);
 
+    private final long[] bucketHeadArr;
+    private final long[] bucketBaseArr;
+    private final byte[] bucketDataPosArr;
+    private final long[] bucketTailArr;
+
+    private final int[] firstColDataLen;
+    private final int[] secondColDataLen;
+
     private final long[] bucketLongArr = new long[readFileLen / 8 / 2];
 
     private final FileChannel fileChannel;
@@ -539,11 +569,20 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private final int fileFlag;
 
+    private final boolean firstFile;
+
     public CpuThread(int index, int fileFlag) throws Exception {
       this.threadIndex = index;
       this.fileFlag = fileFlag;
-      fileChannel = fileFlag == 1 ? FileChannel.open(file1.toPath(), StandardOpenOption.READ) :
+      firstFile = fileFlag == 1;
+      fileChannel = firstFile ? FileChannel.open(file1.toPath(), StandardOpenOption.READ) :
               FileChannel.open(file2.toPath(), StandardOpenOption.READ);
+      bucketHeadArr = firstFile ? bucketHeadArr_1 : bucketHeadArr_2;
+      bucketBaseArr = firstFile ? bucketBaseArr_1 : bucketBaseArr_2;
+      bucketDataPosArr = firstFile ? bucketDataPosArr_1 : bucketDataPosArr_2;
+      bucketTailArr = firstFile ? bucketTailArr_1 : bucketTailArr_2;
+      firstColDataLen = firstFile ? colDataLen_1_1 : colDataLen_2_1;
+      secondColDataLen = firstFile ? colDataLen_1_2 : colDataLen_2_2;
     }
 
     public void run() {
@@ -558,18 +597,33 @@ public class MyAnalyticDB implements AnalyticDB {
             if (data != null) {
               operate(data);
             } else {
-              int finishNum = finishThreadNum.incrementAndGet();
-              if (finishNum == cpuThreadNum) {
-//                operateGapData();
+              if (firstFile) {
+                int finishNum = finishThreadNum1.incrementAndGet();
+                if (finishNum == cpuThreadNum / 2) {
+                  operateGapData1();
+                }
+                for (int i = 0; i < blockNum; i++) {
+                  if (firstCacheLengthArr[i] > 0) {
+                    batchSaveFirstCol(i);
+                  }
+                  if (secondCacheLengthArr[i] > 0) {
+                    batchSaveSecondCol(i);
+                  }
+                }
+              } else {
+                int finishNum = finishThreadNum2.incrementAndGet();
+                if (finishNum == cpuThreadNum / 2) {
+                  operateGapData2();
+                }
+                for (int i = 0; i < blockNum; i++) {
+                  if (firstCacheLengthArr[i] > 0) {
+                    batchSaveFirstCol(i);
+                  }
+                  if (secondCacheLengthArr[i] > 0) {
+                    batchSaveSecondCol(i);
+                  }
+                }
               }
-//              for (int i = 0; i < blockNum; i++) {
-//                if (firstCacheLengthArr[i] > 0) {
-//                  batchSaveFirstCol(i);
-//                }
-//                if (secondCacheLengthArr[i] > 0) {
-//                  batchSaveSecondCol(i);
-//                }
-//              }
               break;
             }
           }
@@ -592,32 +646,32 @@ public class MyAnalyticDB implements AnalyticDB {
 //          }
         }
       } catch (Exception e) {
-        finishThreadNum.incrementAndGet();
+        finishThreadNum1.incrementAndGet();
         e.printStackTrace();
       }
       long cost = System.currentTimeMillis() - begin;
       System.out.println(Thread.currentThread().getName() + " cost time : " + cost);
     }
 
-    private void cpuThreadReInitForFile2() throws Exception {
-      // 存储最后残存的数据
-      long finalBeginTime = System.currentTimeMillis();
-      storeFinalDataToDisk();
-      System.out.println("storeFinalDataToDisk time cost : " + (System.currentTimeMillis() - finalBeginTime));
-
-      // 统计表1每个分桶数量的具体信息
-      statPerBlockCount1();
-
-      Arrays.fill(firstColDataLen, 0);
-      Arrays.fill(secondColDataLen, 0);
-
-      number.set(0);
-      finishThreadNum.set(0);
-      operateFirstFile = false;
-      initGapBucketArr(file2.length());
-      fileSize = file2.length();
-      couldReadFile2 = true;
-    }
+//    private void cpuThreadReInitForFile2() throws Exception {
+//      // 存储最后残存的数据
+//      long finalBeginTime = System.currentTimeMillis();
+//      storeFinalDataToDisk();
+//      System.out.println("storeFinalDataToDisk time cost : " + (System.currentTimeMillis() - finalBeginTime));
+//
+//      // 统计表1每个分桶数量的具体信息
+//      statPerBlockCount1();
+//
+//      Arrays.fill(colDataLen_1_1, 0);
+//      Arrays.fill(colDataLen_1_2, 0);
+//
+//      number.set(0);
+//      finishThreadNum1.set(0);
+//      operateFirstFile = false;
+//      initGapBucketArr(file2.length());
+//      fileSize = file2.length();
+//      couldReadFile2 = true;
+//    }
 
     private int tmpBlockIndex = -1;
 
@@ -644,7 +698,7 @@ public class MyAnalyticDB implements AnalyticDB {
       byteBuffer.flip();
 
       byte[] array = byteBuffer.array();
-      if (bucket == lastBucketIndex) {
+      if (bucket == lastBucketIndex_1) {
         lastBucketLength = byteBuffer.limit();
         byte[] result = new byte[byteBuffer.limit()];
         System.arraycopy(array, 0, result, 0, lastBucketLength);
@@ -654,12 +708,33 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-    private void operateGapData() throws Exception {
-      for (int bucket = 0; bucket < lastBucketIndex; bucket++) {
-        long tailData = bucketTailArr[bucket];
-        long headData = bucketHeadArr[bucket + 1];
-        long data = tailData * bucketBaseArr[bucket + 1] + headData;
-        int number = bucketDataPosArr[bucket + 1];
+    private void operateGapData1() throws Exception {
+      for (int bucket = 0; bucket < lastBucketIndex_1; bucket++) {
+        long tailData = bucketTailArr_1[bucket];
+        long headData = bucketHeadArr_1[bucket + 1];
+        long data = tailData * bucketBaseArr_1[bucket + 1] + headData;
+        int number = bucketDataPosArr_1[bucket + 1];
+        int blockIndex = (int) (data >> drift);
+        if (number == 1) {
+          firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data;
+          if (firstCacheLengthArr[blockIndex] == cacheLength) {
+            batchSaveFirstCol(blockIndex);
+          }
+        } else {
+          secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data;
+          if (secondCacheLengthArr[blockIndex] == secondCacheLength) {
+            batchSaveSecondCol(blockIndex);
+          }
+        }
+      }
+    }
+
+    private void operateGapData2() throws Exception {
+      for (int bucket = 0; bucket < lastBucketIndex_2; bucket++) {
+        long tailData = bucketTailArr_2[bucket];
+        long headData = bucketHeadArr_2[bucket + 1];
+        long data = tailData * bucketBaseArr_2[bucket + 1] + headData;
+        int number = bucketDataPosArr_2[bucket + 1];
         int blockIndex = (int) (data >> drift);
         if (number == 1) {
           firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data;
@@ -681,24 +756,24 @@ public class MyAnalyticDB implements AnalyticDB {
       int length = dataArr.length;
       boolean normal = true;
 
-//      if (bucket > 0) {
-//        long base = 1;
-//        for (int i = 0; i < length; i++) {
-//          byte element = dataArr[i];
-//          if (element < 45) {
-//            beginIndex = i + 1;
-//            bucketHeadArr[bucket] = data;
-//            bucketBaseArr[bucket] = base;
-//            bucketDataPosArr[bucket] = (byte) (element == 10 ? 2 : 1);
-//            data = 0L;
-//            normal = element == 10;
-//            break;
-//          } else {
-//            data = data * 10 + (element - 48);
-//            base *= 10;
-//          }
-//        }
-//      }
+      if (bucket > 0) {
+        long base = 1;
+        for (int i = 0; i < length; i++) {
+          byte element = dataArr[i];
+          if (element < 45) {
+            beginIndex = i + 1;
+            bucketHeadArr[bucket] = data;
+            bucketBaseArr[bucket] = base;
+            bucketDataPosArr[bucket] = (byte) (element == 10 ? 2 : 1);
+            data = 0L;
+            normal = element == 10;
+            break;
+          } else {
+            data = data * 10 + (element - 48);
+            base *= 10;
+          }
+        }
+      }
 
       int firstIndex = 0;
 
@@ -713,7 +788,7 @@ public class MyAnalyticDB implements AnalyticDB {
       }
 
       // 处理尾部数据
-//      bucketTailArr[bucket] = data;
+      bucketTailArr[bucket] = data;
 
       saveToMemoryOrDisk(firstIndex, normal);
     }
