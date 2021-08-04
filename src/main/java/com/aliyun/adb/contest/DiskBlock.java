@@ -79,8 +79,9 @@ public class DiskBlock {
     this.initFileChannel();
   }
 
-  public synchronized void storeLongArr1(long[] dataArr, int length) throws Exception {
-    for (int i = 0; i < length; i++) {
+  public synchronized void storeLongArr1(long[] dataArr, int beginIndex, int length) throws Exception {
+    int endIndex = beginIndex + length;
+    for (int i = beginIndex; i < endIndex; i++) {
       long data = dataArr[i];
       // 2 part  : 36028797018963968L   >> 55
       // 4 part  : 54043195528445952L   >> 54
@@ -101,8 +102,9 @@ public class DiskBlock {
     }
   }
 
-  public synchronized void storeLongArr2(long[] dataArr, int length) throws Exception {
-    for (int i = 0; i < length; i++) {
+  public synchronized void storeLongArr2(long[] dataArr, int beginIndex, int length) throws Exception {
+    int endIndex = beginIndex + length;
+    for (int i = beginIndex; i < endIndex; i++) {
       long data = dataArr[i];
       int index = (int) ((data & 67553994410557440L) >> 52);
       short pos = dataCacheLen2[index]++;
