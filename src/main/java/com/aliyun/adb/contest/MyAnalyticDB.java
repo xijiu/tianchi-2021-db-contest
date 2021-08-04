@@ -778,13 +778,16 @@ public class MyAnalyticDB implements AnalyticDB {
       int i = normal ? 0 : 1;
       int endIndex = firstIndex - 1;
       for (; i < endIndex; i = i + 2) {
-        long data1 = bucketLongArr[i];
-        long data2 = bucketLongArr[i + 1];
-        int blockIndex = (int) (data1 >> drift);
-        firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data1;
+        long data = bucketLongArr[i];
+        int blockIndex = (int) (data >> drift);
+        firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data;
+      }
 
-        blockIndex = (int) (data2 >> drift);
-        secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data2;
+      i = normal ? 1 : 0;
+      for (; i < endIndex; i = i + 2) {
+        long data = bucketLongArr[i];
+        int blockIndex = (int) (data >> drift);
+        secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data;
       }
 
       if (!normal) {
