@@ -180,7 +180,6 @@ public class DiskBlock {
 
       batchWriteBuffer.putInt((int) (data2 << 16 >>> 32));
       batchWriteBuffer.putShort((short) (data2));
-
     }
 
     // 奇数
