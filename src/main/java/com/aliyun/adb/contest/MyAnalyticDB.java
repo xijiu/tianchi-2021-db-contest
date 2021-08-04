@@ -540,9 +540,11 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private final int threadIndex;
 
-    public final short cacheLength = DiskBlock.cacheLength;
+    private static final int thresholdValue = 4096 * 3;
 
-    public final short secondCacheLength = DiskBlock.secondCacheLength;
+    public final short cacheLength = thresholdValue + 1000;
+
+    public final short secondCacheLength = cacheLength;
 
     public final long[][] firstThreadCacheArr = new long[blockNum][cacheLength];
 
@@ -778,38 +780,35 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     private void saveToMemoryOrDisk(int firstIndex, boolean normal) throws Exception {
-      short helperNum = 0;
       int i = normal ? 0 : 1;
       int endIndex = firstIndex - 1;
       for (; i < endIndex; i = i + 2) {
         long data1 = bucketLongArr[i];
         long data2 = bucketLongArr[i + 1];
         int blockIndex = (int) (data1 >> drift);
-        firstThreadCacheArr[blockIndex][helperNum = firstCacheLengthArr[blockIndex]++] = data1;
-        if (helperNum + 1 == cacheLength) {
-          batchSaveFirstCol(blockIndex);
-        }
+        firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data1;
 
         blockIndex = (int) (data2 >> drift);
-        secondThreadCacheArr[blockIndex][helperNum = secondCacheLengthArr[blockIndex]++] = data2;
-        if (helperNum + 1 == secondCacheLength) {
-          batchSaveSecondCol(blockIndex);
-        }
+        secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data2;
       }
+
       if (!normal) {
         long data2 = bucketLongArr[0];
         int blockIndex = (int) (data2 >> drift);
-        secondThreadCacheArr[blockIndex][helperNum = secondCacheLengthArr[blockIndex]++] = data2;
-        if (helperNum + 1 == secondCacheLength) {
-          batchSaveSecondCol(blockIndex);
-        }
+        secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data2;
       }
       if (i - 2 != endIndex - 1) {
         long data1 = bucketLongArr[endIndex];
         int blockIndex = (int) (data1 >> drift);
-        firstThreadCacheArr[blockIndex][helperNum = firstCacheLengthArr[blockIndex]++] = data1;
-        if (helperNum + 1 == cacheLength) {
-          batchSaveFirstCol(blockIndex);
+        firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data1;
+      }
+
+      for (int j = 0; j < blockNum; j++) {
+        if (firstCacheLengthArr[j] >= cacheLength) {
+          batchSaveFirstCol(j);
+        }
+        if (secondCacheLengthArr[j] >= secondCacheLength) {
+          batchSaveSecondCol(j);
         }
       }
     }
