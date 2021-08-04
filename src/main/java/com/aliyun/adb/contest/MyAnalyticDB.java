@@ -542,7 +542,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private static final int thresholdValue = 4096 * 3;
 
-    public final short cacheLength = thresholdValue + 2000;
+    public final short cacheLength = thresholdValue + 1000;
 
     public final short secondCacheLength = cacheLength;
 
@@ -804,10 +804,10 @@ public class MyAnalyticDB implements AnalyticDB {
       }
 
       for (int j = 0; j < blockNum; j++) {
-        if (firstCacheLengthArr[j] >= cacheLength) {
+        if (firstCacheLengthArr[j] >= thresholdValue) {
           batchSaveFirstCol(j);
         }
-        if (secondCacheLengthArr[j] >= secondCacheLength) {
+        if (secondCacheLengthArr[j] >= thresholdValue) {
           batchSaveSecondCol(j);
         }
       }
