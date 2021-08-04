@@ -776,7 +776,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private void saveToMemoryOrDisk(int firstIndex, boolean normal) throws Exception {
       int i = normal ? 0 : 1;
-      int endIndex = firstIndex - 1;
+      int endIndex = firstIndex;
       for (; i < endIndex; i = i + 2) {
         long data = bucketLongArr[i];
         int blockIndex = (int) (data >> drift);
