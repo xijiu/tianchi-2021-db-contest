@@ -95,7 +95,7 @@ public class DiskBlock {
     }
 
     for (int i = 0; i < splitNum; i++) {
-      if (dataCacheLen1[i] >= cacheLength) {
+      if (dataCacheLen1[i] >= thresholdValue) {
         putToByteBuffer(i, dataCache1[i], dataCacheLen1[i]);
         batchWriteBuffer.flip();
 
@@ -115,7 +115,7 @@ public class DiskBlock {
     }
 
     for (int i = 0; i < splitNum; i++) {
-      if (dataCacheLen2[i] >= secondCacheLength) {
+      if (dataCacheLen2[i] >= thresholdValue) {
         putToByteBuffer(i, dataCache2[i], dataCacheLen2[i]);
         batchWriteBuffer.flip();
 
