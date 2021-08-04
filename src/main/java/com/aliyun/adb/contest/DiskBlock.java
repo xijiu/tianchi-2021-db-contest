@@ -113,8 +113,14 @@ public class DiskBlock {
         if (dataCacheLen1[i] % 2 == 0) {
           dataCacheLen1[i] = 0;
         } else {
-          dataCache1[0] = dataCache1[dataCacheLen1[i] - 1];
-          dataCacheLen1[i] = 1;
+          try {
+            dataCache1[0] = dataCache1[dataCacheLen1[i] - 1];
+            dataCacheLen1[i] = 1;
+          } catch (Exception e) {
+            System.out.println("ex " + (dataCacheLen1[i] - 1));
+            e.printStackTrace();
+          }
+
         }
       }
     }
