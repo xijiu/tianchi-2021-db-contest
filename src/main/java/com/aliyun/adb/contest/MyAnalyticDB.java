@@ -432,15 +432,11 @@ public class MyAnalyticDB implements AnalyticDB {
     System.out.println("storeFinalDataToDisk 2 time cost : " + (System.currentTimeMillis() - finalBeginTime));
 
     // 统计每个分桶的数量
-    long beginThreadTime2 = System.currentTimeMillis();
     statPerBlockCount1();
     statPerBlockCount2();
-    System.out.println("statPerBlockCount cost time is : " + (System.currentTimeMillis() - beginThreadTime2));
-
   }
 
   private void initGapBucketArr(long size1, long size2) {
-    long begin = System.currentTimeMillis();
     lastBucketIndex_1 = (int) ((size1 - 21) / readFileLen);
     bucketHeadArr_1 = new long[lastBucketIndex_1 + 1];
     bucketTailArr_1 = new long[lastBucketIndex_1 + 1];
@@ -452,7 +448,6 @@ public class MyAnalyticDB implements AnalyticDB {
     bucketTailArr_2 = new long[lastBucketIndex_2 + 1];
     bucketBaseArr_2 = new long[lastBucketIndex_2 + 1];
     bucketDataPosArr_2 = new byte[lastBucketIndex_2 + 1];
-    System.out.println("init gap cost time is " + (System.currentTimeMillis() - begin));
   }
 
   private void storeFinalDataToDisk() throws Exception {
