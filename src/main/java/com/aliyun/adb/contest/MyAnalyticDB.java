@@ -432,8 +432,11 @@ public class MyAnalyticDB implements AnalyticDB {
     System.out.println("storeFinalDataToDisk 2 time cost : " + (System.currentTimeMillis() - finalBeginTime));
 
     // 统计每个分桶的数量
+    long beginThreadTime2 = System.currentTimeMillis();
     statPerBlockCount1();
     statPerBlockCount2();
+    System.out.println("statPerBlockCount cost time is : " + (System.currentTimeMillis() - beginThreadTime2));
+
   }
 
   private void initGapBucketArr(long size1, long size2) {
