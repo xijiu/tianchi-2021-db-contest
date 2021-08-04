@@ -437,6 +437,7 @@ public class MyAnalyticDB implements AnalyticDB {
   }
 
   private void initGapBucketArr(long size1, long size2) {
+    long begin = System.currentTimeMillis();
     lastBucketIndex_1 = (int) ((size1 - 21) / readFileLen);
     bucketHeadArr_1 = new long[lastBucketIndex_1 + 1];
     bucketTailArr_1 = new long[lastBucketIndex_1 + 1];
@@ -448,6 +449,7 @@ public class MyAnalyticDB implements AnalyticDB {
     bucketTailArr_2 = new long[lastBucketIndex_2 + 1];
     bucketBaseArr_2 = new long[lastBucketIndex_2 + 1];
     bucketDataPosArr_2 = new byte[lastBucketIndex_2 + 1];
+    System.out.println("init gap cost time is " + (System.currentTimeMillis() - begin));
   }
 
   private void storeFinalDataToDisk() throws Exception {
