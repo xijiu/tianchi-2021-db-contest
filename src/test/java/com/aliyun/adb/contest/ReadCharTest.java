@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ReadCharTest {
 
@@ -174,6 +175,25 @@ public class ReadCharTest {
     // 0000000011110000000000000000000000000000000000000000000000000000
 
 
+  }
+
+
+
+  @Test
+  public void aaab3333() throws IOException {
+    int width = 128;
+    int height = 10000;
+    long[][] data = new long[width][height];
+    short[] len = new short[width];
+    int helper = 0;
+    for (int i = 0; i < 10000; i++) {
+      long random = ThreadLocalRandom.current().nextLong();
+      int index = (int) (random % width);
+      data[index][helper = len[index]++] = random;
+      if (helper + 1 >= height) {
+
+      }
+    }
   }
 
 
