@@ -92,18 +92,26 @@ public class DiskBlock {
       // 32 part : 69805794224242688L   >> 51
       int index = (int) ((data & 67553994410557440L) >> 52);
       dataCache1[index][dataCacheLen1[index]++] = data;
-    }
-
-    for (int i = 0; i < splitNum; i++) {
-      if (dataCacheLen1[i] >= thresholdValue) {
-        putToByteBuffer(i, dataCache1[i], dataCacheLen1[i]);
+      if (dataCacheLen1[index] == cacheLength) {
+        putToByteBuffer(index, dataCache1[index], dataCacheLen1[index]);
         batchWriteBuffer.flip();
 
-        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
-        partFilePosArr[i] += batchWriteBuffer.limit();
-        dataCacheLen1[i] = 0;
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
+        partFilePosArr[index] += batchWriteBuffer.limit();
+        dataCacheLen1[index] = 0;
       }
     }
+
+//    for (int i = 0; i < splitNum; i++) {
+//      if (dataCacheLen1[i] >= thresholdValue) {
+//        putToByteBuffer(i, dataCache1[i], dataCacheLen1[i]);
+//        batchWriteBuffer.flip();
+//
+//        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
+//        partFilePosArr[i] += batchWriteBuffer.limit();
+//        dataCacheLen1[i] = 0;
+//      }
+//    }
   }
 
   public synchronized void storeLongArr2(long[] dataArr, int beginIndex, int length) throws Exception {
@@ -112,18 +120,26 @@ public class DiskBlock {
       long data = dataArr[i];
       int index = (int) ((data & 67553994410557440L) >> 52);
       dataCache2[index][dataCacheLen2[index]++] = data;
-    }
-
-    for (int i = 0; i < splitNum; i++) {
-      if (dataCacheLen2[i] >= thresholdValue) {
-        putToByteBuffer(i, dataCache2[i], dataCacheLen2[i]);
+      if (dataCacheLen2[index] == secondCacheLength) {
+        putToByteBuffer(index, dataCache2[index], dataCacheLen2[index]);
         batchWriteBuffer.flip();
 
-        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
-        partFilePosArr[i] += batchWriteBuffer.limit();
-        dataCacheLen2[i] = 0;
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
+        partFilePosArr[index] += batchWriteBuffer.limit();
+        dataCacheLen2[index] = 0;
       }
     }
+
+//    for (int i = 0; i < splitNum; i++) {
+//      if (dataCacheLen2[i] >= thresholdValue) {
+//        putToByteBuffer(i, dataCache2[i], dataCacheLen2[i]);
+//        batchWriteBuffer.flip();
+//
+//        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
+//        partFilePosArr[i] += batchWriteBuffer.limit();
+//        dataCacheLen2[i] = 0;
+//      }
+//    }
   }
 
 
