@@ -774,32 +774,20 @@ public class MyAnalyticDB implements AnalyticDB {
       saveToMemoryOrDisk(firstIndex, normal);
     }
 
-    private void saveToMemoryOrDisk(int firstIndex, boolean normal) throws Exception {
+    private void saveToMemoryOrDisk(int endIndex, boolean normal) throws Exception {
       int i = normal ? 0 : 1;
-      int endIndex = firstIndex;
-      for (; i < endIndex; i = i + 2) {
+      for (; i < endIndex; i += 2) {
         long data = bucketLongArr[i];
         int blockIndex = (int) (data >> drift);
         firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data;
       }
 
       i = normal ? 1 : 0;
-      for (; i < endIndex; i = i + 2) {
+      for (; i < endIndex; i += 2) {
         long data = bucketLongArr[i];
         int blockIndex = (int) (data >> drift);
         secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data;
       }
-
-//      if (!normal) {
-//        long data2 = bucketLongArr[0];
-//        int blockIndex = (int) (data2 >> drift);
-//        secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data2;
-//      }
-//      if (i - 2 != endIndex - 1) {
-//        long data1 = bucketLongArr[endIndex];
-//        int blockIndex = (int) (data1 >> drift);
-//        firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data1;
-//      }
 
       for (int j = 0; j < blockNum; j++) {
         if (firstCacheLengthArr[j] >= thresholdValue) {
