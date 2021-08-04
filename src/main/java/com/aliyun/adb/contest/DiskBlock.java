@@ -118,6 +118,7 @@ public class DiskBlock {
             dataCacheLen1[i] = 1;
           } catch (Exception e) {
             System.out.println("ex " + (dataCacheLen1[i] - 1));
+            dataCacheLen1[i] = 1;
             e.printStackTrace();
           }
 
