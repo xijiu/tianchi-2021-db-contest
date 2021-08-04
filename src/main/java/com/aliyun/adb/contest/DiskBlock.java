@@ -23,7 +23,7 @@ public class DiskBlock {
 
   private static final int thresholdValue = 4096 * 3;
 
-  public static final short cacheLength = thresholdValue + 2000;
+  public static final short cacheLength = thresholdValue + 4000;
 
   public static final short secondCacheLength = (int) (cacheLength);
 
@@ -104,25 +104,12 @@ public class DiskBlock {
 
     for (int i = 0; i < splitNum; i++) {
       if (dataCacheLen1[i] >= thresholdValue) {
-        int lengthTest = dataCacheLen1[i] % 2 == 0 ? dataCacheLen1[i] : dataCacheLen1[i] - 1;
-        putToByteBuffer(i, dataCache1[i], lengthTest);
+        putToByteBuffer(i, dataCache1[i], dataCacheLen1[i]);
         batchWriteBuffer.flip();
 
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
-        if (dataCacheLen1[i] % 2 == 0) {
-          dataCacheLen1[i] = 0;
-        } else {
-          try {
-            dataCache1[0] = dataCache1[dataCacheLen1[i] - 1];
-            dataCacheLen1[i] = 1;
-          } catch (Exception e) {
-            System.out.println("ex " + (dataCacheLen1[i] - 1));
-            dataCacheLen1[i] = 1;
-            e.printStackTrace();
-          }
-
-        }
+        dataCacheLen1[i] = 0;
       }
     }
   }
@@ -145,20 +132,12 @@ public class DiskBlock {
 
     for (int i = 0; i < splitNum; i++) {
       if (dataCacheLen2[i] >= thresholdValue) {
-        int lengthTest = dataCacheLen2[i] % 2 == 0 ? dataCacheLen2[i] : dataCacheLen2[i] - 1;
-        putToByteBuffer(i, dataCache2[i], lengthTest);
+        putToByteBuffer(i, dataCache2[i], dataCacheLen2[i]);
         batchWriteBuffer.flip();
 
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
         dataCacheLen2[i] = 0;
-
-        if (dataCacheLen2[i] % 2 == 0) {
-          dataCacheLen2[i] = 0;
-        } else {
-          dataCache2[0] = dataCache2[dataCacheLen2[i] - 1];
-          dataCacheLen2[i] = 1;
-        }
       }
     }
   }
