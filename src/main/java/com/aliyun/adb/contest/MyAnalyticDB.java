@@ -790,16 +790,16 @@ public class MyAnalyticDB implements AnalyticDB {
         secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data;
       }
 
-      if (!normal) {
-        long data2 = bucketLongArr[0];
-        int blockIndex = (int) (data2 >> drift);
-        secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data2;
-      }
-      if (i - 2 != endIndex - 1) {
-        long data1 = bucketLongArr[endIndex];
-        int blockIndex = (int) (data1 >> drift);
-        firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data1;
-      }
+//      if (!normal) {
+//        long data2 = bucketLongArr[0];
+//        int blockIndex = (int) (data2 >> drift);
+//        secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data2;
+//      }
+//      if (i - 2 != endIndex - 1) {
+//        long data1 = bucketLongArr[endIndex];
+//        int blockIndex = (int) (data1 >> drift);
+//        firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data1;
+//      }
 
       for (int j = 0; j < blockNum; j++) {
         if (firstCacheLengthArr[j] >= thresholdValue) {
