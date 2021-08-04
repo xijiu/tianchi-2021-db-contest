@@ -541,11 +541,11 @@ public class MyAnalyticDB implements AnalyticDB {
 
     public final short secondCacheLength = cacheLength;
 
-    public final long[][] firstThreadCacheArr = new long[blockNum][cacheLength];
+    public final long[] firstThreadCacheArr = new long[blockNum * cacheLength];
 
     public final short[] firstCacheLengthArr = new short[blockNum];
 
-    public final long[][] secondThreadCacheArr = new long[blockNum][secondCacheLength];
+    public final long[] secondThreadCacheArr = new long[blockNum * secondCacheLength];
 
     public final short[] secondCacheLengthArr = new short[blockNum];
 
@@ -697,12 +697,12 @@ public class MyAnalyticDB implements AnalyticDB {
         int number = bucketDataPosArr_1[bucket + 1];
         int blockIndex = (int) (data >> drift);
         if (number == 1) {
-          firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data;
+          firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
           if (firstCacheLengthArr[blockIndex] == cacheLength) {
             batchSaveFirstCol(blockIndex);
           }
         } else {
-          secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data;
+          secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
           if (secondCacheLengthArr[blockIndex] == secondCacheLength) {
             batchSaveSecondCol(blockIndex);
           }
@@ -718,12 +718,12 @@ public class MyAnalyticDB implements AnalyticDB {
         int number = bucketDataPosArr_2[bucket + 1];
         int blockIndex = (int) (data >> drift);
         if (number == 1) {
-          firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data;
+          firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
           if (firstCacheLengthArr[blockIndex] == cacheLength) {
             batchSaveFirstCol(blockIndex);
           }
         } else {
-          secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data;
+          secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
           if (secondCacheLengthArr[blockIndex] == secondCacheLength) {
             batchSaveSecondCol(blockIndex);
           }
@@ -779,14 +779,14 @@ public class MyAnalyticDB implements AnalyticDB {
       for (; i < endIndex; i += 2) {
         long data = bucketLongArr[i];
         int blockIndex = (int) (data >> drift);
-        firstThreadCacheArr[blockIndex][firstCacheLengthArr[blockIndex]++] = data;
+        firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
       }
 
       i = normal ? 1 : 0;
       for (; i < endIndex; i += 2) {
         long data = bucketLongArr[i];
         int blockIndex = (int) (data >> drift);
-        secondThreadCacheArr[blockIndex][secondCacheLengthArr[blockIndex]++] = data;
+        secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
       }
 
       for (int j = 0; j < blockNum; j++) {
@@ -806,7 +806,7 @@ public class MyAnalyticDB implements AnalyticDB {
       firstColDataLen[(threadIndex << power) + blockIndex] += length;
 
       DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
-      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr[blockIndex], length);
+      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -816,7 +816,7 @@ public class MyAnalyticDB implements AnalyticDB {
       secondColDataLen[(threadIndex << power) + blockIndex] += length;
 
       DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
-      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr[blockIndex], length);
+      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
     }
   }
 

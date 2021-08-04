@@ -185,16 +185,39 @@ public class ReadCharTest {
     int height = 10000;
     long[][] data = new long[width][height];
     short[] len = new short[width];
-    int helper = 0;
-    for (int i = 0; i < 10000; i++) {
-      long random = ThreadLocalRandom.current().nextLong();
+    int helper;
+    long begin = System.currentTimeMillis();
+    for (int i = 0; i < 1000000000; i++) {
+      long random = Math.abs(ThreadLocalRandom.current().nextLong());
       int index = (int) (random % width);
       data[index][helper = len[index]++] = random;
       if (helper + 1 >= height) {
-
+        len[index] = 0;
       }
     }
+    System.out.println("cost time is : " + (System.currentTimeMillis() - begin));
   }
+
+  @Test
+  public void aaab33334() throws IOException {
+    int width = 128;
+    int height = 10000;
+    long[] data = new long[width * height];
+    short[] len = new short[width];
+    int helper;
+    long begin = System.currentTimeMillis();
+    for (int i = 0; i < 1000000000; i++) {
+      long random = Math.abs(ThreadLocalRandom.current().nextLong());
+      int index = (int) (random % width);
+      helper = len[index]++;
+      data[index * height + helper] = random;
+      if (helper + 1 >= height) {
+        len[index] = 0;
+      }
+    }
+    System.out.println("cost time is : " + (System.currentTimeMillis() - begin));
+  }
+
 
 
 }
