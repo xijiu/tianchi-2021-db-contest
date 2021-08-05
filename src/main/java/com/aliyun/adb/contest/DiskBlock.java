@@ -238,6 +238,13 @@ public class DiskBlock {
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
         dataCacheLen2[i] = 0;
+      } else if (temporaryArr[i] != 0) {
+        batchWriteBuffer.clear();
+        storeLastData(i);
+        batchWriteBuffer.flip();
+
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
+        partFilePosArr[i] += batchWriteBuffer.limit();
       }
     }
   }
