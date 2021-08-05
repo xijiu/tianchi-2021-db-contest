@@ -145,13 +145,13 @@ public class DiskBlock {
         arrNum += dataCacheLen1[index];
         bufferNum += batchWriteBuffer.limit() / 13 * 2;
 
-        if (Math.abs(arrNum - bufferNum) > 10) {
-          System.out.println("44444__exception!!!!!!!!!!!!!!!!!, arrNum is " + arrNum + ", bufferNum is " + bufferNum);
-          System.out.println("dataCacheLen1[index] is " + dataCacheLen1[index]);
-          System.out.println("batchWriteBuffer.limit() is " + batchWriteBuffer.limit());
-          System.out.println("linshi is " + linshi);
-          System.exit(1);
-        }
+//        if (Math.abs(arrNum - bufferNum) > 10) {
+//          System.out.println("44444__exception!!!!!!!!!!!!!!!!!, arrNum is " + arrNum + ", bufferNum is " + bufferNum);
+//          System.out.println("dataCacheLen1[index] is " + dataCacheLen1[index]);
+//          System.out.println("batchWriteBuffer.limit() is " + batchWriteBuffer.limit());
+//          System.out.println("linshi is " + linshi);
+//          System.exit(1);
+//        }
 
 //        if (Math.abs(arrNum - bufferNum) == 1 && temporaryArr[index] == 0) {
 //          System.out.println("55555__exception!!!!!!!!!!!!!!!!!, arrNum is ");
@@ -161,8 +161,10 @@ public class DiskBlock {
 //          System.exit(1);
 //        }
 
-        System.out.println(blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
-                + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
+        if (blockIndex == 10 && index == 1) {
+          System.out.println(blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
+                  + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
+        }
 
         dataCacheLen1[index] = 0;
       }
