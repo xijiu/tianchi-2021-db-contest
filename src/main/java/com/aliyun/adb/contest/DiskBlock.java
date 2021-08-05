@@ -129,11 +129,15 @@ public class DiskBlock {
             }
           }
         }
-        if (batchWriteBuffer.limit() / 13 * 2 > dataCacheLen1[index]) {
-          System.out.println(hasValue + "heheheh!!!!");
+//        if (batchWriteBuffer.limit() / 13 * 2 > dataCacheLen1[index]) {
+//          System.out.println(hasValue + "heheheh!!!!");
+//        }
+
+        if (dataCacheLen1[index] % 2 == 0) {
+          totalColNum.addAndGet(dataCacheLen1[index]);
+          totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
         }
-        totalColNum.addAndGet(dataCacheLen1[index]);
-        totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
+
         dataCacheLen1[index] = 0;
       }
     }
