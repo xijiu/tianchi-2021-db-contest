@@ -115,6 +115,7 @@ public class DiskBlock {
 
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen1[index] >= thresholdValue) {
+        long linshi = temporaryArr[index];
         boolean hasValue = temporaryArr[index] == 0 ? false : true;
         putToByteBuffer(index, dataCache1[index], dataCacheLen1[index]);
         batchWriteBuffer.flip();
@@ -148,6 +149,7 @@ public class DiskBlock {
           System.out.println("44444__exception!!!!!!!!!!!!!!!!!, arrNum is " + arrNum + ", bufferNum is " + bufferNum);
           System.out.println("dataCacheLen1[index] is " + dataCacheLen1[index]);
           System.out.println("batchWriteBuffer.limit() is " + batchWriteBuffer.limit());
+          System.out.println("linshi is " + linshi);
           System.exit(1);
         }
 
