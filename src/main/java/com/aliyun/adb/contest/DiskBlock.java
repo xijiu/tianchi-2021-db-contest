@@ -144,8 +144,7 @@ public class DiskBlock {
         totalColNum.addAndGet(dataCacheLen1[index]);
         totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
 
-        arrNum += dataCacheLen1[index];
-        bufferNum += batchWriteBuffer.limit() / 13 * 2;
+
 
 //        if (Math.abs(arrNum - bufferNum) > 10) {
 //          System.out.println("44444__exception!!!!!!!!!!!!!!!!!, arrNum is " + arrNum + ", bufferNum is " + bufferNum);
@@ -164,6 +163,9 @@ public class DiskBlock {
 //        }
 
         if (blockIndex == 10 && index == 1 && tableName.equals("1") && col == 1) {
+          arrNum += dataCacheLen1[index];
+          bufferNum += batchWriteBuffer.limit() / 13 * 2;
+
           System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
                   + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
           System.out.println("arrNum is " + arrNum + ", bufferNum is " + bufferNum);
