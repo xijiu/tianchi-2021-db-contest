@@ -65,7 +65,7 @@ public class DiskBlock {
     this.blockIndex = blockIndex;
     this.bytePrev = (byte) (blockIndex >> (MyAnalyticDB.power - 8 + 1));
     if (MyAnalyticDB.isFirstInvoke) {
-      batchWriteBuffer = ByteBuffer.allocateDirect((int) (secondCacheLength * 6.5 + 7));
+      batchWriteBuffer = ByteBuffer.allocateDirect((int) (secondCacheLength * 6.5 + 14));
 
       if (col == 1) {
         dataCache1 = new long[splitNum][cacheLength];
