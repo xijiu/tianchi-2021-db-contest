@@ -207,17 +207,14 @@ public class DiskBlock {
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
 
-
-        int limit = batchWriteBuffer.limit();
-        int bufferLen = limit % 13 == 0 ? limit / 13 * 2 : (limit / 13 * 2 + 1);
-//        System.out.println("aaaa   bbbbb !!!!  arr len is " + len + ", byte buffer len is " + bufferLen);
-//        if (Math.abs(bufferLen - len) > 2) {
-//        }
-        totalColNum.addAndGet(len);
-        totalColNum222.addAndGet(bufferLen);
-
-
         dataCacheLen1[i] = 0;
+      } else if (temporaryArr[i] != 0) {
+        batchWriteBuffer.clear();
+        storeLastData(i);
+        batchWriteBuffer.flip();
+
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
+        partFilePosArr[i] += batchWriteBuffer.limit();
       }
 
       if (arrNum[i] != bufferNum[i]) {
