@@ -153,6 +153,12 @@ public class DiskBlock {
           System.exit(1);
         }
 
+        if (Math.abs(arrNum - bufferNum) == 1 && temporaryArr[index] == 0) {
+          System.out.println("55555__exception!!!!!!!!!!!!!!!!!, arrNum is ");
+          System.out.println("linshi is " + linshi);
+          System.exit(1);
+        }
+
         dataCacheLen1[index] = 0;
       }
     }
