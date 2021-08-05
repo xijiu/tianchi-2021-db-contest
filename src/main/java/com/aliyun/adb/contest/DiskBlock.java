@@ -107,14 +107,23 @@ public class DiskBlock {
 
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen1[index] >= thresholdValue) {
+        boolean hasValue = temporaryArr[index] == 0 ? false : true;
         putToByteBuffer(index, dataCache1[index], dataCacheLen1[index]);
         batchWriteBuffer.flip();
 
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
-//        if (Math.abs(batchWriteBuffer.limit() / 13 * 2 - dataCacheLen1[index]) > 1) {
-//          System.out.println("exception!!!!!!!!!!!!!!!!!");
-//        }
+        if (dataCacheLen1[index] % 2 == 0) {
+          if (dataCacheLen1[index] != batchWriteBuffer.limit() / 13 * 2) {
+            System.out.println("11__exception!!!!!!!!!!!!!!!!!");
+          }
+        } else {
+          if (hasValue) {
+            if (dataCacheLen1[index] != batchWriteBuffer.limit() / 13 * 2 - 1) {
+              System.out.println("222__exception!!!!!!!!!!!!!!!!!");
+            }
+          }
+        }
         totalColNum.addAndGet(dataCacheLen1[index]);
         dataCacheLen1[index] = 0;
       }
