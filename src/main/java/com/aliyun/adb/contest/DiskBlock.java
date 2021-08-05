@@ -154,6 +154,8 @@ public class DiskBlock {
     for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen1[i];
       if (len > 0) {
+        totalColNum.addAndGet(len);
+
         putToByteBuffer(i, dataCache1[i], len);
         storeLastData(i);
         batchWriteBuffer.flip();
