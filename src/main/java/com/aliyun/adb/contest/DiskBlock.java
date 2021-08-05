@@ -47,11 +47,11 @@ public class DiskBlock {
 
   public volatile FileChannel partFileChannel = null;
 
-  private long[][] dataCache1 = null;
+  private long[] dataCache1 = null;
 
   private short[] dataCacheLen1 = null;
 
-  private long[][] dataCache2 = null;
+  private long[] dataCache2 = null;
 
   private short[] dataCacheLen2 = null;
 
@@ -68,10 +68,10 @@ public class DiskBlock {
       batchWriteBuffer = ByteBuffer.allocateDirect((int) (secondCacheLength * 6.5 + 14));
 
       if (col == 1) {
-        dataCache1 = new long[splitNum][cacheLength];
+        dataCache1 = new long[splitNum * cacheLength];
         dataCacheLen1 = new short[splitNum];
       } else {
-        dataCache2 = new long[splitNum][secondCacheLength];
+        dataCache2 = new long[splitNum * secondCacheLength];
         dataCacheLen2 = new short[splitNum];
       }
       for (int i = 0; i < splitNum; i++) {
@@ -91,12 +91,12 @@ public class DiskBlock {
       // 16 part : 67553994410557440L   >> 52
       // 32 part : 69805794224242688L   >> 51
       int index = (int) ((data & 67553994410557440L) >> 52);
-      dataCache1[index][dataCacheLen1[index]++] = data;
+      dataCache1[index * cacheLength + dataCacheLen1[index]++] = data;
     }
 
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen1[index] >= thresholdValue) {
-        putToByteBuffer(index, dataCache1[index], dataCacheLen1[index]);
+        putToByteBuffer(index, dataCache1, dataCacheLen1[index]);
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
@@ -110,12 +110,12 @@ public class DiskBlock {
     for (int i = beginIndex; i < endIndex; i++) {
       long data = dataArr[i];
       int index = (int) ((data & 67553994410557440L) >> 52);
-      dataCache2[index][dataCacheLen2[index]++] = data;
+      dataCache2[index * secondCacheLength + dataCacheLen2[index]++] = data;
     }
 
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen2[index] >= thresholdValue) {
-        putToByteBuffer(index, dataCache2[index], dataCacheLen2[index]);
+        putToByteBuffer(index, dataCache2, dataCacheLen2[index]);
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
@@ -129,7 +129,7 @@ public class DiskBlock {
     for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen1[i];
       if (len > 0) {
-        putToByteBuffer(i, dataCache1[i], len);
+        putToByteBuffer(i, dataCache1, len);
         storeLastData(i);
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
@@ -149,7 +149,7 @@ public class DiskBlock {
     for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen2[i];
       if (len > 0) {
-        putToByteBuffer(i, dataCache2[i], len);
+        putToByteBuffer(i, dataCache2, len);
         storeLastData(i);
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
@@ -178,7 +178,9 @@ public class DiskBlock {
   private void putToByteBuffer(int index, long[] dataArr, int length) {
     batchWriteBuffer.clear();
     int actualLen = length % 2 == 0 ? length : (length - 1);
-    for (int i = 0; i < actualLen; i += 2) {
+    int beginIndex = index * cacheLength;
+    int endIndex = beginIndex + actualLen;
+    for (int i = beginIndex; i < endIndex; i += 2) {
       long data1 = dataArr[i];
       long data2 = dataArr[i + 1];
 
@@ -193,10 +195,10 @@ public class DiskBlock {
     // 奇数
     if (actualLen != length) {
       if (temporaryArr[index] == 0) {
-        temporaryArr[index] = dataArr[length - 1];
+        temporaryArr[index] = dataArr[beginIndex + length - 1];
       } else {
         long data1 = temporaryArr[index];
-        long data2 = dataArr[length - 1];
+        long data2 = dataArr[beginIndex + length - 1];
 
         batchWriteBuffer.put((byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
         batchWriteBuffer.putInt((int) (data1 << 16 >>> 32));
