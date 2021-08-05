@@ -203,8 +203,6 @@ public class DiskBlock {
 
 
   public synchronized void forceStoreLongArr1() throws Exception {
-    System.out.println("arrNum is " + arrNum);
-    System.out.println("bufferNum is " + bufferNum);
     for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen1[i];
       if (len > 0) {
