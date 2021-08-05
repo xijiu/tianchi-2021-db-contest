@@ -129,14 +129,10 @@ public class DiskBlock {
             }
           }
         }
-//        if (batchWriteBuffer.limit() / 13 * 2 > dataCacheLen1[index]) {
-//          System.out.println(hasValue + "heheheh!!!!");
-//        }
 
-        if (dataCacheLen1[index] % 2 == 1) {
-          totalColNum.addAndGet(dataCacheLen1[index]);
-          totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
-        }
+
+//        totalColNum.addAndGet(dataCacheLen1[index]);
+//        totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
 
         dataCacheLen1[index] = 0;
       }
@@ -176,7 +172,7 @@ public class DiskBlock {
     for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen1[i];
       if (len > 0) {
-//        totalColNum.addAndGet(len);
+
 
         putToByteBuffer(i, dataCache1[i], len);
         storeLastData(i);
@@ -186,8 +182,10 @@ public class DiskBlock {
         partFilePosArr[i] += batchWriteBuffer.limit();
 
 
-//        int limit = batchWriteBuffer.limit();
-//        totalColNum222.addAndGet(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1);
+        totalColNum.addAndGet(len);
+        int limit = batchWriteBuffer.limit();
+        totalColNum222.addAndGet(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1);
+
 
         dataCacheLen1[i] = 0;
       }
