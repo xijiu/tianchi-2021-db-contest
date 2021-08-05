@@ -7,8 +7,6 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 硬盘存储块
@@ -61,11 +59,6 @@ public class DiskBlock {
 
   private final long[] temporaryArr = new long[splitNum];
 
-  private volatile long[] arrNum = new long[splitNum];
-
-  private volatile long[] bufferNum = new long[splitNum];
-
-
   public DiskBlock(String tableName, int col, int blockIndex) {
     this.tableName = tableName;
     this.col = col;
@@ -88,10 +81,6 @@ public class DiskBlock {
     this.initFileChannel();
   }
 
-  public static AtomicInteger totalColNum = new AtomicInteger();
-  public static AtomicInteger totalColNum222 = new AtomicInteger();
-  public static AtomicLong totalColNum333 = new AtomicLong();
-
   public synchronized void storeLongArr1(long[] dataArr, int beginIndex, int length) throws Exception {
     int endIndex = beginIndex + length;
     for (int i = beginIndex; i < endIndex; i++) {
@@ -103,58 +92,14 @@ public class DiskBlock {
       // 32 part : 69805794224242688L   >> 51
       int index = (int) ((data & 67553994410557440L) >> 52);
       dataCache1[index][dataCacheLen1[index]++] = data;
-//      if (dataCacheLen1[index] == cacheLength) {
-//        putToByteBuffer(index, dataCache1[index], dataCacheLen1[index]);
-//        batchWriteBuffer.flip();
-//
-//        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
-//        partFilePosArr[index] += batchWriteBuffer.limit();
-//        dataCacheLen1[index] = 0;
-//      }
     }
 
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen1[index] >= thresholdValue) {
-
-
-        if (blockIndex == 10 && index == 1 && tableName.equals("1") && col == 1) {
-          System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     prepare put arr len is " + dataCacheLen1[index]);
-        }
-        boolean hasValue = temporaryArr[index] == 0 ? false : true;
         putToByteBuffer(index, dataCache1[index], dataCacheLen1[index]);
         batchWriteBuffer.flip();
-
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
-        if (dataCacheLen1[index] % 2 == 0) {
-          if (dataCacheLen1[index] != batchWriteBuffer.limit() / 13 * 2) {
-            System.out.println("11__exception!!!!!!!!!!!!!!!!!");
-          }
-        } else {
-          if (hasValue) {
-            if (dataCacheLen1[index] != batchWriteBuffer.limit() / 13 * 2 - 1) {
-              System.out.println("222__exception!!!!!!!!!!!!!!!!!");
-            }
-          } else {
-            if (dataCacheLen1[index] != batchWriteBuffer.limit() / 13 * 2 + 1) {
-              System.out.println("33333__exception!!!!!!!!!!!!!!!!!");
-            }
-          }
-        }
-
-
-        totalColNum.addAndGet(dataCacheLen1[index]);
-        totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
-
-        arrNum[index] += dataCacheLen1[index];
-        bufferNum[index] += batchWriteBuffer.limit() / 13 * 2;
-
-
-        if (blockIndex == 10 && index == 1 && tableName.equals("1") && col == 1) {
-          System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
-                  + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
-        }
-
         dataCacheLen1[index] = 0;
       }
     }
@@ -166,21 +111,12 @@ public class DiskBlock {
       long data = dataArr[i];
       int index = (int) ((data & 67553994410557440L) >> 52);
       dataCache2[index][dataCacheLen2[index]++] = data;
-//      if (dataCacheLen2[index] == secondCacheLength) {
-//        putToByteBuffer(index, dataCache2[index], dataCacheLen2[index]);
-//        batchWriteBuffer.flip();
-//
-//        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
-//        partFilePosArr[index] += batchWriteBuffer.limit();
-//        dataCacheLen2[index] = 0;
-//      }
     }
 
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen2[index] >= thresholdValue) {
         putToByteBuffer(index, dataCache2[index], dataCacheLen2[index]);
         batchWriteBuffer.flip();
-
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
         dataCacheLen2[index] = 0;
@@ -192,37 +128,19 @@ public class DiskBlock {
   public synchronized void forceStoreLongArr1() throws Exception {
     for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen1[i];
-      long beforeArrNum = arrNum[i];
-      long beforeBufferNum = bufferNum[i];
       if (len > 0) {
-
         putToByteBuffer(i, dataCache1[i], len);
-
-        arrNum[i] += dataCacheLen1[i];
-        bufferNum[i] += batchWriteBuffer.position() / 13 * 2;
-
         storeLastData(i);
         batchWriteBuffer.flip();
-
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
-
         dataCacheLen1[i] = 0;
       } else if (temporaryArr[i] != 0) {
         batchWriteBuffer.clear();
         storeLastData(i);
         batchWriteBuffer.flip();
-
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
-      }
-
-      if (arrNum[i] != bufferNum[i]) {
-        System.out.println("table is " + tableName + ", col is " + col + ", blockIndex is " + blockIndex
-                + ", i is " + i + ", arrNum[i] is " + arrNum[i] + ", bufferNum[i] is " + bufferNum[i]
-                + ", beforeArrNum is " + beforeArrNum + ", beforeBufferNum is " + beforeBufferNum
-                + ", len is " + len
-        );
       }
     }
   }
@@ -234,7 +152,6 @@ public class DiskBlock {
         putToByteBuffer(i, dataCache2[i], len);
         storeLastData(i);
         batchWriteBuffer.flip();
-
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
         dataCacheLen2[i] = 0;
@@ -242,7 +159,6 @@ public class DiskBlock {
         batchWriteBuffer.clear();
         storeLastData(i);
         batchWriteBuffer.flip();
-
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
       }
@@ -256,9 +172,6 @@ public class DiskBlock {
       batchWriteBuffer.put((byte)(data >> 40));
       batchWriteBuffer.put((byte)(data >> 32));
       batchWriteBuffer.putInt((int)(data));
-      totalColNum333.addAndGet(1);
-
-      bufferNum[idx]++;
     }
   }
 
@@ -275,16 +188,11 @@ public class DiskBlock {
 
       batchWriteBuffer.putInt((int) (data2 << 16 >>> 32));
       batchWriteBuffer.putShort((short) (data2));
-
     }
-    totalColNum333.addAndGet(actualLen);
 
     // 奇数
     if (actualLen != length) {
       if (temporaryArr[index] == 0) {
-        if (blockIndex == 10 && index == 1 && tableName.equals("1") && col == 1) {
-          System.out.println(Thread.currentThread().getId() + "   temporaryArr 10_1 fuzhi wei " + dataArr[length - 1]);
-        }
         temporaryArr[index] = dataArr[length - 1];
       } else {
         long data1 = temporaryArr[index];
@@ -297,12 +205,7 @@ public class DiskBlock {
         batchWriteBuffer.putInt((int) (data2 << 16 >>> 32));
         batchWriteBuffer.putShort((short) (data2));
 
-        totalColNum333.addAndGet(2);
-
         temporaryArr[index] = 0;
-        if (blockIndex == 10 && index == 1 && tableName.equals("1") && col == 1) {
-          System.out.println(Thread.currentThread().getId() + "  temporaryArr 10_1 fuzhi wei " + 0);
-        }
       }
     }
   }

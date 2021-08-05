@@ -359,7 +359,7 @@ public class MyAnalyticDB implements AnalyticDB {
     isFirstInvoke = files == null || files.length <= 0;
   }
 
-  private void statPerBlockCount1() throws IOException {
+  private void statPerBlockCount1() {
     long firstSum = 0;
     for (int i = 0; i < table_1_BlockDataNumArr1.length; i++) {
       int tmp = 0;
@@ -383,35 +383,6 @@ public class MyAnalyticDB implements AnalyticDB {
       firstSum += tmp;
     }
     System.out.println("table 1 secondSum is " + firstSum);
-
-    int totalNum = 0;
-    for (DiskBlock diskBlock : diskBlockData_1_1) {
-      int[] partFilePosArr = diskBlock.partFilePosArr;
-      int singleNum = 0;
-      for (int i = 0; i < 16; i++) {
-        int size = partFilePosArr[i] - (i * DiskBlock.partFileSize);
-        int num = size % 13 == 0 ? (size / 13 * 2) : (size / 13 * 2 + 1);
-        singleNum += num;
-      }
-      totalNum += singleNum;
-    }
-    System.out.println("col_1_1 number is " + totalNum);
-    totalNum = 0;
-    for (DiskBlock diskBlock : diskBlockData_1_2) {
-      int[] partFilePosArr = diskBlock.partFilePosArr;
-      int singleNum = 0;
-      for (int i = 0; i < 16; i++) {
-        int size = partFilePosArr[i] - (i * DiskBlock.partFileSize);
-        int num = size % 13 == 0 ? (size / 13 * 2) : (size / 13 * 2 + 1);
-        singleNum += num;
-      }
-      totalNum += singleNum;
-    }
-    System.out.println("col_1_2 number is " + totalNum);
-
-    System.out.println("=====> col 1 total number is " + DiskBlock.totalColNum.get());
-    System.out.println("=====> col 1 total number 2222 is " + DiskBlock.totalColNum222.get());
-    System.out.println("=====> col 1 total number 3333 is " + DiskBlock.totalColNum333.get());
   }
 
   private void statPerBlockCount2() {
@@ -911,8 +882,8 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     String result = tmp(table, column, number);
-    System.out.println("table is " + table + ", column is" + column
-            + ", percentile is " + percentile + ", result is " + result);
+//    System.out.println("table is " + table + ", column is" + column
+//            + ", percentile is " + percentile + ", result is " + result);
 
     return result;
   }
