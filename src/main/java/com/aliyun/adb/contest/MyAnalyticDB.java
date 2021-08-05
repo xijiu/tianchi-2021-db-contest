@@ -390,7 +390,7 @@ public class MyAnalyticDB implements AnalyticDB {
       int singleNum = 0;
       for (int i = 0; i < 16; i++) {
         int size = partFilePosArr[i] - (i * DiskBlock.partFileSize);
-        int num = size % 13 == 0 ? size / 13 * 2 : size / 13 * 2 + 1;
+        int num = size % 13 == 0 ? (size / 13 * 2) : (size / 13 * 2 + 1);
         singleNum += num;
       }
       totalNum += singleNum;
@@ -402,7 +402,7 @@ public class MyAnalyticDB implements AnalyticDB {
       int singleNum = 0;
       for (int i = 0; i < 16; i++) {
         int size = partFilePosArr[i] - (i * DiskBlock.partFileSize);
-        int num = size % 13 == 0 ? size / 13 * 2 : size / 13 * 2 + 1;
+        int num = size % 13 == 0 ? (size / 13 * 2) : (size / 13 * 2 + 1);
         singleNum += num;
       }
       totalNum += singleNum;
