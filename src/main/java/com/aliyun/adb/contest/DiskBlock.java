@@ -134,7 +134,7 @@ public class DiskBlock {
 
 
         totalColNum.addAndGet(dataCacheLen1[index]);
-//        totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
+        totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
 
         dataCacheLen1[index] = 0;
       }
