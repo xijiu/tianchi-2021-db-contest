@@ -83,6 +83,7 @@ public class DiskBlock {
   }
 
   public static AtomicInteger totalColNum = new AtomicInteger();
+  public static AtomicInteger totalColNum222 = new AtomicInteger();
 
   public synchronized void storeLongArr1(long[] dataArr, int beginIndex, int length) throws Exception {
     int endIndex = beginIndex + length;
@@ -125,6 +126,7 @@ public class DiskBlock {
           }
         }
         totalColNum.addAndGet(dataCacheLen1[index]);
+        totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
         dataCacheLen1[index] = 0;
       }
     }
@@ -171,6 +173,11 @@ public class DiskBlock {
 
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
+
+
+        int limit = batchWriteBuffer.limit();
+        totalColNum222.addAndGet(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1);
+
         dataCacheLen1[i] = 0;
       }
     }
