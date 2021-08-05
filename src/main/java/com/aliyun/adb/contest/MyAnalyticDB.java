@@ -411,6 +411,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
     System.out.println("=====> col 1 total number is " + DiskBlock.totalColNum.get());
     System.out.println("=====> col 1 total number 2222 is " + DiskBlock.totalColNum222.get());
+    System.out.println("=====> col 1 total number 3333 is " + DiskBlock.totalColNum333.get());
   }
 
   private void statPerBlockCount2() {

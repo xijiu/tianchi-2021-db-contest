@@ -84,6 +84,7 @@ public class DiskBlock {
 
   public static AtomicInteger totalColNum = new AtomicInteger();
   public static AtomicInteger totalColNum222 = new AtomicInteger();
+  public static AtomicInteger totalColNum333 = new AtomicInteger();
 
   public synchronized void storeLongArr1(long[] dataArr, int beginIndex, int length) throws Exception {
     int endIndex = beginIndex + length;
@@ -183,7 +184,7 @@ public class DiskBlock {
 
 
         int limit = batchWriteBuffer.limit();
-        int bufferLen = limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1;
+        int bufferLen = limit % 13 == 0 ? limit / 13 * 2 : (limit / 13 * 2 + 1);
         System.out.println("aaaa   bbbbb !!!!  arr len is " + len + ", byte buffer len is " + bufferLen);
 //        if (Math.abs(bufferLen - len) > 2) {
 //        }
@@ -218,12 +219,13 @@ public class DiskBlock {
       batchWriteBuffer.put((byte)(data >> 40));
       batchWriteBuffer.put((byte)(data >> 32));
       batchWriteBuffer.putInt((int)(data));
+      totalColNum333.addAndGet(1);
     }
   }
 
   private void putToByteBuffer(int index, long[] dataArr, int length) {
     batchWriteBuffer.clear();
-    int actualLen = length % 2 == 0 ? length : length - 1;
+    int actualLen = length % 2 == 0 ? length : (length - 1);
     for (int i = 0; i < actualLen; i += 2) {
       long data1 = dataArr[i];
       long data2 = dataArr[i + 1];
@@ -234,6 +236,8 @@ public class DiskBlock {
 
       batchWriteBuffer.putInt((int) (data2 << 16 >>> 32));
       batchWriteBuffer.putShort((short) (data2));
+
+      totalColNum333.addAndGet(2);
     }
 
     // 奇数
@@ -253,6 +257,8 @@ public class DiskBlock {
 
         batchWriteBuffer.putInt((int) (data2 << 16 >>> 32));
         batchWriteBuffer.putShort((short) (data2));
+
+        totalColNum333.addAndGet(2);
 
         temporaryArr[index] = 0;
       }

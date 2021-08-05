@@ -220,18 +220,21 @@ public class ReadCharTest {
 
   @Test
   public void tst() {
-    long[] dataArr = new long[103];
-    for (int i = 0; i < dataArr.length; i++) {
-      dataArr[i] = i + 1;
-    }
-    int length = dataArr.length;
+//    long[] dataArr = new long[103];
+//    for (int i = 0; i < dataArr.length; i++) {
+//      dataArr[i] = i + 1;
+//    }
+//    int length = dataArr.length;
+//    int actualLen = length % 2 == 0 ? length : length - 1;
+//    for (int i = 0; i < actualLen; i += 2) {
+//      long data1 = dataArr[i];
+//      long data2 = dataArr[i + 1];
+//
+//      System.out.println(data1 + "," + data2);
+//    }
+    int length = 9;
     int actualLen = length % 2 == 0 ? length : length - 1;
-    for (int i = 0; i < actualLen; i += 2) {
-      long data1 = dataArr[i];
-      long data2 = dataArr[i + 1];
-
-      System.out.println(data1 + "," + data2);
-    }
+    System.out.println(actualLen);
   }
 
 
