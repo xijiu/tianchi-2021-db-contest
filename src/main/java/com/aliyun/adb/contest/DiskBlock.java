@@ -194,7 +194,7 @@ public class DiskBlock {
         putToByteBuffer(i, dataCache1[i], len);
 
         arrNum[i] += dataCacheLen1[i];
-        bufferNum[i] += batchWriteBuffer.limit() / 13 * 2;
+        bufferNum[i] += batchWriteBuffer.position() / 13 * 2;
 
         storeLastData(i);
         batchWriteBuffer.flip();
