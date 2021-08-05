@@ -276,10 +276,10 @@ public class DiskBlock {
     // 奇数
     if (actualLen != length) {
       if (temporaryArr[index] == 0) {
-        temporaryArr[index] = dataArr[length - 1];
-        if (dataArr[length - 1] == 0) {
-          System.out.println("wolegeca !!!!");
+        if (blockIndex == 10 && index == 1) {
+          System.out.println("temporaryArr 10_1 fuzhi wei " + dataArr[length - 1]);
         }
+        temporaryArr[index] = dataArr[length - 1];
       } else {
         long data1 = temporaryArr[index];
         long data2 = dataArr[length - 1];
@@ -294,6 +294,9 @@ public class DiskBlock {
         totalColNum333.addAndGet(2);
 
         temporaryArr[index] = 0;
+        if (blockIndex == 10 && index == 1) {
+          System.out.println("temporaryArr 10_1 fuzhi wei " + 0);
+        }
       }
     }
   }
