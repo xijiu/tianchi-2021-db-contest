@@ -183,11 +183,12 @@ public class DiskBlock {
 
 
         int limit = batchWriteBuffer.limit();
-        if (Math.abs(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1 - len) > 2) {
-          System.out.println("aaaa   bbbbb !!!!");
+        int bufferLen = limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1;
+        if (Math.abs(bufferLen - len) > 2) {
+          System.out.println("aaaa   bbbbb !!!!  arr len is " + len + ", byte buffer len is " + bufferLen);
         }
         totalColNum.addAndGet(len);
-        totalColNum222.addAndGet(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1);
+        totalColNum222.addAndGet(bufferLen);
 
 
         dataCacheLen1[i] = 0;
