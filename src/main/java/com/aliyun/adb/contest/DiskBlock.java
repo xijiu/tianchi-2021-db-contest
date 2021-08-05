@@ -183,7 +183,7 @@ public class DiskBlock {
 
 
         int limit = batchWriteBuffer.limit();
-        if (Math.abs(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1 - len) > 1) {
+        if (Math.abs(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1 - len) > 2) {
           System.out.println("aaaa   bbbbb !!!!");
         }
         totalColNum.addAndGet(len);
