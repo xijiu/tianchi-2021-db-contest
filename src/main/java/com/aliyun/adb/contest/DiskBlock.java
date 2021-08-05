@@ -129,6 +129,9 @@ public class DiskBlock {
             }
           }
         }
+        if (batchWriteBuffer.limit() / 13 * 2 > dataCacheLen1[index]) {
+          System.out.println("heheheh!!!!");
+        }
         totalColNum.addAndGet(dataCacheLen1[index]);
         totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
         dataCacheLen1[index] = 0;
