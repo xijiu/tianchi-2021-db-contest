@@ -116,11 +116,10 @@ public class DiskBlock {
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen1[index] >= thresholdValue) {
 
-        System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     prepare put arr len is " + dataCacheLen1[index]);
 
-//        if (blockIndex == 10 && index == 1 && tableName.equals("1") && col == 1) {
-//          System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     prepare put arr len is " + dataCacheLen1[index]);
-//        }
+        if (blockIndex == 10 && index == 1 && tableName.equals("1") && col == 1) {
+          System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     prepare put arr len is " + dataCacheLen1[index]);
+        }
         boolean hasValue = temporaryArr[index] == 0 ? false : true;
         putToByteBuffer(index, dataCache1[index], dataCacheLen1[index]);
         batchWriteBuffer.flip();
@@ -151,13 +150,10 @@ public class DiskBlock {
         bufferNum[index] += batchWriteBuffer.limit() / 13 * 2;
 
 
-        System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
-                + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
-
-//        if (blockIndex == 10 && index == 1 && tableName.equals("1") && col == 1) {
-//          System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
-//                  + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
-//        }
+        if (blockIndex == 10 && index == 1 && tableName.equals("1") && col == 1) {
+          System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
+                  + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
+        }
 
         dataCacheLen1[index] = 0;
       }
@@ -196,6 +192,8 @@ public class DiskBlock {
   public synchronized void forceStoreLongArr1() throws Exception {
     for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen1[i];
+      long beforeArrNum = arrNum[i];
+      long beforeBufferNum = bufferNum[i];
       if (len > 0) {
 
         putToByteBuffer(i, dataCache1[i], len);
@@ -223,7 +221,11 @@ public class DiskBlock {
       }
 
       if (arrNum[i] != bufferNum[i]) {
-        System.out.println("table is " + tableName + ", col is " + col + ", blockIndex is " + blockIndex + ", i is " + i + ", arrNum[i] is " + arrNum[i] + ", bufferNum[i] is " + bufferNum[i]);
+        System.out.println("table is " + tableName + ", col is " + col + ", blockIndex is " + blockIndex
+                + ", i is " + i + ", arrNum[i] is " + arrNum[i] + ", bufferNum[i] is " + bufferNum[i]
+                + ", beforeArrNum is " + beforeArrNum + ", beforeBufferNum is " + beforeBufferNum
+                + ", len is " + len
+        );
       }
     }
   }
