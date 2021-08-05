@@ -145,7 +145,7 @@ public class DiskBlock {
         bufferNum += batchWriteBuffer.limit() / 13 * 2;
 
         if (Math.abs(arrNum - bufferNum) > 1) {
-          System.out.println("44444__exception!!!!!!!!!!!!!!!!!");
+          System.out.println("44444__exception!!!!!!!!!!!!!!!!!, arrNum is " + arrNum + ", bufferNum is " + bufferNum);
         }
 
         dataCacheLen1[index] = 0;
