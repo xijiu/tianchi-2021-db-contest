@@ -115,10 +115,9 @@ public class DiskBlock {
 
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen1[index] >= thresholdValue) {
-        if (blockIndex == 10 && index == 1) {
+        if (blockIndex == 10 && index == 1 && tableName.equals("1")) {
           System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     prepare put arr len is " + dataCacheLen1[index]);
         }
-        long linshi = temporaryArr[index];
         boolean hasValue = temporaryArr[index] == 0 ? false : true;
         putToByteBuffer(index, dataCache1[index], dataCacheLen1[index]);
         batchWriteBuffer.flip();
@@ -164,7 +163,7 @@ public class DiskBlock {
 //          System.exit(1);
 //        }
 
-        if (blockIndex == 10 && index == 1) {
+        if (blockIndex == 10 && index == 1 && tableName.equals("1")) {
           System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
                   + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
         }
@@ -279,7 +278,7 @@ public class DiskBlock {
     // 奇数
     if (actualLen != length) {
       if (temporaryArr[index] == 0) {
-        if (blockIndex == 10 && index == 1) {
+        if (blockIndex == 10 && index == 1 && tableName.equals("1")) {
           System.out.println(Thread.currentThread().getId() + "   temporaryArr 10_1 fuzhi wei " + dataArr[length - 1]);
         }
         temporaryArr[index] = dataArr[length - 1];
@@ -297,7 +296,7 @@ public class DiskBlock {
         totalColNum333.addAndGet(2);
 
         temporaryArr[index] = 0;
-        if (blockIndex == 10 && index == 1) {
+        if (blockIndex == 10 && index == 1 && tableName.equals("1")) {
           System.out.println(Thread.currentThread().getId() + "  temporaryArr 10_1 fuzhi wei " + 0);
         }
       }
