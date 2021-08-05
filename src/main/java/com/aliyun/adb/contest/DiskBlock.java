@@ -7,6 +7,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 硬盘存储块
@@ -81,6 +82,8 @@ public class DiskBlock {
     this.initFileChannel();
   }
 
+  public static AtomicInteger totalColNum = new AtomicInteger();
+
   public synchronized void storeLongArr1(long[] dataArr, int beginIndex, int length) throws Exception {
     int endIndex = beginIndex + length;
     for (int i = beginIndex; i < endIndex; i++) {
@@ -109,9 +112,10 @@ public class DiskBlock {
 
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
-        if (Math.abs(batchWriteBuffer.limit() / 13 * 2 - dataCacheLen1[index]) > 1) {
-          System.out.println("exception!!!!!!!!!!!!!!!!!");
-        }
+//        if (Math.abs(batchWriteBuffer.limit() / 13 * 2 - dataCacheLen1[index]) > 1) {
+//          System.out.println("exception!!!!!!!!!!!!!!!!!");
+//        }
+        totalColNum.addAndGet(dataCacheLen1[index]);
         dataCacheLen1[index] = 0;
       }
     }

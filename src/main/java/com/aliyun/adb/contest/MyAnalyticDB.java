@@ -408,6 +408,8 @@ public class MyAnalyticDB implements AnalyticDB {
       totalNum += singleNum;
     }
     System.out.println("col_1_2 number is " + totalNum);
+
+    System.out.println("=====> col 1 total number is " + DiskBlock.totalColNum.get());
   }
 
   private void statPerBlockCount2() {
