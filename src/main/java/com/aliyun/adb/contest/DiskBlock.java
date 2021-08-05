@@ -169,7 +169,7 @@ public class DiskBlock {
     for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen1[i];
       if (len > 0) {
-        totalColNum.addAndGet(len);
+//        totalColNum.addAndGet(len);
 
         putToByteBuffer(i, dataCache1[i], len);
         storeLastData(i);
@@ -179,8 +179,8 @@ public class DiskBlock {
         partFilePosArr[i] += batchWriteBuffer.limit();
 
 
-        int limit = batchWriteBuffer.limit();
-        totalColNum222.addAndGet(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1);
+//        int limit = batchWriteBuffer.limit();
+//        totalColNum222.addAndGet(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1);
 
         dataCacheLen1[i] = 0;
       }
@@ -231,6 +231,9 @@ public class DiskBlock {
     if (actualLen != length) {
       if (temporaryArr[index] == 0) {
         temporaryArr[index] = dataArr[length - 1];
+        if (dataArr[length - 1] == 0) {
+          System.out.println("wolegeca !!!!");
+        }
       } else {
         long data1 = temporaryArr[index];
         long data2 = dataArr[length - 1];
