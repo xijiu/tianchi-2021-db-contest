@@ -153,15 +153,15 @@ public class DiskBlock {
           System.exit(1);
         }
 
-        if (Math.abs(arrNum - bufferNum) == 1 && temporaryArr[index] == 0) {
-          System.out.println("55555__exception!!!!!!!!!!!!!!!!!, arrNum is ");
-          System.out.println("dataCacheLen1[index] is " + dataCacheLen1[index]);
-          System.out.println("batchWriteBuffer.limit() is " + batchWriteBuffer.limit());
-          System.out.println("linshi is " + linshi);
-          System.exit(1);
-        }
+//        if (Math.abs(arrNum - bufferNum) == 1 && temporaryArr[index] == 0) {
+//          System.out.println("55555__exception!!!!!!!!!!!!!!!!!, arrNum is ");
+//          System.out.println("dataCacheLen1[index] is " + dataCacheLen1[index]);
+//          System.out.println("batchWriteBuffer.limit() is " + batchWriteBuffer.limit());
+//          System.out.println("linshi is " + linshi);
+//          System.exit(1);
+//        }
 
-        System.out.println("arr len is " + dataCacheLen1[index] + ", buffer len is "
+        System.out.println(blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
                 + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
 
         dataCacheLen1[index] = 0;
