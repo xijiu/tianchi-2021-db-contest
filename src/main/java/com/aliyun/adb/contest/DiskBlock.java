@@ -182,8 +182,11 @@ public class DiskBlock {
         partFilePosArr[i] += batchWriteBuffer.limit();
 
 
-        totalColNum.addAndGet(len);
         int limit = batchWriteBuffer.limit();
+        if (Math.abs(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1 - len) > 1) {
+          System.out.println("aaaa   bbbbb !!!!");
+        }
+        totalColNum.addAndGet(len);
         totalColNum222.addAndGet(limit % 13 == 0 ? limit / 13 * 2 : limit / 13 * 2 + 1);
 
 
