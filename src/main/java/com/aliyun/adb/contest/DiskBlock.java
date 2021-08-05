@@ -61,9 +61,9 @@ public class DiskBlock {
 
   private final long[] temporaryArr = new long[splitNum];
 
-  private long arrNum = 0;
+  private volatile long arrNum = 0;
 
-  private long bufferNum = 0;
+  private volatile long bufferNum = 0;
 
 
   public DiskBlock(String tableName, int col, int blockIndex) {
@@ -200,7 +200,7 @@ public class DiskBlock {
 
         int limit = batchWriteBuffer.limit();
         int bufferLen = limit % 13 == 0 ? limit / 13 * 2 : (limit / 13 * 2 + 1);
-        System.out.println("aaaa   bbbbb !!!!  arr len is " + len + ", byte buffer len is " + bufferLen);
+//        System.out.println("aaaa   bbbbb !!!!  arr len is " + len + ", byte buffer len is " + bufferLen);
 //        if (Math.abs(bufferLen - len) > 2) {
 //        }
         totalColNum.addAndGet(len);
