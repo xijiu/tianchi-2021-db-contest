@@ -277,7 +277,7 @@ public class DiskBlock {
     if (actualLen != length) {
       if (temporaryArr[index] == 0) {
         if (blockIndex == 10 && index == 1) {
-          System.out.println("temporaryArr 10_1 fuzhi wei " + dataArr[length - 1]);
+          System.out.println(Thread.currentThread().getId() + "   temporaryArr 10_1 fuzhi wei " + dataArr[length - 1]);
         }
         temporaryArr[index] = dataArr[length - 1];
       } else {
@@ -295,7 +295,7 @@ public class DiskBlock {
 
         temporaryArr[index] = 0;
         if (blockIndex == 10 && index == 1) {
-          System.out.println("temporaryArr 10_1 fuzhi wei " + 0);
+          System.out.println(Thread.currentThread().getId() + "  temporaryArr 10_1 fuzhi wei " + 0);
         }
       }
     }
