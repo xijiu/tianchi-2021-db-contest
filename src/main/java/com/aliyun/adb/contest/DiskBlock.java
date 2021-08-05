@@ -115,6 +115,9 @@ public class DiskBlock {
 
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen1[index] >= thresholdValue) {
+        if (blockIndex == 10 && index == 1) {
+          System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     prepare put arr len is " + dataCacheLen1[index]);
+        }
         long linshi = temporaryArr[index];
         boolean hasValue = temporaryArr[index] == 0 ? false : true;
         putToByteBuffer(index, dataCache1[index], dataCacheLen1[index]);
@@ -162,7 +165,7 @@ public class DiskBlock {
 //        }
 
         if (blockIndex == 10 && index == 1) {
-          System.out.println(blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
+          System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
                   + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
         }
 
