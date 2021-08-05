@@ -133,7 +133,7 @@ public class DiskBlock {
 //          System.out.println(hasValue + "heheheh!!!!");
 //        }
 
-        if (dataCacheLen1[index] % 2 == 0) {
+        if (dataCacheLen1[index] % 2 == 1) {
           totalColNum.addAndGet(dataCacheLen1[index]);
           totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
         }
