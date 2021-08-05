@@ -123,6 +123,10 @@ public class DiskBlock {
             if (dataCacheLen1[index] != batchWriteBuffer.limit() / 13 * 2 - 1) {
               System.out.println("222__exception!!!!!!!!!!!!!!!!!");
             }
+          } else {
+            if (dataCacheLen1[index] != batchWriteBuffer.limit() / 13 * 2 + 1) {
+              System.out.println("33333__exception!!!!!!!!!!!!!!!!!");
+            }
           }
         }
         totalColNum.addAndGet(dataCacheLen1[index]);
