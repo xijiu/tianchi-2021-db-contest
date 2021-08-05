@@ -61,6 +61,11 @@ public class DiskBlock {
 
   private final long[] temporaryArr = new long[splitNum];
 
+  private long arrNum = 0;
+
+  private long bufferNum = 0;
+
+
   public DiskBlock(String tableName, int col, int blockIndex) {
     this.tableName = tableName;
     this.col = col;
@@ -136,6 +141,13 @@ public class DiskBlock {
         totalColNum.addAndGet(dataCacheLen1[index]);
         totalColNum222.addAndGet(batchWriteBuffer.limit() / 13 * 2);
 
+        arrNum += dataCacheLen1[index];
+        bufferNum += batchWriteBuffer.limit() / 13 * 2;
+
+        if (Math.abs(arrNum - bufferNum) > 1) {
+          System.out.println("44444__exception!!!!!!!!!!!!!!!!!");
+        }
+
         dataCacheLen1[index] = 0;
       }
     }
@@ -171,6 +183,8 @@ public class DiskBlock {
 
 
   public synchronized void forceStoreLongArr1() throws Exception {
+    System.out.println("arrNum is " + arrNum);
+    System.out.println("bufferNum is " + bufferNum);
     for (int i = 0; i < splitNum; i++) {
       int len = dataCacheLen1[i];
       if (len > 0) {
