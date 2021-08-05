@@ -396,6 +396,18 @@ public class MyAnalyticDB implements AnalyticDB {
       totalNum += singleNum;
     }
     System.out.println("col_1_1 number is " + totalNum);
+    totalNum = 0;
+    for (DiskBlock diskBlock : diskBlockData_1_2) {
+      int[] partFilePosArr = diskBlock.partFilePosArr;
+      int singleNum = 0;
+      for (int i = 0; i < 16; i++) {
+        int size = partFilePosArr[i] - (i * DiskBlock.partFileSize);
+        int num = size % 13 == 0 ? size / 13 * 2 : size / 13 * 2 + 1;
+        singleNum += num;
+      }
+      totalNum += singleNum;
+    }
+    System.out.println("col_1_2 number is " + totalNum);
   }
 
   private void statPerBlockCount2() {

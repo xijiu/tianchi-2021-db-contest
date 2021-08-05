@@ -130,14 +130,14 @@ public class DiskBlock {
 //      }
     }
 
-    for (int i = 0; i < splitNum; i++) {
-      if (dataCacheLen2[i] >= thresholdValue) {
-        putToByteBuffer(i, dataCache2[i], dataCacheLen2[i]);
+    for (int index = 0; index < splitNum; index++) {
+      if (dataCacheLen2[index] >= thresholdValue) {
+        putToByteBuffer(index, dataCache2[index], dataCacheLen2[index]);
         batchWriteBuffer.flip();
 
-        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
-        partFilePosArr[i] += batchWriteBuffer.limit();
-        dataCacheLen2[i] = 0;
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
+        partFilePosArr[index] += batchWriteBuffer.limit();
+        dataCacheLen2[index] = 0;
       }
     }
   }
@@ -183,7 +183,7 @@ public class DiskBlock {
     }
   }
 
-  private void putToByteBuffer(int idx, long[] dataArr, int length) {
+  private void putToByteBuffer(int index, long[] dataArr, int length) {
     batchWriteBuffer.clear();
     int actualLen = length % 2 == 0 ? length : length - 1;
     for (int i = 0; i < actualLen; i += 2) {
@@ -200,10 +200,10 @@ public class DiskBlock {
 
     // 奇数
     if (actualLen != length) {
-      if (temporaryArr[idx] == 0) {
-        temporaryArr[idx] = dataArr[length - 1];
+      if (temporaryArr[index] == 0) {
+        temporaryArr[index] = dataArr[length - 1];
       } else {
-        long data1 = temporaryArr[idx];
+        long data1 = temporaryArr[index];
         long data2 = dataArr[length - 1];
 
         batchWriteBuffer.put((byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
@@ -213,7 +213,7 @@ public class DiskBlock {
         batchWriteBuffer.putInt((int) (data2 << 16 >>> 32));
         batchWriteBuffer.putShort((short) (data2));
 
-        temporaryArr[idx] = 0;
+        temporaryArr[index] = 0;
       }
     }
   }
