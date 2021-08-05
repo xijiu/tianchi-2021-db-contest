@@ -161,6 +161,9 @@ public class DiskBlock {
           System.exit(1);
         }
 
+        System.out.println("arr len is " + dataCacheLen1[index] + ", buffer len is "
+                + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
+
         dataCacheLen1[index] = 0;
       }
     }
