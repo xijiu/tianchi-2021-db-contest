@@ -166,6 +166,7 @@ public class DiskBlock {
         if (blockIndex == 10 && index == 1 && tableName.equals("1") && col == 1) {
           System.out.println("[" + Thread.currentThread().getId() + "] " + blockIndex + "_" + index + "     arr len is " + dataCacheLen1[index] + ", buffer len is "
                   + (batchWriteBuffer.limit() / 13 * 2) + ", linshi is " + temporaryArr[index]);
+          System.out.println("arrNum is " + arrNum + ", bufferNum is " + bufferNum);
         }
 
         dataCacheLen1[index] = 0;
