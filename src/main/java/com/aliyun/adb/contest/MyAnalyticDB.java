@@ -122,7 +122,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private volatile long fileSize = file1.length();
 
-  public static ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+  public static ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(14);
 
   public MyAnalyticDB() {
 //    try {
