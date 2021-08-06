@@ -4,6 +4,7 @@ package com.aliyun.adb.contest;
 import com.aliyun.adb.contest.utils.PubTools;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -243,7 +244,7 @@ public class DiskBlock {
       }
       lastTmpSize = tmpSize;
     }
-    partNum = (byte) (partNum << 4);
+    byte partNumFinal = (byte) (partNum << 4);
 
     int beginPos = partIndex * partFileSize;
     int endPos = partFilePosArr[partIndex];
@@ -251,9 +252,22 @@ public class DiskBlock {
     long[] data = MyAnalyticDB.helper.get();
 
 //    Future<?> future = MyAnalyticDB.executor.submit(() -> {
-//
+//      readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
 //    });
 
+    readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
+
+    int totalLen = (endPos - beginPos) % 13 == 0 ? ((endPos - beginPos) / 13 * 2) : ((endPos - beginPos) / 13 * 2 + 1);
+    long solve = tryToQuickFindK(partNumFinal, data, totalLen, index);
+    if (solve == -1) {
+      solve = PubTools.solve(data, 0, totalLen - 1, index);
+    }
+    return (((long) bytePrev & 0xff) << 56) | solve;
+//    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
+  }
+
+  private void readAndAssignValue(int beginPos, int endPos, AtomicLong pos, long[] data, byte partNum)
+          throws Exception {
     ByteBuffer byteBuffer = threadLocal.get();
     byte[] array = byteBuffer.array();
     int idx = 0;
@@ -295,13 +309,6 @@ public class DiskBlock {
       data[idx++] = makeLong2(array[length - 7], array[length - 6], array[length - 5],
               array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
     }
-
-    long solve = tryToQuickFindK(partNum, data, idx, index);
-    if (solve == -1) {
-      solve = PubTools.solve(data, 0, idx - 1, index);
-    }
-    return (((long) bytePrev & 0xff) << 56) | solve;
-//    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }
 
   private long tryToQuickFindK(byte partNum, long[] data, int length, int index) {
