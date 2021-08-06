@@ -199,9 +199,9 @@ public class MyAnalyticDB implements AnalyticDB {
     future6.get();
     future7.get();
 
-    if (!isFirstInvoke) {
-      executor.shutdown();
-    }
+//    if (!isFirstInvoke) {
+//      executor.shutdown();
+//    }
   }
 
 
