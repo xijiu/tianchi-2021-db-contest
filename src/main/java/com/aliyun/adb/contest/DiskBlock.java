@@ -7,6 +7,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 硬盘存储块
@@ -243,24 +244,29 @@ public class DiskBlock {
     }
     partNum = (byte) (partNum << 4);
 
+    int endPos = partFilePosArr[partIndex];
+    AtomicLong pos = new AtomicLong(partIndex * partFileSize);
+
     long[] data = MyAnalyticDB.helper.get();
     ByteBuffer byteBuffer = threadLocal.get();
     byte[] array = byteBuffer.array();
     int idx = 0;
-    long pos = partIndex * partFileSize;
     int length = 0;
-    int endPos = partFilePosArr[partIndex];
     boolean over = false;
     while (true) {
       byteBuffer.clear();
-      int flag = partFileChannel.read(byteBuffer, pos);
+      long readPos = pos.getAndAdd(perReadSize);
+      if (readPos >= endPos) {
+        break;
+      }
+      int flag = partFileChannel.read(byteBuffer, readPos);
       if (flag == -1) {
         break;
       }
-      pos += perReadSize;
+      long currPos = readPos + perReadSize;
       length = byteBuffer.position();
-      if (pos > endPos) {
-        length = (int) (perReadSize - (pos - endPos));
+      if (currPos > endPos) {
+        length = (int) (perReadSize - (currPos - endPos));
         over = true;
       }
       int cycleTime = length / 13;

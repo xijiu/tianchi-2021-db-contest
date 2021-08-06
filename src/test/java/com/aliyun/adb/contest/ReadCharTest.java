@@ -232,10 +232,15 @@ public class ReadCharTest {
 //
 //      System.out.println(data1 + "," + data2);
 //    }
-    int length = 9;
-    int actualLen = length % 2 == 0 ? length : length - 1;
-    System.out.println(actualLen);
+//    System.out.println(format(Long.toBinaryString(7023000389120829470L)));
+//    System.out.println(format(Long.toBinaryString(7020000000000000000L)));
+//    System.out.println(format(Long.toBinaryString(7023000000000000000L)));
+    System.out.println(PubTools.format(Long.toBinaryString(9131197959929832808L))); // 0.99001
+    System.out.println(PubTools.format(Long.toBinaryString(9135095068500240138L))); // 0.99043
   }
+
+
+
 
 
 

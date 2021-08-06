@@ -640,4 +640,25 @@ public class PubTools {
     }
     return nums[right + 1];
   }
+
+  public static String format(String target) {
+    StringBuilder sb = new StringBuilder();
+    if (target.length() < 64) {
+      int len = 64 - target.length();
+      for (int i = 0; i < len; i++) {
+        sb.append("0");
+      }
+      sb.append(target);
+    } else {
+      sb.append(target);
+    }
+    sb.insert(56, " ");
+    sb.insert(48, " ");
+    sb.insert(40, " ");
+    sb.insert(32, " ");
+    sb.insert(24, " ");
+    sb.insert(16, " ");
+    sb.insert(8, " ");
+    return sb.toString();
+  }
 }
