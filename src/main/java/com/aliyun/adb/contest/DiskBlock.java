@@ -32,7 +32,7 @@ public class DiskBlock {
 
   private final String tableName;
 
-  private static final int perReadSize = 13 * 1024 * 32;
+  private static final int perReadSize = 13 * 1024 * 128;
 
   public static final int partFileSize = 4000000;
 
