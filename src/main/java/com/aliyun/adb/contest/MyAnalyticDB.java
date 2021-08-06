@@ -757,11 +757,10 @@ public class MyAnalyticDB implements AnalyticDB {
       for (int i = beginIndex; i < length; i++) {
         byte element = dataArr[i];
         if (element < 45) {
+          int blockIndex = (int) (data >> drift);
           if (element == 44) {
-            int blockIndex = (int) (data >> drift);
             firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
           } else {
-            int blockIndex = (int) (data >> drift);
             secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
           }
           data = 0L;
