@@ -559,8 +559,6 @@ public class MyAnalyticDB implements AnalyticDB {
     private final int[] firstColDataLen;
     private final int[] secondColDataLen;
 
-    private final long[] bucketLongArr = new long[readFileLen / 8 / 2];
-
     private final FileChannel fileChannel;
 
     private int bucket = -1;
