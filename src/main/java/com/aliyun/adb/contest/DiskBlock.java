@@ -7,6 +7,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -244,10 +245,15 @@ public class DiskBlock {
     }
     partNum = (byte) (partNum << 4);
 
+    int beginPos = partIndex * partFileSize;
     int endPos = partFilePosArr[partIndex];
-    AtomicLong pos = new AtomicLong(partIndex * partFileSize);
-
+    AtomicLong pos = new AtomicLong(beginPos);
     long[] data = MyAnalyticDB.helper.get();
+
+//    Future<?> future = MyAnalyticDB.executor.submit(() -> {
+//
+//    });
+
     ByteBuffer byteBuffer = threadLocal.get();
     byte[] array = byteBuffer.array();
     int idx = 0;
@@ -256,6 +262,7 @@ public class DiskBlock {
     while (true) {
       byteBuffer.clear();
       long readPos = pos.getAndAdd(perReadSize);
+      idx = (int) ((readPos - beginPos) / 13 * 2);
       if (readPos >= endPos) {
         break;
       }
