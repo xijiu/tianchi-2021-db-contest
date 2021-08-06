@@ -32,7 +32,7 @@ public class DiskBlock {
 
   private final String tableName;
 
-  private static final int perReadSize = 13 * 1024 * 128;
+  private static final int perReadSize = 13 * 1024 * 64;
 
   public static final int partFileSize = 4000000;
 
@@ -251,13 +251,16 @@ public class DiskBlock {
     AtomicLong pos = new AtomicLong(beginPos);
     long[] data = MyAnalyticDB.helper.get();
 
-    Future<?> future = MyAnalyticDB.executor.submit(() -> {
+    if (Math.random() > 0.5) {
+      Future<?> future = MyAnalyticDB.executor.submit(() -> {
+        readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
+      });
       readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
-    });
+      future.get();
+    } else {
+      readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
+    }
 
-    readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
-
-    future.get();
 
     int totalLen = (endPos - beginPos) % 13 == 0 ? ((endPos - beginPos) / 13 * 2) : ((endPos - beginPos) / 13 * 2 + 1);
     long solve = tryToQuickFindK(partNumFinal, data, totalLen, index);
