@@ -251,11 +251,13 @@ public class DiskBlock {
     AtomicLong pos = new AtomicLong(beginPos);
     long[] data = MyAnalyticDB.helper.get();
 
-//    Future<?> future = MyAnalyticDB.executor.submit(() -> {
-//      readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
-//    });
+    Future<?> future = MyAnalyticDB.executor.submit(() -> {
+      readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
+    });
 
     readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
+
+    future.get();
 
     int totalLen = (endPos - beginPos) % 13 == 0 ? ((endPos - beginPos) / 13 * 2) : ((endPos - beginPos) / 13 * 2 + 1);
     long solve = tryToQuickFindK(partNumFinal, data, totalLen, index);
@@ -266,8 +268,7 @@ public class DiskBlock {
 //    return PubTools.quickSelect(data, 0, idx - 1, idx - index);
   }
 
-  private void readAndAssignValue(int beginPos, int endPos, AtomicLong pos, long[] data, byte partNum)
-          throws Exception {
+  private void readAndAssignValue(int beginPos, int endPos, AtomicLong pos, long[] data, byte partNum) {
     ByteBuffer byteBuffer = threadLocal.get();
     byte[] array = byteBuffer.array();
     int idx = 0;
@@ -280,7 +281,12 @@ public class DiskBlock {
       if (readPos >= endPos) {
         break;
       }
-      int flag = partFileChannel.read(byteBuffer, readPos);
+      int flag = 0;
+      try {
+        flag = partFileChannel.read(byteBuffer, readPos);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
       if (flag == -1) {
         break;
       }
