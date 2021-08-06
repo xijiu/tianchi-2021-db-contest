@@ -251,13 +251,18 @@ public class DiskBlock {
     AtomicLong pos = new AtomicLong(beginPos);
     long[] data = MyAnalyticDB.helper.get();
 
-    Future<?> future = MyAnalyticDB.executor.submit(() -> {
+    Future<?> future1 = MyAnalyticDB.executor.submit(() -> {
+      readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
+    });
+
+    Future<?> future2 = MyAnalyticDB.executor.submit(() -> {
       readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
     });
 
     readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
 
-    future.get();
+    future1.get();
+    future2.get();
 
     int totalLen = (endPos - beginPos) % 13 == 0 ? ((endPos - beginPos) / 13 * 2) : ((endPos - beginPos) / 13 * 2 + 1);
     long solve = tryToQuickFindK(partNumFinal, data, totalLen, index);
