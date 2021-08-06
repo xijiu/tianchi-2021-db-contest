@@ -735,7 +735,6 @@ public class MyAnalyticDB implements AnalyticDB {
       long data = 0L;
       int beginIndex = 0;
       int length = dataArr.length;
-      boolean normal = true;
 
       if (bucket > 0) {
         long base = 1;
@@ -747,7 +746,6 @@ public class MyAnalyticDB implements AnalyticDB {
             bucketBaseArr[bucket] = base;
             bucketDataPosArr[bucket] = (byte) (element == 10 ? 2 : 1);
             data = 0L;
-            normal = element == 10;
             break;
           } else {
             data = data * 10 + (element - 48);
@@ -756,12 +754,16 @@ public class MyAnalyticDB implements AnalyticDB {
         }
       }
 
-      int firstIndex = 0;
-
       for (int i = beginIndex; i < length; i++) {
         byte element = dataArr[i];
         if (element < 45) {
-          bucketLongArr[firstIndex++] = data;
+          if (element == 44) {
+            int blockIndex = (int) (data >> drift);
+            firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
+          } else {
+            int blockIndex = (int) (data >> drift);
+            secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
+          }
           data = 0L;
         } else {
           data = data * 10 + (element - 48);
@@ -771,24 +773,10 @@ public class MyAnalyticDB implements AnalyticDB {
       // 处理尾部数据
       bucketTailArr[bucket] = data;
 
-      saveToMemoryOrDisk(firstIndex, normal);
+      saveToMemoryOrDisk();
     }
 
-    private void saveToMemoryOrDisk(int endIndex, boolean normal) throws Exception {
-      int i = normal ? 0 : 1;
-      for (; i < endIndex; i += 2) {
-        long data = bucketLongArr[i];
-        int blockIndex = (int) (data >> drift);
-        firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
-      }
-
-      i = normal ? 1 : 0;
-      for (; i < endIndex; i += 2) {
-        long data = bucketLongArr[i];
-        int blockIndex = (int) (data >> drift);
-        secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
-      }
-
+    private void saveToMemoryOrDisk() throws Exception {
       for (int j = 0; j < blockNum; j++) {
         if (firstCacheLengthArr[j] >= thresholdValue) {
           batchSaveFirstCol(j);
