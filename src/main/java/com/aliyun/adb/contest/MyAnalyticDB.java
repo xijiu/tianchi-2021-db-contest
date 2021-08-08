@@ -537,7 +537,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private static final int thresholdValue = 4096 * 32;
 
-    public final int cacheLength = thresholdValue + 1000;
+    public final int cacheLength = thresholdValue + 10000;
 
     public final int secondCacheLength = cacheLength;
 
