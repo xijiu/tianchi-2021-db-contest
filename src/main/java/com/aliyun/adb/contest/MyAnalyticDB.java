@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MyAnalyticDB implements AnalyticDB {
 
   /** 7-128  8-256  9-512  10-1024  11-2048 */
-  public static final int power = 7;
+  public static final int power = 11;
 
   /**
    * 128- 8000000
@@ -788,20 +788,20 @@ public class MyAnalyticDB implements AnalyticDB {
       int length = firstCacheLengthArr[blockIndex];
       firstCacheLengthArr[blockIndex] = 0;
       // 标记已经在内存存储的位置
-      firstColDataLen[(threadIndex << power) + blockIndex] += length;
-
-      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
-      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
+//      firstColDataLen[(threadIndex << power) + blockIndex] += length;
+//
+//      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
+//      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
       int length = secondCacheLengthArr[blockIndex];
       secondCacheLengthArr[blockIndex] = 0;
       // 标记已经在内存存储的位置
-      secondColDataLen[(threadIndex << power) + blockIndex] += length;
-
-      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
-      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
+//      secondColDataLen[(threadIndex << power) + blockIndex] += length;
+//
+//      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
+//      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
     }
   }
 
