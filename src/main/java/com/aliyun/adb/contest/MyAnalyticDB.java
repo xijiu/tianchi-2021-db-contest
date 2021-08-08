@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MyAnalyticDB implements AnalyticDB {
 
   /** 7-128  8-256  9-512  10-1024  11-2048 */
-  public static final int power = 11;
+  public static final int power = 3;
 
   /**
    * 128- 8000000
@@ -535,19 +535,19 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private final int threadIndex;
 
-    private static final int thresholdValue = 4096 * 3;
+    private static final int thresholdValue = 4096 * 32;
 
-    public final short cacheLength = thresholdValue + 1000;
+    public final int cacheLength = thresholdValue + 1000;
 
-    public final short secondCacheLength = cacheLength;
+    public final int secondCacheLength = cacheLength;
 
     public final long[] firstThreadCacheArr = new long[blockNum * cacheLength];
 
-    public final short[] firstCacheLengthArr = new short[blockNum];
+    public final int[] firstCacheLengthArr = new int[blockNum];
 
     public final long[] secondThreadCacheArr = new long[blockNum * secondCacheLength];
 
-    public final short[] secondCacheLengthArr = new short[blockNum];
+    public final int[] secondCacheLengthArr = new int[blockNum];
 
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(readFileLen);
 
