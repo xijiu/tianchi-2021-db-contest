@@ -312,8 +312,9 @@ public class DiskBlock {
         byte first = (byte) (((byteTmp >> 4) & 15) | partNum);
         byte second = (byte) ((byteTmp & 15) | partNum);
 
-        data[idx++] = makeLong4(first, intTmp, longTmp);
-        data[idx++] = makeLong5(second, longTmp);
+        data[idx++] = ((((long) first & 0xff) << 48) | (((long) intTmp & 0xffffffffL) << 16) | (((longTmp >>> 48) & 0xffff)));
+        data[idx++] = ((((long) second & 0xff) << 48) | (longTmp << 16 >>> 16));
+
       }
       if (over) {
         break;
