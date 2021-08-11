@@ -254,8 +254,12 @@ public class DiskBlock {
     Future<?> future = MyAnalyticDB.executor.submit(() -> {
       readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
     });
+    Future<?> future2 = MyAnalyticDB.executor.submit(() -> {
+      readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
+    });
     readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
     future.get();
+    future2.get();
 
 //    if (1 == 1) {
 //      return 0;
@@ -310,18 +314,6 @@ public class DiskBlock {
 
         data[idx++] = makeLong4(first, intTmp, longTmp);
         data[idx++] = makeLong5(second, longTmp);
-
-
-
-//        long long3 = makeLong2(first, byteBuffer.get(tmpIdx + 1), byteBuffer.get(tmpIdx + 2),
-//                byteBuffer.get(tmpIdx + 3), byteBuffer.get(tmpIdx + 4), byteBuffer.get(tmpIdx + 5), byteBuffer.get(tmpIdx + 6));
-//        long long4 = makeLong2(second, byteBuffer.get(tmpIdx + 7), byteBuffer.get(tmpIdx + 8),
-//                byteBuffer.get(tmpIdx + 9), byteBuffer.get(tmpIdx + 10), byteBuffer.get(tmpIdx + 11), byteBuffer.get(tmpIdx + 12));
-//
-//        System.out.println(long1 + "_" + long2 + "_" + long3 + "_" + long4);
-//        if (1 == 1) {
-//          return;
-//        }
       }
       if (over) {
         break;
