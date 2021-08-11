@@ -220,23 +220,20 @@ public class ReadCharTest {
 
   @Test
   public void tst() {
-//    long[] dataArr = new long[103];
-//    for (int i = 0; i < dataArr.length; i++) {
-//      dataArr[i] = i + 1;
-//    }
-//    int length = dataArr.length;
-//    int actualLen = length % 2 == 0 ? length : length - 1;
-//    for (int i = 0; i < actualLen; i += 2) {
-//      long data1 = dataArr[i];
-//      long data2 = dataArr[i + 1];
-//
-//      System.out.println(data1 + "," + data2);
-//    }
-//    System.out.println(format(Long.toBinaryString(7023000389120829470L)));
-//    System.out.println(format(Long.toBinaryString(7020000000000000000L)));
-//    System.out.println(format(Long.toBinaryString(7023000000000000000L)));
-    System.out.println(PubTools.format(Long.toBinaryString(9131197959929832808L))); // 0.99001
-    System.out.println(PubTools.format(Long.toBinaryString(9135095068500240138L))); // 0.99043
+
+    byte a = -2;
+    int b = -4;
+    long c = -2;
+    System.out.println(Integer.toBinaryString(-4));
+//    System.out.println(PubTools.format(Long.toBinaryString(-2)));
+    long l = DiskBlock.makeLong4(a, b, c);
+//    System.out.println(PubTools.format(Long.toBinaryString(l))); // 0.99043
+
+    a = 4;
+    c = -2;
+    System.out.println(PubTools.format(Long.toBinaryString(-2)));
+    long l2 = DiskBlock.makeLong5(a, c);
+    System.out.println(PubTools.format(Long.toBinaryString(l2))); // 0.99043
   }
 
 

@@ -225,7 +225,7 @@ public class DiskBlock {
 
 
 
-  private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
+  private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocateDirect(perReadSize));
 
   public long get2(int index) throws Exception {
     int lastTmpSize = 0;
@@ -254,8 +254,16 @@ public class DiskBlock {
     Future<?> future = MyAnalyticDB.executor.submit(() -> {
       readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
     });
+//    Future<?> future2 = MyAnalyticDB.executor.submit(() -> {
+//      readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
+//    });
     readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
     future.get();
+//    future2.get();
+
+//    if (1 == 1) {
+//      return 0;
+//    }
 
     int totalLen = (endPos - beginPos) % 13 == 0 ? ((endPos - beginPos) / 13 * 2) : ((endPos - beginPos) / 13 * 2 + 1);
     long solve = tryToQuickFindK(partNumFinal, data, totalLen, index);
@@ -268,7 +276,7 @@ public class DiskBlock {
 
   private void readAndAssignValue(int beginPos, int endPos, AtomicLong pos, long[] data, byte partNum) {
     ByteBuffer byteBuffer = threadLocal.get();
-    byte[] array = byteBuffer.array();
+//    byte[] array = byteBuffer.array();
     int idx = 0;
     int length = 0;
     boolean over = false;
@@ -294,15 +302,18 @@ public class DiskBlock {
         length = (int) (perReadSize - (currPos - endPos));
         over = true;
       }
+      byteBuffer.flip();
       int cycleTime = length / 13;
       for (int i = 0; i < cycleTime; i++) {
-        int tmpIdx = i * 13;
-        byte first = (byte) (((array[tmpIdx] >> 4) & 15) | partNum);
-        byte second = (byte) ((array[tmpIdx] & 15) | partNum);
-        data[idx++] = makeLong2(first, array[tmpIdx + 1], array[tmpIdx + 2],
-                array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
-        data[idx++] = makeLong2(second, array[tmpIdx + 7], array[tmpIdx + 8],
-                array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
+        byte byteTmp = byteBuffer.get();
+        int intTmp = byteBuffer.getInt();
+        long longTmp = byteBuffer.getLong();
+
+        byte first = (byte) (((byteTmp >> 4) & 15) | partNum);
+        byte second = (byte) ((byteTmp & 15) | partNum);
+
+        data[idx++] = makeLong4(first, intTmp, longTmp);
+        data[idx++] = makeLong5(second, longTmp);
       }
       if (over) {
         break;
@@ -310,8 +321,7 @@ public class DiskBlock {
     }
 
     if (length % 13 != 0) {
-      data[idx++] = makeLong2(array[length - 7], array[length - 6], array[length - 5],
-              array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
+      data[idx++] = makeLong3(byteBuffer.get(length - 7), byteBuffer.getShort(length - 6), byteBuffer.getInt(length - 4));
     }
   }
 
@@ -350,6 +360,24 @@ public class DiskBlock {
     } else {
       return -1;
     }
+  }
+
+
+  public static long makeLong5(byte byteTmp, long longTmp) {
+    return ((((long) byteTmp & 0xff) << 48) |
+            (longTmp << 16 >>> 16));
+  }
+
+  public static long makeLong4(byte byteTmp, int intTmp, long longTmp) {
+    return ((((long) byteTmp & 0xff) << 48) |
+            (((long) intTmp & 0xffffffffL) << 16) |
+            (((longTmp >>> 48) & 0xffff)));
+  }
+
+  public static long makeLong3(byte b6, short s, int i) {
+    return ((((long) b6 & 0xff) << 48) |
+            (((long) s & 0xffff) << 32) |
+            (((long) i & (long)0xfffffff)));
   }
 
   public static long makeLong2(byte b6, byte b5, byte b4,
