@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MyAnalyticDB implements AnalyticDB {
 
   /** 7-128  8-256  9-512  10-1024  11-2048 */
-  public static final int power = 8;
+  public static final int power = 7;
 
   /**
    * 128- 8000000
@@ -535,19 +535,19 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private final int threadIndex;
 
-    private static final int thresholdValue = 4096 * 32;
+    private static final int thresholdValue = 4096 * 3;
 
-    public final int cacheLength = thresholdValue + 10000;
+    public final short cacheLength = thresholdValue + 1000;
 
-    public final int secondCacheLength = cacheLength;
+    public final short secondCacheLength = cacheLength;
 
     public final long[] firstThreadCacheArr = new long[blockNum * cacheLength];
 
-    public final int[] firstCacheLengthArr = new int[blockNum];
+    public final short[] firstCacheLengthArr = new short[blockNum];
 
     public final long[] secondThreadCacheArr = new long[blockNum * secondCacheLength];
 
-    public final int[] secondCacheLengthArr = new int[blockNum];
+    public final short[] secondCacheLengthArr = new short[blockNum];
 
     private final ByteBuffer byteBuffer = ByteBuffer.allocate(readFileLen);
 
@@ -788,20 +788,20 @@ public class MyAnalyticDB implements AnalyticDB {
       int length = firstCacheLengthArr[blockIndex];
       firstCacheLengthArr[blockIndex] = 0;
       // 标记已经在内存存储的位置
-//      firstColDataLen[(threadIndex << power) + blockIndex] += length;
-//
-//      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
-//      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
+      firstColDataLen[(threadIndex << power) + blockIndex] += length;
+
+      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
+      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
       int length = secondCacheLengthArr[blockIndex];
       secondCacheLengthArr[blockIndex] = 0;
       // 标记已经在内存存储的位置
-//      secondColDataLen[(threadIndex << power) + blockIndex] += length;
-//
-//      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
-//      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
+      secondColDataLen[(threadIndex << power) + blockIndex] += length;
+
+      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
+      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
     }
   }
 
@@ -842,9 +842,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-    if (1 == 1) {
-      return "0";
-    }
+//    if (1 == 1) {
+//      return "0";
+//    }
 
 //    if (!isFirstInvoke) {
 //      return "0";
