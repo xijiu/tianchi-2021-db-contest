@@ -257,9 +257,9 @@ public class DiskBlock {
     readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
     future.get();
 
-    if (1 == 1) {
-      return 0;
-    }
+//    if (1 == 1) {
+//      return 0;
+//    }
 
     int totalLen = (endPos - beginPos) % 13 == 0 ? ((endPos - beginPos) / 13 * 2) : ((endPos - beginPos) / 13 * 2 + 1);
     long solve = tryToQuickFindK(partNumFinal, data, totalLen, index);
