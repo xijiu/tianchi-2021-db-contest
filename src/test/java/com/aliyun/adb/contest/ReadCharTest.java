@@ -235,8 +235,18 @@ public class ReadCharTest {
 //    System.out.println(format(Long.toBinaryString(7023000389120829470L)));
 //    System.out.println(format(Long.toBinaryString(7020000000000000000L)));
 //    System.out.println(format(Long.toBinaryString(7023000000000000000L)));
-    System.out.println(PubTools.format(Long.toBinaryString(9131197959929832808L))); // 0.99001
-    System.out.println(PubTools.format(Long.toBinaryString(9135095068500240138L))); // 0.99043
+//    System.out.println(PubTools.format(Long.toBinaryString(9131197959929832808L))); // 0.99001
+//    System.out.println(PubTools.format(Long.toBinaryString(9135095068500240138L))); // 0.99043
+//    System.out.println(0xff);
+//    System.out.println(0xffff);
+//    System.out.println((long)0xffffffff);
+
+    byte a = 2;
+    short b = 4;
+    int c = 64;
+    long l = DiskBlock.makeLong3(a, b, c);
+    System.out.println(PubTools.format(Long.toBinaryString(l))); // 0.99043
+
   }
 
 

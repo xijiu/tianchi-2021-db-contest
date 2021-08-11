@@ -297,12 +297,13 @@ public class DiskBlock {
       int cycleTime = length / 13;
       for (int i = 0; i < cycleTime; i++) {
         int tmpIdx = i * 13;
-        byte first = (byte) (((byteBuffer.get(tmpIdx) >> 4) & 15) | partNum);
-        byte second = (byte) ((byteBuffer.get(tmpIdx) & 15) | partNum);
-        data[idx++] = makeLong2(first, byteBuffer.get(tmpIdx + 1), byteBuffer.get(tmpIdx + 2),
-                byteBuffer.get(tmpIdx + 3), byteBuffer.get(tmpIdx + 4), byteBuffer.get(tmpIdx + 5), byteBuffer.get(tmpIdx + 6));
-        data[idx++] = makeLong2(second, byteBuffer.get(tmpIdx + 7), byteBuffer.get(tmpIdx + 8),
-                byteBuffer.get(tmpIdx + 9), byteBuffer.get(tmpIdx + 10), byteBuffer.get(tmpIdx + 11), byteBuffer.get(tmpIdx + 12));
+        byte byteTmp = byteBuffer.get(tmpIdx);
+
+        byte first = (byte) (((byteTmp >> 4) & 15) | partNum);
+        byte second = (byte) ((byteTmp & 15) | partNum);
+
+        data[idx++] = makeLong3(first, byteBuffer.getShort(tmpIdx + 1), byteBuffer.getInt(tmpIdx + 3));
+        data[idx++] = makeLong3(second, byteBuffer.getShort(tmpIdx + 7), byteBuffer.getInt(tmpIdx + 9));
       }
       if (over) {
         break;
@@ -310,8 +311,7 @@ public class DiskBlock {
     }
 
     if (length % 13 != 0) {
-      data[idx++] = makeLong2(byteBuffer.get(length - 7), byteBuffer.get(length - 6), byteBuffer.get(length - 5),
-              byteBuffer.get(length - 4), byteBuffer.get(length - 3), byteBuffer.get(length - 2), byteBuffer.get(length - 1));
+      data[idx++] = makeLong3(byteBuffer.get(length - 7), byteBuffer.getShort(length - 6), byteBuffer.getInt(length - 4));
     }
   }
 
@@ -350,6 +350,13 @@ public class DiskBlock {
     } else {
       return -1;
     }
+  }
+
+
+  public static long makeLong3(byte b6, short s, int i) {
+    return ((((long) b6 & 0xff) << 48) |
+            (((long) s & 0xffff) << 32) |
+            (((long) i)));
   }
 
   public static long makeLong2(byte b6, byte b5, byte b4,
