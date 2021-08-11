@@ -867,8 +867,8 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     String result = tmp(table, column, number);
-//    System.out.println("table is " + table + ", column is" + column
-//            + ", percentile is " + percentile + ", result is " + result);
+    System.out.println("table is " + table + ", column is" + column
+            + ", percentile is " + percentile + ", result is " + result);
 
     return result;
   }
