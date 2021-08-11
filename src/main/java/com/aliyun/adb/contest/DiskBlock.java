@@ -298,29 +298,30 @@ public class DiskBlock {
         length = (int) (perReadSize - (currPos - endPos));
         over = true;
       }
+      byteBuffer.flip();
       int cycleTime = length / 13;
       for (int i = 0; i < cycleTime; i++) {
-        int tmpIdx = i * 13;
-        byte byteTmp = byteBuffer.get(tmpIdx);
+        byte byteTmp = byteBuffer.get();
+        int intTmp = byteBuffer.getInt();
+        long longTmp = byteBuffer.getLong();
 
         byte first = (byte) (((byteTmp >> 4) & 15) | partNum);
         byte second = (byte) ((byteTmp & 15) | partNum);
 
-//        data[idx++] = makeLong3(first, byteBuffer.getShort(tmpIdx + 1), byteBuffer.getInt(tmpIdx + 3));
-//        data[idx++] = makeLong3(second, byteBuffer.getShort(tmpIdx + 7), byteBuffer.getInt(tmpIdx + 9));
+        data[idx++] = makeLong4(first, intTmp, longTmp);
+        data[idx++] = makeLong5(second, longTmp);
 
-        long long1 = makeLong3(first, byteBuffer.getShort(tmpIdx + 1), byteBuffer.getInt(tmpIdx + 3));
-        long long2 = makeLong3(second, byteBuffer.getShort(tmpIdx + 7), byteBuffer.getInt(tmpIdx + 9));
 
-        long long3 = makeLong2(first, byteBuffer.get(tmpIdx + 1), byteBuffer.get(tmpIdx + 2),
-                byteBuffer.get(tmpIdx + 3), byteBuffer.get(tmpIdx + 4), byteBuffer.get(tmpIdx + 5), byteBuffer.get(tmpIdx + 6));
-        long long4 = makeLong2(second, byteBuffer.get(tmpIdx + 7), byteBuffer.get(tmpIdx + 8),
-                byteBuffer.get(tmpIdx + 9), byteBuffer.get(tmpIdx + 10), byteBuffer.get(tmpIdx + 11), byteBuffer.get(tmpIdx + 12));
 
-        System.out.println(long1 + "_" + long2 + "_" + long3 + "_" + long4);
-        if (1 == 1) {
-          return;
-        }
+//        long long3 = makeLong2(first, byteBuffer.get(tmpIdx + 1), byteBuffer.get(tmpIdx + 2),
+//                byteBuffer.get(tmpIdx + 3), byteBuffer.get(tmpIdx + 4), byteBuffer.get(tmpIdx + 5), byteBuffer.get(tmpIdx + 6));
+//        long long4 = makeLong2(second, byteBuffer.get(tmpIdx + 7), byteBuffer.get(tmpIdx + 8),
+//                byteBuffer.get(tmpIdx + 9), byteBuffer.get(tmpIdx + 10), byteBuffer.get(tmpIdx + 11), byteBuffer.get(tmpIdx + 12));
+//
+//        System.out.println(long1 + "_" + long2 + "_" + long3 + "_" + long4);
+//        if (1 == 1) {
+//          return;
+//        }
       }
       if (over) {
         break;
@@ -369,6 +370,17 @@ public class DiskBlock {
     }
   }
 
+
+  public static long makeLong5(byte byteTmp, long longTmp) {
+    return ((((long) byteTmp & 0xff) << 48) |
+            (longTmp << 16 >>> 16));
+  }
+
+  public static long makeLong4(byte byteTmp, int intTmp, long longTmp) {
+    return ((((long) byteTmp & 0xff) << 48) |
+            (((long) intTmp & 0xffffffffL) << 16) |
+            (((longTmp >>> 48) & 0xffff)));
+  }
 
   public static long makeLong3(byte b6, short s, int i) {
     return ((((long) b6 & 0xff) << 48) |
