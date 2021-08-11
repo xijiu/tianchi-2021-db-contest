@@ -302,21 +302,21 @@ public class DiskBlock {
         byte first = (byte) (((byteTmp >> 4) & 15) | partNum);
         byte second = (byte) ((byteTmp & 15) | partNum);
 
-        data[idx++] = makeLong3(first, byteBuffer.getShort(tmpIdx + 1), byteBuffer.getInt(tmpIdx + 3));
-        data[idx++] = makeLong3(second, byteBuffer.getShort(tmpIdx + 7), byteBuffer.getInt(tmpIdx + 9));
+//        data[idx++] = makeLong3(first, byteBuffer.getShort(tmpIdx + 1), byteBuffer.getInt(tmpIdx + 3));
+//        data[idx++] = makeLong3(second, byteBuffer.getShort(tmpIdx + 7), byteBuffer.getInt(tmpIdx + 9));
 
-//        long long1 = makeLong3(first, byteBuffer.getShort(tmpIdx + 1), byteBuffer.getInt(tmpIdx + 3));
-//        long long2 = makeLong3(second, byteBuffer.getShort(tmpIdx + 7), byteBuffer.getInt(tmpIdx + 9));
-//
-//        long long3 = makeLong2(first, byteBuffer.get(tmpIdx + 1), byteBuffer.get(tmpIdx + 2),
-//                byteBuffer.get(tmpIdx + 3), byteBuffer.get(tmpIdx + 4), byteBuffer.get(tmpIdx + 5), byteBuffer.get(tmpIdx + 6));
-//        long long4 = makeLong2(second, byteBuffer.get(tmpIdx + 7), byteBuffer.get(tmpIdx + 8),
-//                byteBuffer.get(tmpIdx + 9), byteBuffer.get(tmpIdx + 10), byteBuffer.get(tmpIdx + 11), byteBuffer.get(tmpIdx + 12));
-//
-//        System.out.println(long1 + "_" + long2 + "_" + long3 + "_" + long4);
-//        if (1 == 1) {
-//          return;
-//        }
+        long long1 = makeLong3(first, byteBuffer.getShort(tmpIdx + 1), byteBuffer.getInt(tmpIdx + 3));
+        long long2 = makeLong3(second, byteBuffer.getShort(tmpIdx + 7), byteBuffer.getInt(tmpIdx + 9));
+
+        long long3 = makeLong2(first, byteBuffer.get(tmpIdx + 1), byteBuffer.get(tmpIdx + 2),
+                byteBuffer.get(tmpIdx + 3), byteBuffer.get(tmpIdx + 4), byteBuffer.get(tmpIdx + 5), byteBuffer.get(tmpIdx + 6));
+        long long4 = makeLong2(second, byteBuffer.get(tmpIdx + 7), byteBuffer.get(tmpIdx + 8),
+                byteBuffer.get(tmpIdx + 9), byteBuffer.get(tmpIdx + 10), byteBuffer.get(tmpIdx + 11), byteBuffer.get(tmpIdx + 12));
+
+        System.out.println(long1 + "_" + long2 + "_" + long3 + "_" + long4);
+        if (1 == 1) {
+          return;
+        }
       }
       if (over) {
         break;
