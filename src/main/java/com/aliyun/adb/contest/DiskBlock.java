@@ -225,7 +225,7 @@ public class DiskBlock {
 
 
 
-  private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocate(perReadSize));
+  private static ThreadLocal<ByteBuffer> threadLocal = ThreadLocal.withInitial(() -> ByteBuffer.allocateDirect(perReadSize));
 
   public long get2(int index) throws Exception {
     int lastTmpSize = 0;
@@ -268,7 +268,7 @@ public class DiskBlock {
 
   private void readAndAssignValue(int beginPos, int endPos, AtomicLong pos, long[] data, byte partNum) {
     ByteBuffer byteBuffer = threadLocal.get();
-    byte[] array = byteBuffer.array();
+//    byte[] array = byteBuffer.array();
     int idx = 0;
     int length = 0;
     boolean over = false;
@@ -297,12 +297,12 @@ public class DiskBlock {
       int cycleTime = length / 13;
       for (int i = 0; i < cycleTime; i++) {
         int tmpIdx = i * 13;
-        byte first = (byte) (((array[tmpIdx] >> 4) & 15) | partNum);
-        byte second = (byte) ((array[tmpIdx] & 15) | partNum);
-        data[idx++] = makeLong2(first, array[tmpIdx + 1], array[tmpIdx + 2],
-                array[tmpIdx + 3], array[tmpIdx + 4], array[tmpIdx + 5], array[tmpIdx + 6]);
-        data[idx++] = makeLong2(second, array[tmpIdx + 7], array[tmpIdx + 8],
-                array[tmpIdx + 9], array[tmpIdx + 10], array[tmpIdx + 11], array[tmpIdx + 12]);
+        byte first = (byte) (((byteBuffer.get(tmpIdx) >> 4) & 15) | partNum);
+        byte second = (byte) ((byteBuffer.get(tmpIdx) & 15) | partNum);
+        data[idx++] = makeLong2(first, byteBuffer.get(tmpIdx + 1), byteBuffer.get(tmpIdx + 2),
+                byteBuffer.get(tmpIdx + 3), byteBuffer.get(tmpIdx + 4), byteBuffer.get(tmpIdx + 5), byteBuffer.get(tmpIdx + 6));
+        data[idx++] = makeLong2(second, byteBuffer.get(tmpIdx + 7), byteBuffer.get(tmpIdx + 8),
+                byteBuffer.get(tmpIdx + 9), byteBuffer.get(tmpIdx + 10), byteBuffer.get(tmpIdx + 11), byteBuffer.get(tmpIdx + 12));
       }
       if (over) {
         break;
@@ -310,8 +310,8 @@ public class DiskBlock {
     }
 
     if (length % 13 != 0) {
-      data[idx++] = makeLong2(array[length - 7], array[length - 6], array[length - 5],
-              array[length - 4], array[length - 3], array[length - 2], array[length - 1]);
+      data[idx++] = makeLong2(byteBuffer.get(length - 7), byteBuffer.get(length - 6), byteBuffer.get(length - 5),
+              byteBuffer.get(length - 4), byteBuffer.get(length - 3), byteBuffer.get(length - 2), byteBuffer.get(length - 1));
     }
   }
 
