@@ -189,10 +189,7 @@ public class DiskBlock {
 
       batchWriteBuffer.put((byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
       batchWriteBuffer.putInt((int) (data1 << 16 >>> 32));
-      batchWriteBuffer.putShort((short) (data1));
-
-      batchWriteBuffer.putInt((int) (data2 << 16 >>> 32));
-      batchWriteBuffer.putShort((short) (data2));
+      batchWriteBuffer.putLong(data1 << 48 | (data2 << 16 >>> 16));
     }
 
     // 奇数
