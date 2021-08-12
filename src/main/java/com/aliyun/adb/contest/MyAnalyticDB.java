@@ -840,7 +840,7 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=======================> actual total cost : " + totalCost);
 
       if (isTest) {
-        if (totalCost > 38000) {
+        if (totalCost > 37600) {
           return "0";
         }
       }
