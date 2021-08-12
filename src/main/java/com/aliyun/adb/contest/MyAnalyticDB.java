@@ -534,7 +534,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private final int threadIndex;
 
-    private static final int thresholdValue = 4096 * 3;
+    private static final int thresholdValue = 4096 * 2;
 
     public final short cacheLength = thresholdValue + 1000;
 
