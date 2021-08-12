@@ -540,15 +540,15 @@ public class MyAnalyticDB implements AnalyticDB {
 
     public final short secondCacheLength = cacheLength;
 
-    public final long[] firstThreadCacheArr = new long[blockNum * cacheLength];
+    public long[] firstThreadCacheArr = null;
 
-    public final short[] firstCacheLengthArr = new short[blockNum];
+    public short[] firstCacheLengthArr = null;
 
-    public final long[] secondThreadCacheArr = new long[blockNum * secondCacheLength];
+    public long[] secondThreadCacheArr = null;
 
-    public final short[] secondCacheLengthArr = new short[blockNum];
+    public short[] secondCacheLengthArr = null;
 
-    private final ByteBuffer byteBuffer = ByteBuffer.allocate(readFileLen);
+    private ByteBuffer byteBuffer = null;
 
     private final long[] bucketHeadArr;
     private final long[] bucketBaseArr;
@@ -584,6 +584,11 @@ public class MyAnalyticDB implements AnalyticDB {
 
     public void run() {
       long begin = System.currentTimeMillis();
+      firstThreadCacheArr = new long[blockNum * cacheLength];
+      firstCacheLengthArr = new short[blockNum];
+      secondThreadCacheArr = new long[blockNum * secondCacheLength];
+      secondCacheLengthArr = new short[blockNum];
+      byteBuffer = ByteBuffer.allocate(readFileLen);
       try {
         while (true) {
 //            long begin1 = System.currentTimeMillis();
