@@ -213,7 +213,7 @@ public class MyAnalyticDB implements AnalyticDB {
     String cmd = "cp /adb-data/tpch/lineitem " + workspaceDir + "/lineitem";
     System.out.println("cmd is " + cmd);
     Runtime.getRuntime().exec(cmd);
-    Thread.sleep(10000);
+    Thread.sleep(30000);
     System.out.println("file total size is " + PubTools.getDirSize(new File("/adb-data/tpch")));
     System.out.println("workspaceDir size is " + PubTools.getDirSize(new File(workspaceDir)));
     loadCostTime = System.currentTimeMillis() - begin;
