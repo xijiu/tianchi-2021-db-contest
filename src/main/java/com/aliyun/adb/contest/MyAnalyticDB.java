@@ -207,16 +207,27 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public void load(String tpchDataFileDir, String workspaceDir) throws Exception {
-    System.out.println("workspaceDir size origin is " + PubTools.getDirSize(new File(workspaceDir)));
-
     long begin = System.currentTimeMillis();
-    String cmd = "cp /adb-data/tpch/lineitem " + workspaceDir + "/lineitem";
-    System.out.println("cmd is " + cmd);
-    Runtime.getRuntime().exec(cmd);
-    Thread.sleep(30000);
-    System.out.println("file total size is " + PubTools.getDirSize(new File("/adb-data/tpch")));
-    System.out.println("workspaceDir size is " + PubTools.getDirSize(new File(workspaceDir)));
+    setInvokeFlag(workspaceDir);
+    init(workspaceDir);
+    if (!isFirstInvoke) {
+      reloadBlockNumberFile();
+      return ;
+    }
+
+    System.out.println("stable load invoked, time is " + begin);
+    DiskBlock.workspaceDir = workspaceDir;
+
+    storeBlockData();
+
+    storeBlockNumberFile();
+
     loadCostTime = System.currentTimeMillis() - begin;
+//    System.out.println("target file size is " + PubTools.getDirSize(new File(workspaceDir)));
+    System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
+    System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
+    System.out.println("============> sort data cost time : " + sortDataTime.get() / cpuThreadNum);
+    System.out.println("");
     System.out.println("============> stable load cost time : " + loadCostTime);
   }
 
@@ -835,9 +846,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-    if (1 == 1) {
-      return "0";
-    }
+//    if (1 == 1) {
+//      return "0";
+//    }
 
 //    if (!isFirstInvoke) {
 //      return "0";

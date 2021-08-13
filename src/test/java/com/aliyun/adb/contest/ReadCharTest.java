@@ -3,11 +3,14 @@ package com.aliyun.adb.contest;
 import com.aliyun.adb.contest.utils.PubTools;
 import org.junit.Assert;
 import org.junit.Test;
+import sun.misc.Unsafe;
+import sun.nio.ch.DirectBuffer;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -18,11 +21,18 @@ public class ReadCharTest {
 
   @Test
   public void test3() throws Exception {
-    // lineitem L_ORDERKEY,L_PARTKEY
-    // orders   O_ORDERKEY,O_CUSTKEY
+    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4096);
+    byteBuffer.putLong(8L);
+    byteBuffer.getLong();
 
-    System.out.println(Long.toBinaryString(2207551456187336L));
-    System.out.println(Integer.toBinaryString(-63));
+    long address = ((DirectBuffer) byteBuffer).address();
+
+    Field f = Unsafe.class.getDeclaredField("theUnsafe");
+    f.setAccessible(true);
+    Unsafe unsafe = (Unsafe) f.get(null);
+    unsafe.putLong(address, 100);
+
+    System.out.println(unsafe.getLong(address));
   }
 
   @Test

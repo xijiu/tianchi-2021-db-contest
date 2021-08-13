@@ -2,6 +2,8 @@ package com.aliyun.adb.contest;
 
 
 import com.aliyun.adb.contest.utils.PubTools;
+import sun.misc.Unsafe;
+import sun.nio.ch.DirectBuffer;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +62,11 @@ public class DiskBlock {
 
   private ByteBuffer batchWriteBuffer = null;
 
+  private long address = 0;
+
   private final long[] temporaryArr = new long[splitNum];
+
+  public static Unsafe unsafe = PubTools.unsafe();
 
   public DiskBlock(String tableName, int col, int blockIndex) {
     this.tableName = tableName;
@@ -69,6 +75,8 @@ public class DiskBlock {
     this.bytePrev = (byte) (blockIndex >> (MyAnalyticDB.power - 8 + 1));
     if (MyAnalyticDB.isFirstInvoke) {
       batchWriteBuffer = ByteBuffer.allocateDirect((int) (secondCacheLength * 6.5 + 14));
+      address = ((DirectBuffer) batchWriteBuffer).address();
+
 
       if (col == 1) {
         dataCache1 = new long[splitNum * cacheLength];
@@ -202,10 +210,7 @@ public class DiskBlock {
 
         batchWriteBuffer.put((byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
         batchWriteBuffer.putInt((int) (data1 << 16 >>> 32));
-        batchWriteBuffer.putShort((short) (data1));
-
-        batchWriteBuffer.putInt((int) (data2 << 16 >>> 32));
-        batchWriteBuffer.putShort((short) (data2));
+        batchWriteBuffer.putLong(data1 << 48 | (data2 << 16 >>> 16));
 
         temporaryArr[index] = 0;
       }

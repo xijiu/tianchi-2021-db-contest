@@ -1,8 +1,21 @@
 package com.aliyun.adb.contest.utils;
 
+import sun.misc.Unsafe;
+
 import java.io.File;
+import java.lang.reflect.Field;
 
 public class PubTools {
+
+  public static Unsafe unsafe() {
+    try {
+      Field f = Unsafe.class.getDeclaredField("theUnsafe");
+      f.setAccessible(true);
+      return (Unsafe) f.get(null);
+    } catch (Exception e) {
+      return null;
+    }
+  }
 
   public static long getDirSize(File file) {
     if (file.exists()) {
