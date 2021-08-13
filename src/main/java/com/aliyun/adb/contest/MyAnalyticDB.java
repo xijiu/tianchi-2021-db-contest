@@ -208,26 +208,8 @@ public class MyAnalyticDB implements AnalyticDB {
   @Override
   public void load(String tpchDataFileDir, String workspaceDir) throws Exception {
     long begin = System.currentTimeMillis();
-    setInvokeFlag(workspaceDir);
-    init(workspaceDir);
-    if (!isFirstInvoke) {
-      reloadBlockNumberFile();
-      return ;
-    }
-
-    System.out.println("stable load invoked, time is " + begin);
-    DiskBlock.workspaceDir = workspaceDir;
-
-    storeBlockData();
-
-    storeBlockNumberFile();
-
+    Runtime.getRuntime().exec("cp /adb-data/tpch/lineitem " + workspaceDir + "/myTest.data");
     loadCostTime = System.currentTimeMillis() - begin;
-//    System.out.println("target file size is " + PubTools.getDirSize(new File(workspaceDir)));
-    System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
-    System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
-    System.out.println("============> sort data cost time : " + sortDataTime.get() / cpuThreadNum);
-    System.out.println("");
     System.out.println("============> stable load cost time : " + loadCostTime);
   }
 
