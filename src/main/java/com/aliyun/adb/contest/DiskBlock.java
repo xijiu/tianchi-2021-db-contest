@@ -194,8 +194,8 @@ public class DiskBlock {
     long data = temporaryArr[idx];
     if (data != 0) {
       unsafe.putByte(addressHelper++, (byte)(data >> 48));
-      unsafe.putByte(addressHelper++, (byte)(data >> 40));
-      unsafe.putByte(addressHelper++, (byte)(data >> 32));
+      unsafe.putShort(addressHelper, (short) (data << 16 >>> 48));
+      addressHelper += 2;
       unsafe.putInt(addressHelper, (int)(data));
       addressHelper += 4;
     }
