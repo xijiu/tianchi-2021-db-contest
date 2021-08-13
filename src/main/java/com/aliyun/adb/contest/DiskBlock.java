@@ -62,7 +62,9 @@ public class DiskBlock {
 
   private ByteBuffer batchWriteBuffer = null;
 
-  private long address = 0;
+  private final long address;
+
+  private long addressHelper = 0;
 
   private final long[] temporaryArr = new long[splitNum];
 
@@ -88,6 +90,8 @@ public class DiskBlock {
       for (int i = 0; i < splitNum; i++) {
         partFilePosArr[i] = i * partFileSize;
       }
+    } else {
+      address = 0L;
     }
     this.initFileChannel();
   }
@@ -108,6 +112,8 @@ public class DiskBlock {
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen1[index] >= thresholdValue) {
         putToByteBuffer(index, dataCache1, dataCacheLen1[index]);
+
+        batchWriteBuffer.position((int) (addressHelper - address));
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
@@ -127,6 +133,8 @@ public class DiskBlock {
     for (int index = 0; index < splitNum; index++) {
       if (dataCacheLen2[index] >= thresholdValue) {
         putToByteBuffer(index, dataCache2, dataCacheLen2[index]);
+
+        batchWriteBuffer.position((int) (addressHelper - address));
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
@@ -142,13 +150,16 @@ public class DiskBlock {
       if (len > 0) {
         putToByteBuffer(i, dataCache1, len);
         storeLastData(i);
+        batchWriteBuffer.position((int) (addressHelper - address));
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
         dataCacheLen1[i] = 0;
       } else if (temporaryArr[i] != 0) {
         batchWriteBuffer.clear();
+        addressHelper = address;
         storeLastData(i);
+        batchWriteBuffer.position((int) (addressHelper - address));
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
@@ -179,15 +190,17 @@ public class DiskBlock {
   private void storeLastData(int idx) {
     long data = temporaryArr[idx];
     if (data != 0) {
-      batchWriteBuffer.put((byte)(data >> 48));
-      batchWriteBuffer.put((byte)(data >> 40));
-      batchWriteBuffer.put((byte)(data >> 32));
-      batchWriteBuffer.putInt((int)(data));
+      unsafe.putByte(addressHelper++, (byte)(data >> 48));
+      unsafe.putByte(addressHelper++, (byte)(data >> 40));
+      unsafe.putByte(addressHelper++, (byte)(data >> 32));
+      unsafe.putInt(addressHelper, (int)(data));
+      addressHelper += 4;
     }
   }
 
   private void putToByteBuffer(int index, long[] dataArr, int length) {
     batchWriteBuffer.clear();
+    addressHelper = address;
     int actualLen = length % 2 == 0 ? length : (length - 1);
     int beginIndex = index * cacheLength;
     int endIndex = beginIndex + actualLen;
@@ -195,9 +208,11 @@ public class DiskBlock {
       long data1 = dataArr[i];
       long data2 = dataArr[i + 1];
 
-      batchWriteBuffer.put((byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
-      batchWriteBuffer.putInt((int) (data1 << 16 >>> 32));
-      batchWriteBuffer.putLong(data1 << 48 | (data2 << 16 >>> 16));
+      unsafe.putByte(addressHelper++, (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
+      unsafe.putInt(addressHelper, (int) (data1 << 16 >>> 32));
+      addressHelper += 4;
+      unsafe.putLong(addressHelper++, data1 << 48 | (data2 << 16 >>> 16));
+      addressHelper += 8;
     }
 
     // 奇数
@@ -208,9 +223,11 @@ public class DiskBlock {
         long data1 = temporaryArr[index];
         long data2 = dataArr[beginIndex + length - 1];
 
-        batchWriteBuffer.put((byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
-        batchWriteBuffer.putInt((int) (data1 << 16 >>> 32));
-        batchWriteBuffer.putLong(data1 << 48 | (data2 << 16 >>> 16));
+        unsafe.putByte(addressHelper++, (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
+        unsafe.putInt(addressHelper, (int) (data1 << 16 >>> 32));
+        addressHelper += 4;
+        unsafe.putLong(addressHelper++, data1 << 48 | (data2 << 16 >>> 16));
+        addressHelper += 8;
 
         temporaryArr[index] = 0;
       }

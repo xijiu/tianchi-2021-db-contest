@@ -846,9 +846,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-//    if (1 == 1) {
-//      return "0";
-//    }
+    if (1 == 1) {
+      return "0";
+    }
 
 //    if (!isFirstInvoke) {
 //      return "0";
