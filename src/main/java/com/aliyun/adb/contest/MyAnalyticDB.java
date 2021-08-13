@@ -209,6 +209,7 @@ public class MyAnalyticDB implements AnalyticDB {
   public void load(String tpchDataFileDir, String workspaceDir) throws Exception {
     long begin = System.currentTimeMillis();
     Runtime.getRuntime().exec("cp /adb-data/tpch/lineitem " + workspaceDir + "/myTest.data");
+    System.out.println("file total size is " + PubTools.getDirSize(new File("/adb-data/tpch")));
     loadCostTime = System.currentTimeMillis() - begin;
     System.out.println("============> stable load cost time : " + loadCostTime);
   }
