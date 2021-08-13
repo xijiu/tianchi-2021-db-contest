@@ -179,7 +179,9 @@ public class DiskBlock {
         dataCacheLen2[i] = 0;
       } else if (temporaryArr[i] != 0) {
         batchWriteBuffer.clear();
+        addressHelper = address;
         storeLastData(i);
+        batchWriteBuffer.position((int) (addressHelper - address));
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
