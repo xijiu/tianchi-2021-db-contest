@@ -295,11 +295,12 @@ public class DiskBlock {
 
   private void readAndAssignValue(int beginPos, int endPos, AtomicLong pos, long[] data, byte partNum) {
     ByteBuffer byteBuffer = threadLocal.get();
-    long address = ((DirectBuffer) byteBuffer).address();
+
     int idx = 0;
     int length = 0;
     boolean over = false;
     while (true) {
+      long address = ((DirectBuffer) byteBuffer).address();
       byteBuffer.clear();
       long readPos = pos.getAndAdd(perReadSize);
       idx = (int) ((readPos - beginPos) / 13 * 2);
@@ -324,9 +325,11 @@ public class DiskBlock {
       byteBuffer.flip();
       int cycleTime = length / 13;
       for (int i = 0; i < cycleTime; i++) {
-        byte byteTmp = byteBuffer.get();
-        int intTmp = byteBuffer.getInt();
-        long longTmp = byteBuffer.getLong();
+        byte byteTmp = unsafe.getByte(address++);
+        int intTmp = unsafe.getInt(address);
+        address += 4;
+        long longTmp = unsafe.getLong(address);
+        address += 8;
 
         byte first = (byte) (((byteTmp >> 4) & 15) | partNum);
         byte second = (byte) ((byteTmp & 15) | partNum);
@@ -340,7 +343,11 @@ public class DiskBlock {
     }
 
     if (length % 13 != 0) {
-      data[idx++] = makeLong3(byteBuffer.get(length - 7), byteBuffer.getShort(length - 6), byteBuffer.getInt(length - 4));
+      long address = ((DirectBuffer) byteBuffer).address();
+      byte aByte = unsafe.getByte(address + (length - 7));
+      short aShort = unsafe.getShort(address + (length - 6));
+      int anInt = unsafe.getInt(address + (length - 4));
+      data[idx++] = makeLong3(aByte, aShort, anInt);
     }
   }
 
