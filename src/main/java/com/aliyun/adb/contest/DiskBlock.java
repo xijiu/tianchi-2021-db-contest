@@ -211,7 +211,7 @@ public class DiskBlock {
       unsafe.putByte(addressHelper++, (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
       unsafe.putInt(addressHelper, (int) (data1 << 16 >>> 32));
       addressHelper += 4;
-      unsafe.putLong(addressHelper++, data1 << 48 | (data2 << 16 >>> 16));
+      unsafe.putLong(addressHelper, data1 << 48 | (data2 << 16 >>> 16));
       addressHelper += 8;
     }
 
@@ -226,7 +226,7 @@ public class DiskBlock {
         unsafe.putByte(addressHelper++, (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
         unsafe.putInt(addressHelper, (int) (data1 << 16 >>> 32));
         addressHelper += 4;
-        unsafe.putLong(addressHelper++, data1 << 48 | (data2 << 16 >>> 16));
+        unsafe.putLong(addressHelper, data1 << 48 | (data2 << 16 >>> 16));
         addressHelper += 8;
 
         temporaryArr[index] = 0;
@@ -295,7 +295,7 @@ public class DiskBlock {
 
   private void readAndAssignValue(int beginPos, int endPos, AtomicLong pos, long[] data, byte partNum) {
     ByteBuffer byteBuffer = threadLocal.get();
-//    byte[] array = byteBuffer.array();
+    long address = ((DirectBuffer) byteBuffer).address();
     int idx = 0;
     int length = 0;
     boolean over = false;
