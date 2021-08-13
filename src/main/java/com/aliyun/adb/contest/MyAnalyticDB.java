@@ -2,6 +2,8 @@ package com.aliyun.adb.contest;
 
 import com.aliyun.adb.contest.spi.AnalyticDB;
 import com.aliyun.adb.contest.utils.PubTools;
+import sun.misc.Unsafe;
+import sun.nio.ch.DirectBuffer;
 
 import java.io.File;
 import java.io.IOException;
@@ -123,6 +125,8 @@ public class MyAnalyticDB implements AnalyticDB {
   private volatile long fileSize = file1.length();
 
   public static ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+
+  private static Unsafe unsafe = PubTools.unsafe();
 
   public MyAnalyticDB() {
 //    try {
@@ -567,6 +571,8 @@ public class MyAnalyticDB implements AnalyticDB {
     private final boolean firstFile;
     private final AtomicInteger number;
 
+    private long address = 0;
+
     public CpuThread(int index, int fileFlag) throws Exception {
       this.threadIndex = index;
       this.fileFlag = fileFlag;
@@ -588,15 +594,16 @@ public class MyAnalyticDB implements AnalyticDB {
       firstCacheLengthArr = new short[blockNum];
       secondThreadCacheArr = new long[blockNum * secondCacheLength];
       secondCacheLengthArr = new short[blockNum];
-      byteBuffer = ByteBuffer.allocate(readFileLen);
+      byteBuffer = ByteBuffer.allocateDirect(readFileLen);
+      address = ((DirectBuffer) byteBuffer).address();
       try {
         while (true) {
 //            long begin1 = System.currentTimeMillis();
-          byte[] data = threadReadData();
+          int dataLen = threadReadData();
 //            readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
-          if (data != null) {
-            operate(data);
+          if (dataLen >= 0) {
+            operate(dataLen);
           } else {
             if (firstFile) {
               int finishNum = finishThreadNum1.incrementAndGet();
@@ -658,7 +665,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private int tmpBlockIndex = -1;
 
-    private byte[] threadReadData() throws Exception {
+    private int threadReadData() throws Exception {
       if (tmpBlockIndex == -1) {
         tmpBlockIndex = number.getAndAdd(cpuThreadNum);
       } else {
@@ -673,21 +680,18 @@ public class MyAnalyticDB implements AnalyticDB {
       bucket = indexNum;
       long position = (long) indexNum * readFileLen;
       if (position >= fileSize) {
-        return null;
+        return -1;
       }
 
       byteBuffer.clear();
       fileChannel.read(byteBuffer, position + 21);
       byteBuffer.flip();
 
-      byte[] array = byteBuffer.array();
       if (bucket == lastBucketIndex_1) {
         lastBucketLength = byteBuffer.limit();
-        byte[] result = new byte[byteBuffer.limit()];
-        System.arraycopy(array, 0, result, 0, lastBucketLength);
-        return result;
+        return lastBucketLength;
       } else {
-        return array;
+        return readFileLen;
       }
     }
 
@@ -733,15 +737,15 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-    private void operate(byte[] dataArr) throws Exception {
+    private void operate(int length) throws Exception {
       long data = 0L;
       int beginIndex = 0;
-      int length = dataArr.length;
 
+      long addressTmp = address;
       if (bucket > 0) {
         long base = 1;
         for (int i = 0; i < length; i++) {
-          byte element = dataArr[i];
+          byte element = unsafe.getByte(addressTmp++);
           if (element < 45) {
             beginIndex = i + 1;
             bucketHeadArr[bucket] = data;
@@ -757,7 +761,7 @@ public class MyAnalyticDB implements AnalyticDB {
       }
 
       for (int i = beginIndex; i < length; i++) {
-        byte element = dataArr[i];
+        byte element = unsafe.getByte(addressTmp++);
         if (element < 45) {
           int blockIndex = (int) (data >> drift);
           if (element == 44) {
