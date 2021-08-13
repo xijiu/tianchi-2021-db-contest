@@ -207,10 +207,13 @@ public class MyAnalyticDB implements AnalyticDB {
 
   @Override
   public void load(String tpchDataFileDir, String workspaceDir) throws Exception {
+    System.out.println("workspaceDir size origin is " + PubTools.getDirSize(new File(workspaceDir)));
+
     long begin = System.currentTimeMillis();
-    String cmd = "cp /adb-data/tpch/lineitem " + workspaceDir + "/myTest.data";
+    String cmd = "cp /adb-data/tpch/lineitem " + workspaceDir + "/lineitem";
     System.out.println("cmd is " + cmd);
-    Runtime.getRuntime().exec(cmd);
+    Process exec = Runtime.getRuntime().exec(cmd);
+    exec.wait(30 * 1000);
     System.out.println("file total size is " + PubTools.getDirSize(new File("/adb-data/tpch")));
     System.out.println("workspaceDir size is " + PubTools.getDirSize(new File(workspaceDir)));
     loadCostTime = System.currentTimeMillis() - begin;
