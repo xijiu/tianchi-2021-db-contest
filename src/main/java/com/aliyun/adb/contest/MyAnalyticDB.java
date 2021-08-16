@@ -764,8 +764,10 @@ public class MyAnalyticDB implements AnalyticDB {
         byte element = unsafe.getByte(addressTmp++);
         if (element < 45) {
           int blockIndex = (int) (data >> drift);
-          if (blockIndex < 0) {
-            System.out.println(123);
+          if (element == 44) {
+            firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
+          } else {
+            secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
           }
           data = 0L;
         } else {
@@ -776,7 +778,7 @@ public class MyAnalyticDB implements AnalyticDB {
       // 处理尾部数据
       bucketTailArr[bucket] = data;
 
-//      saveToMemoryOrDisk();
+      saveToMemoryOrDisk();
     }
 
     private void saveToMemoryOrDisk() throws Exception {
@@ -796,8 +798,8 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       firstColDataLen[(threadIndex << power) + blockIndex] += length;
 
-      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
-      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
+//      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
+//      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -806,8 +808,8 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       secondColDataLen[(threadIndex << power) + blockIndex] += length;
 
-      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
-      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
+//      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
+//      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
     }
   }
 
