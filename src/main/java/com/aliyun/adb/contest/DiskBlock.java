@@ -44,17 +44,19 @@ public class DiskBlock {
 
   public volatile FileChannel partFileChannel = null;
 
-  private long[] dataCache1 = null;
+  private ByteBuffer[] dataCache1 = new ByteBuffer[splitNum];
 
-  private short[] dataCacheLen1 = null;
+  private long[] dataCacheLenBase1 = null;
 
-  private long[] dataCache2 = null;
+  private long[] dataCacheLen1 = null;
 
-  private short[] dataCacheLen2 = null;
+  private ByteBuffer[] dataCache2 = new ByteBuffer[splitNum];
 
-  private ByteBuffer batchWriteBuffer = null;
+  private long[] dataCacheLenBase2 = null;
 
-  private final long address;
+  private long[] dataCacheLen2 = null;
+
+//  private final long address;
 
   private long addressHelper = 0;
 
@@ -66,22 +68,30 @@ public class DiskBlock {
     this.blockIndex = blockIndex;
     this.bytePrev = (byte) (blockIndex >> (MyAnalyticDB.power - 8 + 1));
     if (MyAnalyticDB.isFirstInvoke) {
-      batchWriteBuffer = ByteBuffer.allocateDirect((int) (secondCacheLength * 7 + 14));
-      address = ((DirectBuffer) batchWriteBuffer).address();
+//      batchWriteBuffer = ByteBuffer.allocateDirect((int) (secondCacheLength * 7 + 14));
+//      address = ((DirectBuffer) batchWriteBuffer).address();
 
 
       if (col == 1) {
-        dataCache1 = new long[splitNum * cacheLength];
-        dataCacheLen1 = new short[splitNum];
+        dataCacheLen1 = new long[splitNum];
+        dataCacheLenBase1 = new long[splitNum];
+        for (int i = 0; i < splitNum; i++) {
+          dataCache1[i] = ByteBuffer.allocateDirect(cacheLength * 7);
+          dataCacheLen1[i] = ((DirectBuffer) dataCache1[i]).address();
+          dataCacheLenBase1[i] = ((DirectBuffer) dataCache1[i]).address();
+        }
       } else {
-        dataCache2 = new long[splitNum * secondCacheLength];
-        dataCacheLen2 = new short[splitNum];
+        dataCacheLen2 = new long[splitNum];
+        dataCacheLenBase2 = new long[splitNum];
+        for (int i = 0; i < splitNum; i++) {
+          dataCache2[i] = ByteBuffer.allocateDirect(cacheLength * 7);
+          dataCacheLen2[i] = ((DirectBuffer) dataCache2[i]).address();
+          dataCacheLenBase2[i] = ((DirectBuffer) dataCache2[i]).address();
+        }
       }
       for (int i = 0; i < splitNum; i++) {
         partFilePosArr[i] = i * partFileSize;
       }
-    } else {
-      address = 0L;
     }
     this.initFileChannel();
   }
@@ -96,20 +106,23 @@ public class DiskBlock {
       // 16 part : 67553994410557440L   >> 52
       // 32 part : 69805794224242688L   >> 51
       int index = (int) ((data & 67553994410557440L) >> 52);
-      dataCache1[index * cacheLength + dataCacheLen1[index]++] = data;
+
+      unsafe.putLong(dataCacheLen1[index], data);
+      dataCacheLen1[index] += 7;
     }
 
     for (int index = 0; index < splitNum; index++) {
-      if (dataCacheLen1[index] >= thresholdValue) {
-        putToByteBuffer(index, dataCache1, dataCacheLen1[index]);
+      long size = dataCacheLen1[index] - dataCacheLenBase1[index];
+      if (size >= thresholdValue * 7) {
+        ByteBuffer byteBuffer = dataCache1[index];
+        byteBuffer.position((int) size);
+        byteBuffer.flip();
 
-        batchWriteBuffer.position((int) (addressHelper - address));
-        batchWriteBuffer.flip();
 //        long begin = System.currentTimeMillis();
-        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
+        partFileChannel.write(byteBuffer, partFilePosArr[index]);
 //        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
-        partFilePosArr[index] += batchWriteBuffer.limit();
-        dataCacheLen1[index] = 0;
+        partFilePosArr[index] += byteBuffer.limit();
+        dataCacheLen1[index] = dataCacheLenBase1[index];
       }
     }
   }
@@ -119,20 +132,23 @@ public class DiskBlock {
     for (int i = beginIndex; i < endIndex; i++) {
       long data = dataArr[i];
       int index = (int) ((data & 67553994410557440L) >> 52);
-      dataCache2[index * secondCacheLength + dataCacheLen2[index]++] = data;
+
+      unsafe.putLong(dataCacheLen2[index], data);
+      dataCacheLen2[index] += 7;
     }
 
     for (int index = 0; index < splitNum; index++) {
-      if (dataCacheLen2[index] >= thresholdValue) {
-        putToByteBuffer(index, dataCache2, dataCacheLen2[index]);
+      long size = dataCacheLen2[index] - dataCacheLenBase2[index];
+      if (size >= thresholdValue * 7) {
+        ByteBuffer byteBuffer = dataCache2[index];
+        byteBuffer.position((int) size);
+        byteBuffer.flip();
 
-        batchWriteBuffer.position((int) (addressHelper - address));
-        batchWriteBuffer.flip();
 //        long begin = System.currentTimeMillis();
-        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
+        partFileChannel.write(byteBuffer, partFilePosArr[index]);
 //        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
-        partFilePosArr[index] += batchWriteBuffer.limit();
-        dataCacheLen2[index] = 0;
+        partFilePosArr[index] += byteBuffer.limit();
+        dataCacheLen2[index] = dataCacheLenBase2[index];
       }
     }
   }
@@ -140,42 +156,38 @@ public class DiskBlock {
 
   public synchronized void forceStoreLongArr1() throws Exception {
     for (int i = 0; i < splitNum; i++) {
-      int len = dataCacheLen1[i];
-      if (len > 0) {
-        putToByteBuffer(i, dataCache1, len);
-        batchWriteBuffer.position((int) (addressHelper - address));
-        batchWriteBuffer.flip();
-        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
-        partFilePosArr[i] += batchWriteBuffer.limit();
-        dataCacheLen1[i] = 0;
+      long size = dataCacheLen1[i] - dataCacheLenBase1[i];
+      if (size > 0) {
+        ByteBuffer byteBuffer = dataCache1[i];
+        byteBuffer.position((int) size);
+        byteBuffer.flip();
+
+//        long begin = System.currentTimeMillis();
+        partFileChannel.write(byteBuffer, partFilePosArr[i]);
+//        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
+        partFilePosArr[i] += byteBuffer.limit();
+        dataCacheLen1[i] = dataCacheLenBase1[i];
       }
     }
   }
 
   public synchronized void forceStoreLongArr2() throws Exception {
     for (int i = 0; i < splitNum; i++) {
-      int len = dataCacheLen2[i];
-      if (len > 0) {
-        putToByteBuffer(i, dataCache2, len);
-        batchWriteBuffer.position((int) (addressHelper - address));
-        batchWriteBuffer.flip();
-        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
-        partFilePosArr[i] += batchWriteBuffer.limit();
-        dataCacheLen2[i] = 0;
+      long size = dataCacheLen2[i] - dataCacheLenBase2[i];
+      if (size > 0) {
+        ByteBuffer byteBuffer = dataCache2[i];
+        byteBuffer.position((int) size);
+        byteBuffer.flip();
+
+//        long begin = System.currentTimeMillis();
+        partFileChannel.write(byteBuffer, partFilePosArr[i]);
+//        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
+        partFilePosArr[i] += byteBuffer.limit();
+        dataCacheLen2[i] = dataCacheLenBase2[i];
       }
     }
   }
 
-  private void putToByteBuffer(int index, long[] dataArr, int length) {
-    batchWriteBuffer.clear();
-    addressHelper = address;
-    int beginIndex = index * cacheLength;
-    int endIndex = beginIndex + length;
-    for (int i = beginIndex; i < endIndex; i++) {
-      unsafe.putLong(addressHelper, dataArr[i]);
-      addressHelper += 7;
-    }
-  }
 
 //  private void putToByteBuffer(int index, long[] dataArr, int length) {
 //    batchWriteBuffer.clear();
