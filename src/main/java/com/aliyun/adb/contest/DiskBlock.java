@@ -115,6 +115,7 @@ public class DiskBlock {
       long size = dataCacheLen1[index] - dataCacheLenBase1[index];
       if (size >= thresholdValue * 7) {
         ByteBuffer byteBuffer = dataCache1[index];
+        System.out.println("size 1 is " + size);
         byteBuffer.position((int) size);
         byteBuffer.flip();
 
@@ -141,6 +142,7 @@ public class DiskBlock {
       long size = dataCacheLen2[index] - dataCacheLenBase2[index];
       if (size >= thresholdValue * 7) {
         ByteBuffer byteBuffer = dataCache2[index];
+        System.out.println("size 2 is " + size);
         byteBuffer.position((int) size);
         byteBuffer.flip();
 
