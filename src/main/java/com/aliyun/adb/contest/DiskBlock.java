@@ -263,8 +263,6 @@ public class DiskBlock {
 //      return 0;
 //    }
 
-    System.out.println("num is " + (endPos - beginPos) / 7);
-    System.out.println("num % is " + (endPos - beginPos) % 7);
     int totalLen = (endPos - beginPos) / 7;
     long solve = tryToQuickFindK(partNumFinal, data, totalLen, index);
     if (solve == -1) {
