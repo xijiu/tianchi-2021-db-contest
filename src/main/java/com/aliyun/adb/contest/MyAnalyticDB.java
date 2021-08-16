@@ -760,7 +760,7 @@ public class MyAnalyticDB implements AnalyticDB {
         }
       }
 
-      long beginTest = System.currentTimeMillis();
+//      long beginTest = System.currentTimeMillis();
       for (int i = beginIndex; i < length; i++) {
         byte element = unsafe.getByte(addressTmp++);
         if (element < 45) {
@@ -775,7 +775,7 @@ public class MyAnalyticDB implements AnalyticDB {
           data = data * 10 + (element - 48);
         }
       }
-      cpu10Time.addAndGet(System.currentTimeMillis() - beginTest);
+//      cpu10Time.addAndGet(System.currentTimeMillis() - beginTest);
 
       // 处理尾部数据
       bucketTailArr[bucket] = data;
