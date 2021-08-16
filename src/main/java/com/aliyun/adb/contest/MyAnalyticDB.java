@@ -760,7 +760,6 @@ public class MyAnalyticDB implements AnalyticDB {
         }
       }
 
-      length = length / 2;
       for (int i = beginIndex; i < length; i++) {
         byte element = unsafe.getByte(addressTmp++);
         if (element < 45) {
