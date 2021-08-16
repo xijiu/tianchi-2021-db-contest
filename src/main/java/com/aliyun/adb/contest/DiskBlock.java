@@ -114,16 +114,24 @@ public class DiskBlock {
     for (int index = 0; index < splitNum; index++) {
       long size = dataCacheLen1[index] - dataCacheLenBase1[index];
       if (size >= thresholdValue * 7) {
-        ByteBuffer byteBuffer = dataCache1[index];
-        System.out.println("size 1 is " + size);
-        byteBuffer.position((int) size);
-        byteBuffer.flip();
 
-//        long begin = System.currentTimeMillis();
-        partFileChannel.write(byteBuffer, partFilePosArr[index]);
+        try {
+          ByteBuffer byteBuffer = dataCache1[index];
+          byteBuffer.position((int) size);
+          byteBuffer.flip();
+
+          //        long begin = System.currentTimeMillis();
+          partFileChannel.write(byteBuffer, partFilePosArr[index]);
 //        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
-        partFilePosArr[index] += byteBuffer.limit();
-        dataCacheLen1[index] = dataCacheLenBase1[index];
+          partFilePosArr[index] += byteBuffer.limit();
+          dataCacheLen1[index] = dataCacheLenBase1[index];
+        } catch (Exception e) {
+          System.out.println("size 1 is " + size);
+          throw e;
+        }
+
+
+
       }
     }
   }
@@ -142,7 +150,6 @@ public class DiskBlock {
       long size = dataCacheLen2[index] - dataCacheLenBase2[index];
       if (size >= thresholdValue * 7) {
         ByteBuffer byteBuffer = dataCache2[index];
-        System.out.println("size 2 is " + size);
         byteBuffer.position((int) size);
         byteBuffer.flip();
 
