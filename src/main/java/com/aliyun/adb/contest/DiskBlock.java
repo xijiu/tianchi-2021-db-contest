@@ -76,7 +76,7 @@ public class DiskBlock {
     this.blockIndex = blockIndex;
     this.bytePrev = (byte) (blockIndex >> (MyAnalyticDB.power - 8 + 1));
     if (MyAnalyticDB.isFirstInvoke) {
-      batchWriteBuffer = ByteBuffer.allocateDirect((int) (secondCacheLength * 6.5 + 14));
+      batchWriteBuffer = ByteBuffer.allocateDirect((int) (secondCacheLength * 7 + 14));
       address = ((DirectBuffer) batchWriteBuffer).address();
 
 
@@ -208,38 +208,52 @@ public class DiskBlock {
   private void putToByteBuffer(int index, long[] dataArr, int length) {
     batchWriteBuffer.clear();
     addressHelper = address;
-    int actualLen = length % 2 == 0 ? length : (length - 1);
+    int actualLen = length;
     int beginIndex = index * cacheLength;
     int endIndex = beginIndex + actualLen;
     for (int i = beginIndex; i < endIndex; i += 2) {
       long data1 = dataArr[i];
-      long data2 = dataArr[i + 1];
 
-      unsafe.putByte(addressHelper++, (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
-      unsafe.putInt(addressHelper, (int) (data1 << 16 >>> 32));
-      addressHelper += 4;
-      unsafe.putLong(addressHelper, data1 << 48 | (data2 << 16 >>> 16));
-      addressHelper += 8;
-    }
-
-    // 奇数
-    if (actualLen != length) {
-      if (temporaryArr[index] == 0) {
-        temporaryArr[index] = dataArr[beginIndex + length - 1];
-      } else {
-        long data1 = temporaryArr[index];
-        long data2 = dataArr[beginIndex + length - 1];
-
-        unsafe.putByte(addressHelper++, (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
-        unsafe.putInt(addressHelper, (int) (data1 << 16 >>> 32));
-        addressHelper += 4;
-        unsafe.putLong(addressHelper, data1 << 48 | (data2 << 16 >>> 16));
-        addressHelper += 8;
-
-        temporaryArr[index] = 0;
-      }
+      unsafe.putLong(addressHelper, data1);
+      addressHelper += 7;
     }
   }
+
+//  private void putToByteBuffer(int index, long[] dataArr, int length) {
+//    batchWriteBuffer.clear();
+//    addressHelper = address;
+//    int actualLen = length % 2 == 0 ? length : (length - 1);
+//    int beginIndex = index * cacheLength;
+//    int endIndex = beginIndex + actualLen;
+//    for (int i = beginIndex; i < endIndex; i += 2) {
+//      long data1 = dataArr[i];
+//      long data2 = dataArr[i + 1];
+//
+//      unsafe.putByte(addressHelper++, (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
+//      unsafe.putInt(addressHelper, (int) (data1 << 16 >>> 32));
+//      addressHelper += 4;
+//      unsafe.putLong(addressHelper, data1 << 48 | (data2 << 16 >>> 16));
+//      addressHelper += 8;
+//    }
+//
+//    // 奇数
+//    if (actualLen != length) {
+//      if (temporaryArr[index] == 0) {
+//        temporaryArr[index] = dataArr[beginIndex + length - 1];
+//      } else {
+//        long data1 = temporaryArr[index];
+//        long data2 = dataArr[beginIndex + length - 1];
+//
+//        unsafe.putByte(addressHelper++, (byte) ((data1 >> 48 << 4) | (data2 << 12 >>> 60)));
+//        unsafe.putInt(addressHelper, (int) (data1 << 16 >>> 32));
+//        addressHelper += 4;
+//        unsafe.putLong(addressHelper, data1 << 48 | (data2 << 16 >>> 16));
+//        addressHelper += 8;
+//
+//        temporaryArr[index] = 0;
+//      }
+//    }
+//  }
 
 
 
