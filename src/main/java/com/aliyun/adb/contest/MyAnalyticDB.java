@@ -573,6 +573,9 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private long address = 0;
 
+    private final DiskBlock[] diskBlocks_1;
+    private final DiskBlock[] diskBlocks_2;
+
     public CpuThread(int index, int fileFlag) throws Exception {
       this.threadIndex = index;
       this.fileFlag = fileFlag;
@@ -586,6 +589,8 @@ public class MyAnalyticDB implements AnalyticDB {
       firstColDataLen = firstFile ? colDataLen_1_1 : colDataLen_2_1;
       secondColDataLen = firstFile ? colDataLen_1_2 : colDataLen_2_2;
       number = firstFile ? number1 : number2;
+      diskBlocks_1 = firstFile ? diskBlockData_1_1 : diskBlockData_2_1;
+      diskBlocks_2 = firstFile ? diskBlockData_1_2 : diskBlockData_2_2;
     }
 
     public void run() {
@@ -800,8 +805,7 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       firstColDataLen[(threadIndex << power) + blockIndex] += length;
 
-      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
-      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
+      diskBlocks_1[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -810,8 +814,7 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       secondColDataLen[(threadIndex << power) + blockIndex] += length;
 
-      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
-      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
+      diskBlocks_2[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
     }
   }
 

@@ -38,14 +38,6 @@ public class DiskBlock {
 
   public static final int partFileSize = 4000000;
 
-//  private static final int concurrentQueryThreadNum = 2;
-//
-//  private final long[] beginReadPosArr = new long[concurrentQueryThreadNum];
-//
-//  private final int[] readSizeArr = new int[concurrentQueryThreadNum];
-//
-//  private static final ThreadPoolExecutor executor = MyAnalyticDB.executor;
-
   public static final int splitNum = 16;
 
   public int[] partFilePosArr = new int[splitNum];
@@ -65,8 +57,6 @@ public class DiskBlock {
   private final long address;
 
   private long addressHelper = 0;
-
-  private final long[] temporaryArr = new long[splitNum];
 
   public static Unsafe unsafe = PubTools.unsafe();
 
@@ -113,7 +103,7 @@ public class DiskBlock {
       if (dataCacheLen1[index] >= thresholdValue) {
         putToByteBuffer(index, dataCache1, dataCacheLen1[index]);
 
-        batchWriteBuffer.position((int) (addressHelper - address));
+        batchWriteBuffer.position((int) (addressHelper - address - 1));
         batchWriteBuffer.flip();
 //        long begin = System.currentTimeMillis();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
@@ -136,7 +126,7 @@ public class DiskBlock {
       if (dataCacheLen2[index] >= thresholdValue) {
         putToByteBuffer(index, dataCache2, dataCacheLen2[index]);
 
-        batchWriteBuffer.position((int) (addressHelper - address));
+        batchWriteBuffer.position((int) (addressHelper - address - 1));
         batchWriteBuffer.flip();
 //        long begin = System.currentTimeMillis();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
@@ -153,20 +143,11 @@ public class DiskBlock {
       int len = dataCacheLen1[i];
       if (len > 0) {
         putToByteBuffer(i, dataCache1, len);
-        storeLastData(i);
-        batchWriteBuffer.position((int) (addressHelper - address));
+        batchWriteBuffer.position((int) (addressHelper - address - 1));
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
         dataCacheLen1[i] = 0;
-      } else if (temporaryArr[i] != 0) {
-        batchWriteBuffer.clear();
-        addressHelper = address;
-        storeLastData(i);
-        batchWriteBuffer.position((int) (addressHelper - address));
-        batchWriteBuffer.flip();
-        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
-        partFilePosArr[i] += batchWriteBuffer.limit();
       }
     }
   }
@@ -176,41 +157,20 @@ public class DiskBlock {
       int len = dataCacheLen2[i];
       if (len > 0) {
         putToByteBuffer(i, dataCache2, len);
-        storeLastData(i);
-        batchWriteBuffer.position((int) (addressHelper - address));
+        batchWriteBuffer.position((int) (addressHelper - address - 1));
         batchWriteBuffer.flip();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
         partFilePosArr[i] += batchWriteBuffer.limit();
         dataCacheLen2[i] = 0;
-      } else if (temporaryArr[i] != 0) {
-        batchWriteBuffer.clear();
-        addressHelper = address;
-        storeLastData(i);
-        batchWriteBuffer.position((int) (addressHelper - address));
-        batchWriteBuffer.flip();
-        partFileChannel.write(batchWriteBuffer, partFilePosArr[i]);
-        partFilePosArr[i] += batchWriteBuffer.limit();
       }
-    }
-  }
-
-  private void storeLastData(int idx) {
-    long data = temporaryArr[idx];
-    if (data != 0) {
-      unsafe.putByte(addressHelper++, (byte)(data >> 48));
-      unsafe.putShort(addressHelper, (short) (data << 16 >>> 48));
-      addressHelper += 2;
-      unsafe.putInt(addressHelper, (int)(data));
-      addressHelper += 4;
     }
   }
 
   private void putToByteBuffer(int index, long[] dataArr, int length) {
     batchWriteBuffer.clear();
     addressHelper = address;
-    int actualLen = length;
     int beginIndex = index * cacheLength;
-    int endIndex = beginIndex + actualLen;
+    int endIndex = beginIndex + length;
     for (int i = beginIndex; i < endIndex; i += 2) {
       long data1 = dataArr[i];
 
