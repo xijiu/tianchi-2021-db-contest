@@ -129,19 +129,19 @@ public class MyAnalyticDB implements AnalyticDB {
   private static Unsafe unsafe = PubTools.unsafe();
 
   public MyAnalyticDB() {
-//    try {
-//      Thread thread = new Thread(() -> {
-//        try {
-//          Thread.sleep(1 * 1000 * 60);
-//          System.exit(1);
-//        } catch (InterruptedException e) {
-//          e.printStackTrace();
-//        }
-//      });
-//      thread.start();
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//    }
+    try {
+      Thread thread = new Thread(() -> {
+        try {
+          Thread.sleep(1 * 1000 * 60);
+          System.exit(1);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      });
+      thread.start();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -764,10 +764,8 @@ public class MyAnalyticDB implements AnalyticDB {
         byte element = unsafe.getByte(addressTmp++);
         if (element < 45) {
           int blockIndex = (int) (data >> drift);
-          if (element == 44) {
-            firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
-          } else {
-            secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
+          if (blockIndex < 0) {
+            System.out.println(123);
           }
           data = 0L;
         } else {
@@ -778,7 +776,7 @@ public class MyAnalyticDB implements AnalyticDB {
       // 处理尾部数据
       bucketTailArr[bucket] = data;
 
-      saveToMemoryOrDisk();
+//      saveToMemoryOrDisk();
     }
 
     private void saveToMemoryOrDisk() throws Exception {
