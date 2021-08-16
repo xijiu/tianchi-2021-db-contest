@@ -108,7 +108,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   public static final AtomicLong writeFileTime = new AtomicLong();
 
-  private final AtomicLong sortDataTime = new AtomicLong();
+  private final AtomicLong cpu10Time = new AtomicLong();
 
   private long totalBeginTime = System.currentTimeMillis();
 
@@ -230,7 +230,7 @@ public class MyAnalyticDB implements AnalyticDB {
 //    System.out.println("target file size is " + PubTools.getDirSize(new File(workspaceDir)));
     System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
     System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
-    System.out.println("============> sort data cost time : " + sortDataTime.get() / cpuThreadNum);
+    System.out.println("============> cpu10Time cost time : " + cpu10Time.get() / cpuThreadNum);
     System.out.println("");
     System.out.println("============> stable load cost time : " + loadCostTime);
   }
@@ -598,12 +598,11 @@ public class MyAnalyticDB implements AnalyticDB {
       address = ((DirectBuffer) byteBuffer).address();
       try {
         while (true) {
-//            long begin1 = System.currentTimeMillis();
+          long begin1 = System.currentTimeMillis();
           int dataLen = threadReadData();
-//            readFileTime.addAndGet(System.currentTimeMillis() - begin1);
+          readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
           if (dataLen >= 0) {
-            Thread.sleep(1);
             operate(dataLen);
           } else {
             if (firstFile) {
@@ -761,6 +760,7 @@ public class MyAnalyticDB implements AnalyticDB {
         }
       }
 
+      long beginTest = System.currentTimeMillis();
       for (int i = beginIndex; i < length; i++) {
         byte element = unsafe.getByte(addressTmp++);
         if (element < 45) {
@@ -775,6 +775,7 @@ public class MyAnalyticDB implements AnalyticDB {
           data = data * 10 + (element - 48);
         }
       }
+      cpu10Time.addAndGet(System.currentTimeMillis() - beginTest);
 
       // 处理尾部数据
       bucketTailArr[bucket] = data;
