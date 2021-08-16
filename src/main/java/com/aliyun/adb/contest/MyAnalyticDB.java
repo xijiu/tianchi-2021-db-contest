@@ -603,35 +603,36 @@ public class MyAnalyticDB implements AnalyticDB {
 //            readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
           if (dataLen >= 0) {
+            Thread.sleep(1);
             operate(dataLen);
           } else {
-//            if (firstFile) {
-//              int finishNum = finishThreadNum1.incrementAndGet();
-//              if (finishNum == cpuThreadNum / 2) {
-//                operateGapData1();
-//              }
-//              for (int i = 0; i < blockNum; i++) {
-//                if (firstCacheLengthArr[i] > 0) {
-//                  batchSaveFirstCol(i);
-//                }
-//                if (secondCacheLengthArr[i] > 0) {
-//                  batchSaveSecondCol(i);
-//                }
-//              }
-//            } else {
-//              int finishNum = finishThreadNum2.incrementAndGet();
-//              if (finishNum == cpuThreadNum / 2) {
-//                operateGapData2();
-//              }
-//              for (int i = 0; i < blockNum; i++) {
-//                if (firstCacheLengthArr[i] > 0) {
-//                  batchSaveFirstCol(i);
-//                }
-//                if (secondCacheLengthArr[i] > 0) {
-//                  batchSaveSecondCol(i);
-//                }
-//              }
-//            }
+            if (firstFile) {
+              int finishNum = finishThreadNum1.incrementAndGet();
+              if (finishNum == cpuThreadNum / 2) {
+                operateGapData1();
+              }
+              for (int i = 0; i < blockNum; i++) {
+                if (firstCacheLengthArr[i] > 0) {
+                  batchSaveFirstCol(i);
+                }
+                if (secondCacheLengthArr[i] > 0) {
+                  batchSaveSecondCol(i);
+                }
+              }
+            } else {
+              int finishNum = finishThreadNum2.incrementAndGet();
+              if (finishNum == cpuThreadNum / 2) {
+                operateGapData2();
+              }
+              for (int i = 0; i < blockNum; i++) {
+                if (firstCacheLengthArr[i] > 0) {
+                  batchSaveFirstCol(i);
+                }
+                if (secondCacheLengthArr[i] > 0) {
+                  batchSaveSecondCol(i);
+                }
+              }
+            }
             break;
           }
         }

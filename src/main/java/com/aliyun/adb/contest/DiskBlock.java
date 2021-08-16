@@ -115,7 +115,7 @@ public class DiskBlock {
 
         batchWriteBuffer.position((int) (addressHelper - address));
         batchWriteBuffer.flip();
-//        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
         dataCacheLen1[index] = 0;
       }
@@ -136,7 +136,7 @@ public class DiskBlock {
 
         batchWriteBuffer.position((int) (addressHelper - address));
         batchWriteBuffer.flip();
-//        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
+        partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
         partFilePosArr[index] += batchWriteBuffer.limit();
         dataCacheLen2[index] = 0;
       }
