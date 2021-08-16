@@ -603,6 +603,7 @@ public class MyAnalyticDB implements AnalyticDB {
 //            readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
           if (dataLen >= 0) {
+            Thread.sleep(2);
 //            operate(dataLen);
           } else {
 //            if (firstFile) {
