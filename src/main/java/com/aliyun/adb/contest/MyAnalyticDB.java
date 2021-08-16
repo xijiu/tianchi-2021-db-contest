@@ -798,8 +798,8 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       firstColDataLen[(threadIndex << power) + blockIndex] += length;
 
-//      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
-//      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
+      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_1 : diskBlockData_2_1;
+      diskBlocks[blockIndex].storeLongArr1(firstThreadCacheArr, blockIndex * cacheLength, length);
     }
 
     private void batchSaveSecondCol(int blockIndex) throws Exception {
@@ -808,8 +808,8 @@ public class MyAnalyticDB implements AnalyticDB {
       // 标记已经在内存存储的位置
       secondColDataLen[(threadIndex << power) + blockIndex] += length;
 
-//      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
-//      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
+      DiskBlock[] diskBlocks = fileFlag == 1 ? diskBlockData_1_2 : diskBlockData_2_2;
+      diskBlocks[blockIndex].storeLongArr2(secondThreadCacheArr, blockIndex * secondCacheLength, length);
     }
   }
 
@@ -850,9 +850,9 @@ public class MyAnalyticDB implements AnalyticDB {
       }
     }
 
-//    if (1 == 1) {
-//      return "0";
-//    }
+    if (1 == 1) {
+      return "0";
+    }
 
 //    if (!isFirstInvoke) {
 //      return "0";
