@@ -603,7 +603,7 @@ public class MyAnalyticDB implements AnalyticDB {
 //            readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
           if (dataLen >= 0) {
-            operate(dataLen);
+//            operate(dataLen);
           } else {
             if (firstFile) {
               int finishNum = finishThreadNum1.incrementAndGet();
