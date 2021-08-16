@@ -235,7 +235,7 @@ public class DiskBlock {
     int fileLen = 0;
     for (byte i = 0; i < splitNum; i++) {
       fileLen = (int) partFilePosArr[i] - (i * partFileSize);
-      tmpSize += fileLen % 13 == 0 ? (fileLen / 13 * 2) : (fileLen / 13 * 2 + 1);
+      tmpSize += fileLen / 7;
       if (tmpSize > index) {
         partNum = i;
         partIndex = i;
@@ -265,7 +265,7 @@ public class DiskBlock {
 //      return 0;
 //    }
 
-    int totalLen = (endPos - beginPos) % 13 == 0 ? ((endPos - beginPos) / 13 * 2) : ((endPos - beginPos) / 13 * 2 + 1);
+    int totalLen = (endPos - beginPos) / 7;
     long solve = tryToQuickFindK(partNumFinal, data, totalLen, index);
     if (solve == -1) {
       solve = PubTools.solve(data, 0, totalLen - 1, index);
@@ -284,7 +284,7 @@ public class DiskBlock {
       long address = ((DirectBuffer) byteBuffer).address();
       byteBuffer.clear();
       long readPos = pos.getAndAdd(perReadSize);
-      idx = (int) ((readPos - beginPos) / 13 * 2);
+      idx = (int) ((readPos - beginPos) / 7);
       if (readPos >= endPos) {
         break;
       }
@@ -304,31 +304,14 @@ public class DiskBlock {
         over = true;
       }
       byteBuffer.flip();
-      int cycleTime = length / 13;
+      int cycleTime = length / 7;
       for (int i = 0; i < cycleTime; i++) {
-        byte byteTmp = unsafe.getByte(address++);
-        int intTmp = unsafe.getInt(address);
-        address += 4;
-        long longTmp = unsafe.getLong(address);
-        address += 8;
-
-        byte first = (byte) (((byteTmp >> 4) & 15) | partNum);
-        byte second = (byte) ((byteTmp & 15) | partNum);
-
-        data[idx++] = makeLong4(first, intTmp, longTmp);
-        data[idx++] = makeLong5(second, longTmp);
+        data[idx++] = unsafe.getLong(address) & 0x00FFFFFFFFFFFFFFL;
+        address += 7;
       }
       if (over) {
         break;
       }
-    }
-
-    if (length % 13 != 0) {
-      long address = ((DirectBuffer) byteBuffer).address();
-      byte aByte = unsafe.getByte(address + (length - 7));
-      short aShort = unsafe.getShort(address + (length - 6));
-      int anInt = unsafe.getInt(address + (length - 4));
-      data[idx++] = makeLong3(aByte, aShort, anInt);
     }
   }
 
