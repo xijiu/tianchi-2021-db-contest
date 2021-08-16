@@ -252,12 +252,12 @@ public class DiskBlock {
     Future<?> future = MyAnalyticDB.executor.submit(() -> {
       readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
     });
-    Future<?> future2 = MyAnalyticDB.executor.submit(() -> {
-      readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
-    });
+//    Future<?> future2 = MyAnalyticDB.executor.submit(() -> {
+//      readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
+//    });
     readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
     future.get();
-    future2.get();
+//    future2.get();
 
 //    if (1 == 1) {
 //      return 0;
