@@ -603,8 +603,7 @@ public class MyAnalyticDB implements AnalyticDB {
 //            readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
           if (dataLen >= 0) {
-            Thread.sleep(2);
-//            operate(dataLen);
+            operate(dataLen);
           } else {
 //            if (firstFile) {
 //              int finishNum = finishThreadNum1.incrementAndGet();
@@ -761,6 +760,7 @@ public class MyAnalyticDB implements AnalyticDB {
         }
       }
 
+      length = length / 2;
       for (int i = beginIndex; i < length; i++) {
         byte element = unsafe.getByte(addressTmp++);
         if (element < 45) {
