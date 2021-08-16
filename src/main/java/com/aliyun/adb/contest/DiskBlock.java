@@ -171,10 +171,8 @@ public class DiskBlock {
     addressHelper = address;
     int beginIndex = index * cacheLength;
     int endIndex = beginIndex + length;
-    for (int i = beginIndex; i < endIndex; i += 2) {
-      long data1 = dataArr[i];
-
-      unsafe.putLong(addressHelper, data1);
+    for (int i = beginIndex; i < endIndex; i++) {
+      unsafe.putLong(addressHelper, dataArr[i]);
       addressHelper += 7;
     }
   }
