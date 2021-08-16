@@ -115,9 +115,9 @@ public class DiskBlock {
 
         batchWriteBuffer.position((int) (addressHelper - address));
         batchWriteBuffer.flip();
-        long begin = System.currentTimeMillis();
+//        long begin = System.currentTimeMillis();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
-        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
+//        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         partFilePosArr[index] += batchWriteBuffer.limit();
         dataCacheLen1[index] = 0;
       }
@@ -138,9 +138,9 @@ public class DiskBlock {
 
         batchWriteBuffer.position((int) (addressHelper - address));
         batchWriteBuffer.flip();
-        long begin = System.currentTimeMillis();
+//        long begin = System.currentTimeMillis();
         partFileChannel.write(batchWriteBuffer, partFilePosArr[index]);
-        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
+//        MyAnalyticDB.writeFileTime.addAndGet(System.currentTimeMillis() - begin);
         partFilePosArr[index] += batchWriteBuffer.limit();
         dataCacheLen2[index] = 0;
       }

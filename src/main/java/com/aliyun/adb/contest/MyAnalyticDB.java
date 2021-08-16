@@ -129,19 +129,19 @@ public class MyAnalyticDB implements AnalyticDB {
   private static Unsafe unsafe = PubTools.unsafe();
 
   public MyAnalyticDB() {
-    try {
-      Thread thread = new Thread(() -> {
-        try {
-          Thread.sleep(1 * 1000 * 60);
-          System.exit(1);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      });
-      thread.start();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+//    try {
+//      Thread thread = new Thread(() -> {
+//        try {
+//          Thread.sleep(1 * 1000 * 60);
+//          System.exit(1);
+//        } catch (InterruptedException e) {
+//          e.printStackTrace();
+//        }
+//      });
+//      thread.start();
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
   }
 
   /**
@@ -598,9 +598,9 @@ public class MyAnalyticDB implements AnalyticDB {
       address = ((DirectBuffer) byteBuffer).address();
       try {
         while (true) {
-          long begin1 = System.currentTimeMillis();
+//          long begin1 = System.currentTimeMillis();
           int dataLen = threadReadData();
-          readFileTime.addAndGet(System.currentTimeMillis() - begin1);
+//          readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
           if (dataLen >= 0) {
             operate(dataLen);
