@@ -777,7 +777,7 @@ public class MyAnalyticDB implements AnalyticDB {
           }
           data = 0L;
         } else {
-          data = data * 10 + (element - 48);
+          data = data * 10 + (element & 15);
         }
       }
 //      cpu10Time.addAndGet(System.currentTimeMillis() - beginTest);

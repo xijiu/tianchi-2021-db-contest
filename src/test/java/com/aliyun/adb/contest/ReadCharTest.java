@@ -230,20 +230,22 @@ public class ReadCharTest {
 
   @Test
   public void tst() {
+    System.out.println(PubTools.format(Long.toBinaryString(48)));
+    System.out.println(PubTools.format(Long.toBinaryString(49)));
+    System.out.println(PubTools.format(Long.toBinaryString(50)));
+    System.out.println(PubTools.format(Long.toBinaryString(51)));
+    System.out.println(PubTools.format(Long.toBinaryString(52)));
+    System.out.println(PubTools.format(Long.toBinaryString(53)));
+    System.out.println(PubTools.format(Long.toBinaryString(54)));
+    System.out.println(PubTools.format(Long.toBinaryString(55)));
+    System.out.println(PubTools.format(Long.toBinaryString(56)));
+    System.out.println(PubTools.format(Long.toBinaryString(57)));
+    System.out.println(PubTools.format(Long.toBinaryString(15)));
 
-    byte a = -2;
-    int b = -4;
-    long c = -2;
-    System.out.println(Integer.toBinaryString(-4));
-//    System.out.println(PubTools.format(Long.toBinaryString(-2)));
-    long l = DiskBlock.makeLong4(a, b, c);
-//    System.out.println(PubTools.format(Long.toBinaryString(l))); // 0.99043
-
-    a = 4;
-    c = -2;
-    System.out.println(PubTools.format(Long.toBinaryString(-2)));
-    long l2 = DiskBlock.makeLong5(a, c);
-    System.out.println(PubTools.format(Long.toBinaryString(l2))); // 0.99043
+    byte a = 48;
+    System.out.println(a & 15);
+    System.out.println(49 & 15);
+    System.out.println(50 & 15);
   }
 
 
