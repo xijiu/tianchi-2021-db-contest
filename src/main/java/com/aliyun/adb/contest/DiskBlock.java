@@ -28,7 +28,7 @@ public class DiskBlock {
 
   private static final int thresholdValue = 4096 * 3;
 
-  public static final short cacheLength = thresholdValue + 500;
+  public static final short cacheLength = thresholdValue + 800;
 
   public static final short secondCacheLength = (int) (cacheLength);
 
