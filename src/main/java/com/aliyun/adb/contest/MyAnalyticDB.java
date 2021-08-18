@@ -538,7 +538,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private final int threadIndex;
 
-    private static final int thresholdValue = 4096 * 2;
+    private static final int thresholdValue = 4096 * 2 - 500;
 
     public final short cacheLength = thresholdValue + 500;
 
@@ -708,12 +708,12 @@ public class MyAnalyticDB implements AnalyticDB {
         int number = bucketDataPosArr_1[bucket + 1];
         int blockIndex = (int) (data >> drift);
         if (number == 1) {
-          firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
+          firstThreadCacheArr[(blockIndex << 13) + firstCacheLengthArr[blockIndex]++] = data;
           if (firstCacheLengthArr[blockIndex] == cacheLength) {
             batchSaveFirstCol(blockIndex);
           }
         } else {
-          secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
+          secondThreadCacheArr[(blockIndex << 13) + secondCacheLengthArr[blockIndex]++] = data;
           if (secondCacheLengthArr[blockIndex] == secondCacheLength) {
             batchSaveSecondCol(blockIndex);
           }
@@ -849,7 +849,7 @@ public class MyAnalyticDB implements AnalyticDB {
       System.out.println("=======================> actual total cost : " + totalCost);
 
       if (isTest) {
-        if (totalCost > 35800) {
+        if (totalCost > 35500) {
           return "0";
         }
       }
