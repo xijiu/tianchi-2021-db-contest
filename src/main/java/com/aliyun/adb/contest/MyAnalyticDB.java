@@ -793,8 +793,8 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     private long doOperate(int length, long addressTmp) {
-      long endAddress = address + length - 19;
-      while (endAddress - addressTmp > 19) {
+      long endAddress = address + length - 20;
+      while (endAddress > addressTmp) {
         byte element = unsafe.getByte(addressTmp + 19);
         if (element < 45) {
           long tmp = 0;
