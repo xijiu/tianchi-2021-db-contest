@@ -231,7 +231,7 @@ public class MyAnalyticDB implements AnalyticDB {
 //    System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
 //    System.out.println("============> cpu10Time cost time : " + cpu10Time.get() / cpuThreadNum);
 //    System.out.println("");
-    System.out.println("============> stable load cost time : " + loadCostTime);
+    System.out.println("============> stable load cost time : " + loadCostTime + "\n\n\n");
   }
 
 //  private void printForTest() {
