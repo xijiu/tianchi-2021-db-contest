@@ -871,7 +871,7 @@ public class MyAnalyticDB implements AnalyticDB {
       long totalCost = time - totalBeginTime;
 //      System.out.println("hit cache count is : " + findKStat.get());
 //      System.out.println("miss cache count is : " + (4000 - findKStat.get()));
-      System.out.println("finish time is : " + time);
+//      System.out.println("finish time is : " + time);
       System.out.println("=======================> step 2 cost : " + (time - step2BeginTime));
       System.out.println("=======================> actual total cost : " + totalCost);
 
