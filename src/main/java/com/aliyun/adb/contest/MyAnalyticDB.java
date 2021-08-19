@@ -129,19 +129,19 @@ public class MyAnalyticDB implements AnalyticDB {
   private static Unsafe unsafe = PubTools.unsafe();
 
   public MyAnalyticDB() {
-//    try {
-//      Thread thread = new Thread(() -> {
-//        try {
-//          Thread.sleep(1 * 1000 * 60);
-//          System.exit(1);
-//        } catch (InterruptedException e) {
-//          e.printStackTrace();
-//        }
-//      });
-//      thread.start();
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//    }
+    try {
+      Thread thread = new Thread(() -> {
+        try {
+          Thread.sleep(1 * 1000 * 60);
+          System.exit(1);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      });
+      thread.start();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -766,15 +766,36 @@ public class MyAnalyticDB implements AnalyticDB {
       }
 
 //      long beginTest = System.currentTimeMillis();
-      for (int i = beginIndex; i < length; i++) {
+      int tmpLen = length - 19;
+      int i;
+      for (i = beginIndex; i < tmpLen; i++) {
+        byte element = unsafe.getByte(addressTmp + 19);
+        if (element < 45) {
+          long tmp = 0;
+          for (int j = 0; j < 19; j++) {
+            tmp = tmp * 10 + (unsafe.getByte(addressTmp++) & 15);
+          }
+          storeData(element, tmp);
+          i += 19;
+        } else {
+          long tmp = 0;
+          for (int j = 0; j < 19; j++) {
+            byte ele = unsafe.getByte(addressTmp++);
+            if (ele < 45) {
+              storeData(ele, tmp);
+              i += j + 1;
+              break;
+            } else {
+              tmp = tmp * 10 + (ele & 15);
+            }
+          }
+        }
+      }
+
+      for (; i < length; i++) {
         byte element = unsafe.getByte(addressTmp++);
         if (element < 45) {
-          int blockIndex = (int) (data >> drift);
-          if (element == 44) {
-            firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
-          } else {
-            secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
-          }
+          storeData(element, data);
           data = 0L;
         } else {
           data = data * 10 + (element & 15);
@@ -786,6 +807,15 @@ public class MyAnalyticDB implements AnalyticDB {
       bucketTailArr[bucket] = data;
 
       saveToMemoryOrDisk();
+    }
+
+    private void storeData(byte element, long data) {
+      int blockIndex = (int) (data >> drift);
+      if (element == 44) {
+        firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
+      } else {
+        secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
+      }
     }
 
     private void saveToMemoryOrDisk() throws Exception {
