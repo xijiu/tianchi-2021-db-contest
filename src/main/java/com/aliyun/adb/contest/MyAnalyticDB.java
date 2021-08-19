@@ -744,7 +744,6 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private void operate(int length) throws Exception {
       long data = 0L;
-      int beginIndex = 0;
 
       long addressTmp = address;
       if (bucket > 0) {
@@ -752,11 +751,9 @@ public class MyAnalyticDB implements AnalyticDB {
         for (int i = 0; i < length; i++) {
           byte element = unsafe.getByte(addressTmp++);
           if (element < 45) {
-            beginIndex = i + 1;
             bucketHeadArr[bucket] = data;
             bucketBaseArr[bucket] = base;
             bucketDataPosArr[bucket] = (byte) (element == 10 ? 2 : 1);
-            data = 0L;
             break;
           } else {
             data = data * 10 + (element - 48);
@@ -765,6 +762,31 @@ public class MyAnalyticDB implements AnalyticDB {
         }
       }
 
+      addressTmp = doOperate(length, addressTmp);
+
+      doOperateTail(length, addressTmp);
+
+      saveToMemoryOrDisk();
+    }
+
+    private void doOperateTail(int length, long addressTmp) {
+      long data = 0L;
+      long endAddress = address + length;
+      while (addressTmp < endAddress) {
+        byte element = unsafe.getByte(addressTmp++);
+        if (element < 45) {
+          storeData(element, data);
+          data = 0L;
+        } else {
+          data = data * 10 + (element & 15);
+        }
+      }
+
+      // 处理尾部数据
+      bucketTailArr[bucket] = data;
+    }
+
+    private long doOperate(int length, long addressTmp) {
       long endAddress = address + length - 19;
       while (endAddress - addressTmp > 19) {
         byte element = unsafe.getByte(addressTmp + 19);
@@ -788,22 +810,7 @@ public class MyAnalyticDB implements AnalyticDB {
           }
         }
       }
-
-      endAddress = address + length;
-      while (addressTmp < endAddress) {
-        byte element = unsafe.getByte(addressTmp++);
-        if (element < 45) {
-          storeData(element, data);
-          data = 0L;
-        } else {
-          data = data * 10 + (element & 15);
-        }
-      }
-
-      // 处理尾部数据
-      bucketTailArr[bucket] = data;
-
-      saveToMemoryOrDisk();
+      return addressTmp;
     }
 
     private void storeData(byte element, long data) {
