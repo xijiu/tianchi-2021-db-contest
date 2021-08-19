@@ -129,19 +129,19 @@ public class MyAnalyticDB implements AnalyticDB {
   private static Unsafe unsafe = PubTools.unsafe();
 
   public MyAnalyticDB() {
-    try {
-      Thread thread = new Thread(() -> {
-        try {
-          Thread.sleep(1 * 1000 * 60);
-          System.exit(1);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-      });
-      thread.start();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+//    try {
+//      Thread thread = new Thread(() -> {
+//        try {
+//          Thread.sleep(1 * 1000 * 60);
+//          System.exit(1);
+//        } catch (InterruptedException e) {
+//          e.printStackTrace();
+//        }
+//      });
+//      thread.start();
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
   }
 
   /**
