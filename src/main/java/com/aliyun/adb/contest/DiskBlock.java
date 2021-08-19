@@ -246,7 +246,7 @@ public class DiskBlock {
     byte partIndex = 0;
     int fileLen = 0;
     for (byte i = 0; i < splitNum; i++) {
-      fileLen = (int) partFilePosArr[i] - (i * partFileSize);
+      fileLen = partFilePosArr[i] - (i * partFileSize);
       tmpSize += fileLen / 7;
       if (tmpSize > index) {
         partNum = i;
@@ -272,10 +272,6 @@ public class DiskBlock {
     readAndAssignValue(beginPos, endPos, pos, data, partNumFinal);
     future.get();
 //    future2.get();
-
-//    if (1 == 1) {
-//      return 0;
-//    }
 
     int totalLen = (endPos - beginPos) / 7;
     long solve = tryToQuickFindK(partNumFinal, data, totalLen, index);
@@ -334,8 +330,6 @@ public class DiskBlock {
     long solve = (long) ((index / (double)length) * (max - min)) + min;
     long leftSolve = (long) (solve - solve * 0.0003);
     long rightSolve = (long) (solve + solve * 0.0003);
-
-//    System.out.println("min is " + min + ", max is " + max + ", solve is " + solve + ", index is " + index);
 
     int left = 0, middle = 0;
 
