@@ -21,18 +21,17 @@ public class ReadCharTest {
 
   @Test
   public void test3() throws Exception {
-    ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4096);
-    byteBuffer.putLong(8L);
-    byteBuffer.getLong();
-
-    long address = ((DirectBuffer) byteBuffer).address();
-
-    Field f = Unsafe.class.getDeclaredField("theUnsafe");
-    f.setAccessible(true);
-    Unsafe unsafe = (Unsafe) f.get(null);
-    unsafe.putLong(address, 100);
-
-    System.out.println(unsafe.getLong(address));
+    long sum = 0L;
+    int val = 4096 * 2;
+    long begin = System.currentTimeMillis();
+    for (int i = 0; i < 2000000000; i++) {
+      sum += i * val;
+//      sum += (i << 13);
+    }
+    System.out.println(System.currentTimeMillis() - begin);
+    if (sum == 0) {
+      System.out.println(123);
+    }
   }
 
   @Test

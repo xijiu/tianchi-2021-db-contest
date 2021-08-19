@@ -816,9 +816,9 @@ public class MyAnalyticDB implements AnalyticDB {
     private void storeData(byte element, long data) {
       int blockIndex = (int) (data >> drift);
       if (element == 44) {
-        firstThreadCacheArr[blockIndex * cacheLength + firstCacheLengthArr[blockIndex]++] = data;
+        firstThreadCacheArr[(blockIndex << 13) + firstCacheLengthArr[blockIndex]++] = data;
       } else {
-        secondThreadCacheArr[blockIndex * secondCacheLength + secondCacheLengthArr[blockIndex]++] = data;
+        secondThreadCacheArr[(blockIndex << 13) + secondCacheLengthArr[blockIndex]++] = data;
       }
     }
 
