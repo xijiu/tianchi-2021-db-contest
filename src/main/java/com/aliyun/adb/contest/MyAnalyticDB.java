@@ -743,6 +743,17 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     private void operate(int length) throws Exception {
+
+      long addressTmp = doOperateHead(length);
+
+      addressTmp = doOperate(length, addressTmp);
+
+      doOperateTail(length, addressTmp);
+
+      saveToMemoryOrDisk();
+    }
+
+    private long doOperateHead(int length) {
       long data = 0L;
 
       long addressTmp = address;
@@ -761,12 +772,7 @@ public class MyAnalyticDB implements AnalyticDB {
           }
         }
       }
-
-      addressTmp = doOperate(length, addressTmp);
-
-      doOperateTail(length, addressTmp);
-
-      saveToMemoryOrDisk();
+      return addressTmp;
     }
 
     private void doOperateTail(int length, long addressTmp) {
