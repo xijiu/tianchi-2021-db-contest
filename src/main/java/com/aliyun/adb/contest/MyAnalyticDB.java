@@ -765,10 +765,8 @@ public class MyAnalyticDB implements AnalyticDB {
         }
       }
 
-//      long beginTest = System.currentTimeMillis();
-      int tmpLen = length - 19;
-      int i;
-      for (i = beginIndex; i < tmpLen; i++) {
+      long endAddress = address + length - 19;
+      while (endAddress - addressTmp > 19) {
         byte element = unsafe.getByte(addressTmp + 19);
         if (element < 45) {
           long tmp = 0;
@@ -776,14 +774,12 @@ public class MyAnalyticDB implements AnalyticDB {
             tmp = tmp * 10 + (unsafe.getByte(addressTmp++) & 15);
           }
           storeData(element, tmp);
-          i += 19;
         } else {
           long tmp = 0;
           for (int j = 0; j < 19; j++) {
             byte ele = unsafe.getByte(addressTmp++);
             if (ele < 45) {
               storeData(ele, tmp);
-              i += j + 1;
               break;
             } else {
               tmp = tmp * 10 + (ele & 15);
@@ -792,7 +788,8 @@ public class MyAnalyticDB implements AnalyticDB {
         }
       }
 
-      for (; i < length; i++) {
+      endAddress = address + length;
+      while (addressTmp < endAddress) {
         byte element = unsafe.getByte(addressTmp++);
         if (element < 45) {
           storeData(element, data);
@@ -801,7 +798,6 @@ public class MyAnalyticDB implements AnalyticDB {
           data = data * 10 + (element & 15);
         }
       }
-//      cpu10Time.addAndGet(System.currentTimeMillis() - beginTest);
 
       // 处理尾部数据
       bucketTailArr[bucket] = data;
