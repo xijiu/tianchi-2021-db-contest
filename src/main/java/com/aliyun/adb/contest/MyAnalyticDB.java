@@ -773,7 +773,7 @@ public class MyAnalyticDB implements AnalyticDB {
           for (int j = 0; j < 19; j++) {
             tmp = tmp * 10 + (unsafe.getByte(addressTmp++) & 15);
           }
-          System.out.println("tmp is " + tmp);
+          addressTmp++;
           storeData(element, tmp);
         } else {
           long tmp = 0;
