@@ -68,7 +68,7 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private AtomicInteger finishThreadNum2 = new AtomicInteger();
 
-  private AtomicInteger totalFinishThreadNum = new AtomicInteger();
+//  private AtomicInteger totalFinishThreadNum = new AtomicInteger();
 
   /** 第一列的所有块的元素个数 */
   private final int[] table_1_BlockDataNumArr1 = new int[blockNum];
@@ -102,13 +102,13 @@ public class MyAnalyticDB implements AnalyticDB {
 
   private volatile long loadCostTime = 1000000000L;
 
-  private static volatile boolean operateFirstFile = true;
+//  private static volatile boolean operateFirstFile = true;
 
-  private final AtomicLong readFileTime = new AtomicLong();
-
-  public static final AtomicLong writeFileTime = new AtomicLong();
-
-  private final AtomicLong cpu10Time = new AtomicLong();
+//  private final AtomicLong readFileTime = new AtomicLong();
+//
+//  public static final AtomicLong writeFileTime = new AtomicLong();
+//
+//  private final AtomicLong cpu10Time = new AtomicLong();
 
   private long totalBeginTime = System.currentTimeMillis();
 
@@ -149,9 +149,9 @@ public class MyAnalyticDB implements AnalyticDB {
    */
   private void init(String workspaceDir) throws Exception {
     DiskBlock.workspaceDir = workspaceDir;
-    long begin = System.currentTimeMillis();
+//    long begin = System.currentTimeMillis();
     firstInit();
-    System.out.println("\n\n\ninit cost time : " + (System.currentTimeMillis() - begin));
+//    System.out.println("\n\n\ninit cost time : " + (System.currentTimeMillis() - begin));
   }
 
   private void firstInit() throws Exception {
@@ -219,7 +219,6 @@ public class MyAnalyticDB implements AnalyticDB {
       return ;
     }
 
-    System.out.println("stable load invoked, time is " + begin);
     DiskBlock.workspaceDir = workspaceDir;
 
     storeBlockData();
@@ -228,10 +227,10 @@ public class MyAnalyticDB implements AnalyticDB {
 
     loadCostTime = System.currentTimeMillis() - begin;
 //    System.out.println("target file size is " + PubTools.getDirSize(new File(workspaceDir)));
-    System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
-    System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
-    System.out.println("============> cpu10Time cost time : " + cpu10Time.get() / cpuThreadNum);
-    System.out.println("");
+//    System.out.println("============> read file cost time : " + readFileTime.get() / cpuThreadNum);
+//    System.out.println("============> write file cost time : " + writeFileTime.get() / cpuThreadNum);
+//    System.out.println("============> cpu10Time cost time : " + cpu10Time.get() / cpuThreadNum);
+//    System.out.println("");
     System.out.println("============> stable load cost time : " + loadCostTime);
   }
 
@@ -373,7 +372,7 @@ public class MyAnalyticDB implements AnalyticDB {
       table_1_BlockDataNumArr1[i] = tmp;
       firstSum += tmp;
     }
-    System.out.println("table 1 firstSum is " + firstSum);
+//    System.out.println("table 1 firstSum is " + firstSum);
 
     firstSum = 0;
     for (int i = 0; i < table_1_BlockDataNumArr2.length; i++) {
@@ -385,7 +384,7 @@ public class MyAnalyticDB implements AnalyticDB {
       table_1_BlockDataNumArr2[i] = tmp;
       firstSum += tmp;
     }
-    System.out.println("table 1 secondSum is " + firstSum);
+//    System.out.println("table 1 secondSum is " + firstSum);
   }
 
   private void statPerBlockCount2() {
@@ -399,7 +398,7 @@ public class MyAnalyticDB implements AnalyticDB {
       table_2_BlockDataNumArr1[i] = tmp;
       firstSum += tmp;
     }
-    System.out.println("table 2 firstSum is " + firstSum);
+//    System.out.println("table 2 firstSum is " + firstSum);
 
     firstSum = 0;
     for (int i = 0; i < table_2_BlockDataNumArr2.length; i++) {
@@ -411,28 +410,24 @@ public class MyAnalyticDB implements AnalyticDB {
       table_2_BlockDataNumArr2[i] = tmp;
       firstSum += tmp;
     }
-    System.out.println("table 2 secondSum is " + firstSum);
+//    System.out.println("table 2 secondSum is " + firstSum);
   }
 
   public void storeBlockData() throws Exception {
     initGapBucketArr(file1.length(), file2.length());
 
-    long beginThreadTime = System.currentTimeMillis();
     for (int i = 0; i < cpuThreadNum; i++) {
       cpuThread[i] = new CpuThread(i, i < cpuThreadNum / 2 ? 1 : 2);
       cpuThread[i].setName("stable-thread-" + i);
       cpuThread[i].start();
     }
-    System.out.println("create threads cost time is : " + (System.currentTimeMillis() - beginThreadTime));
 
     for (int i = 0; i < cpuThreadNum; i++) {
       cpuThread[i].join();
     }
 
     // 存储残存的第二张表的数据
-    long finalBeginTime = System.currentTimeMillis();
     storeFinalDataToDisk();
-    System.out.println("storeFinalDataToDisk 2 time cost : " + (System.currentTimeMillis() - finalBeginTime));
 
     // 统计每个分桶的数量
     statPerBlockCount1();
@@ -566,8 +561,6 @@ public class MyAnalyticDB implements AnalyticDB {
 
     private int bucket = -1;
 
-    private final int fileFlag;
-
     private final boolean firstFile;
     private final AtomicInteger number;
 
@@ -578,7 +571,6 @@ public class MyAnalyticDB implements AnalyticDB {
 
     public CpuThread(int index, int fileFlag) throws Exception {
       this.threadIndex = index;
-      this.fileFlag = fileFlag;
       firstFile = fileFlag == 1;
       fileChannel = firstFile ? FileChannel.open(file1.toPath(), StandardOpenOption.READ) :
               FileChannel.open(file2.toPath(), StandardOpenOption.READ);
@@ -594,7 +586,6 @@ public class MyAnalyticDB implements AnalyticDB {
     }
 
     public void run() {
-      long begin = System.currentTimeMillis();
       firstThreadCacheArr = new long[blockNum * cacheLength];
       firstCacheLengthArr = new short[blockNum];
       secondThreadCacheArr = new long[blockNum * secondCacheLength];
@@ -603,9 +594,7 @@ public class MyAnalyticDB implements AnalyticDB {
       address = ((DirectBuffer) byteBuffer).address();
       try {
         while (true) {
-//          long begin1 = System.currentTimeMillis();
           int dataLen = threadReadData();
-//          readFileTime.addAndGet(System.currentTimeMillis() - begin1);
 
           if (dataLen >= 0) {
             operate(dataLen);
@@ -644,8 +633,6 @@ public class MyAnalyticDB implements AnalyticDB {
         finishThreadNum1.incrementAndGet();
         e.printStackTrace();
       }
-      long cost = System.currentTimeMillis() - begin;
-      System.out.println(Thread.currentThread().getName() + " cost time : " + cost);
     }
 
 //    private void cpuThreadReInitForFile2() throws Exception {
